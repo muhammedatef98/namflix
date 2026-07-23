@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Namflix",
+    "slug": "namflix",
+    "scheme": "namflix",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0503",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0503"
+    },
+    "plugins": [
+      "expo-router",
+      "@react-native-community/datetimepicker",
+      "expo-font",
+      "expo-localization"
+    ],
+    "icon": "./assets/icon.png",
+    "ios": {
+      "bundleIdentifier": "com.namflix.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"],
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.namflix.app",
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0A0503"
+      }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8d8fa8e4-a5b2-47f2-97af-2032eeb69e2d"
+      }
+    },
+    "owner": "muhammedatef98",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/8d8fa8e4-a5b2-47f2-97af-2032eeb69e2d"
+    }
+  }
+}
