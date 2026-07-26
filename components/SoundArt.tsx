@@ -112,7 +112,7 @@ function Flash({ children }: { children: ReactNode }) {
   useEffect(() => {
     o.value = withRepeat(
       withSequence(
-        withTiming(0, { duration: 5200 }),
+        withTiming(0, { duration: 7500 }),
         withTiming(0.95, { duration: 90 }),
         withTiming(0.1, { duration: 160 }),
         withTiming(0.75, { duration: 90 }),
@@ -146,24 +146,31 @@ const Layer = ({ children }: { children: ReactNode }) => (
 
 // ── Scenes ───────────────────────────────────────────────────────────────────
 
-function RainDrops({ opacity = 0.55 }: { opacity?: number }) {
-  const drops = [12, 26, 40, 54, 68, 82, 20, 48, 76, 34, 62, 90];
+function RainDrops({ opacity = 0.55, len = 11, width = 0.8 }: { opacity?: number; len?: number; width?: number }) {
+  // Dense, thin, near-vertical streaks with a slight, consistent wind lean and
+  // scattered starts — reads like real falling rain rather than dashes. The two
+  // stacked tiles (off 0 / 130) keep the vertical scroll seamless.
+  const cols = [5, 13, 20, 28, 35, 43, 50, 58, 65, 73, 80, 88, 95];
   return (
     <Svg width="100%" height="100%" viewBox="0 0 100 260" preserveAspectRatio="xMidYMid slice">
       {[0, 130].map((off) =>
-        drops.map((x, i) => (
-          <Line
-            key={`${off}-${i}`}
-            x1={x}
-            y1={off + 8 + (i % 5) * 26}
-            x2={x - 4}
-            y2={off + 20 + (i % 5) * 26}
-            stroke={GLOW}
-            strokeWidth={1}
-            strokeLinecap="round"
-            opacity={opacity}
-          />
-        )),
+        cols.map((x, i) => {
+          const streak = len + (i % 3) * 5; // varied streak length = depth
+          const y = off + ((i * 37) % 122); // scattered so rows don't align
+          return (
+            <Line
+              key={`${off}-${i}`}
+              x1={x}
+              y1={y}
+              x2={x - 1.6}
+              y2={y + streak}
+              stroke={GLOW}
+              strokeWidth={width}
+              strokeLinecap="round"
+              opacity={opacity * (0.55 + (i % 4) * 0.15)}
+            />
+          );
+        }),
       )}
     </Svg>
   );
@@ -313,8 +320,10 @@ export function SoundArt({
       {type === 'rain' &&
         (anim ? (
           <>
-            <Fall duration={7000} height={h}><RainDrops /></Fall>
-            <Fall duration={9500} height={h}><RainDrops opacity={0.3} /></Fall>
+            {/* far, faint, thin, slow */}
+            <Fall duration={16000} height={h}><RainDrops opacity={0.3} len={8} width={0.6} /></Fall>
+            {/* near, brighter, longer streaks */}
+            <Fall duration={11000} height={h}><RainDrops opacity={0.6} len={14} width={0.9} /></Fall>
           </>
         ) : (
           <View style={StyleSheet.absoluteFill}><Layer>
@@ -325,7 +334,7 @@ export function SoundArt({
         ))}
 
       {type === 'waves' && (
-        <Sway duration={anim ? 12000 : 0} dx={anim ? 6 : 0} dy={2}>
+        <Sway duration={anim ? 18000 : 0} dx={anim ? 6 : 0} dy={2}>
           <Layer>
             <G stroke={A} fill="none" strokeWidth={1.4} strokeLinecap="round">
               {[70, 84, 98, 112].map((y, i) => (
@@ -338,13 +347,13 @@ export function SoundArt({
 
       {type === 'fire' && (
         <>
-          <Flicker duration={anim ? 2000 : 0} min={0.82} scale>
+          <Flicker duration={anim ? 3200 : 0} min={0.82} scale>
             <Layer>
               <Path d="M50 105 C30 95 38 78 50 58 C62 78 70 95 50 105 Z" fill={A2} opacity={0.8} />
               <Path d="M50 102 C38 95 44 82 50 68 C56 82 62 95 50 102 Z" fill={A} />
             </Layer>
           </Flicker>
-          <Flicker duration={anim ? 2600 : 0} min={0.65} scale>
+          <Flicker duration={anim ? 4200 : 0} min={0.65} scale>
             <Layer>
               <Path d="M50 98 C44 93 47 86 50 78 C53 86 56 93 50 98 Z" fill={GLOW} />
             </Layer>
@@ -353,7 +362,7 @@ export function SoundArt({
       )}
 
       {type === 'wind' && (
-        <Sway duration={anim ? 8500 : 0} dx={anim ? 7 : 0}>
+        <Sway duration={anim ? 13000 : 0} dx={anim ? 7 : 0}>
           <Layer>
             <G stroke={GLOW} fill="none" strokeWidth={1.4} strokeLinecap="round" opacity={0.5}>
               {[30, 52, 74].map((y, i) => (
@@ -368,7 +377,7 @@ export function SoundArt({
       {type === 'night' && (
         <>
           {[0, 1, 2].map((k) => (
-            <Flicker key={k} duration={anim ? 3400 + k * 1200 : 0} min={0.3} delay={k * 900}>
+            <Flicker key={k} duration={anim ? 5200 + k * 1600 : 0} min={0.3} delay={k * 1200}>
               <Layer>
                 {[[18, 24], [40, 16], [64, 28], [82, 20], [30, 40], [72, 46], [12, 54], [88, 60]]
                   .filter((_, i) => i % 3 === k)
@@ -390,7 +399,7 @@ export function SoundArt({
 
       {type === 'fan' && (
         <>
-          <Spin duration={anim ? 11000 : 0}>
+          <Spin duration={anim ? 17000 : 0}>
             <Layer>
               {[0, 120, 240].map((deg) => (
                 <Path
@@ -412,7 +421,7 @@ export function SoundArt({
       {type === 'thunder' && (
         <>
           {anim ? (
-            <Fall duration={7500} height={h}><RainDrops opacity={0.4} /></Fall>
+            <Fall duration={11000} height={h}><RainDrops opacity={0.4} len={12} /></Fall>
           ) : null}
           <Flash>
             <Layer>
@@ -433,8 +442,8 @@ export function SoundArt({
       {type === 'waterfall' &&
         (anim ? (
           <>
-            <Fall duration={4500} height={h}><FallStreaks /></Fall>
-            <Fall duration={6000} height={h}><FallStreaks /></Fall>
+            <Fall duration={7000} height={h}><FallStreaks /></Fall>
+            <Fall duration={9000} height={h}><FallStreaks /></Fall>
           </>
         ) : (
           <View style={StyleSheet.absoluteFill}><Layer>
@@ -447,15 +456,15 @@ export function SoundArt({
       {type === 'snow' &&
         (anim ? (
           <>
-            <Fall duration={17000} height={h}><SnowFlakes /></Fall>
             <Fall duration={24000} height={h}><SnowFlakes /></Fall>
+            <Fall duration={33000} height={h}><SnowFlakes /></Fall>
           </>
         ) : (
           <View style={StyleSheet.absoluteFill}><SnowFlakes /></View>
         ))}
 
       {type === 'train' && (
-        <Sway duration={anim ? 3000 : 0} dx={anim ? 1 : 0} dy={0.8}>
+        <Sway duration={anim ? 4600 : 0} dx={anim ? 1 : 0} dy={0.8}>
           <Layer>
             <Rect x="38" y="40" width="24" height="20" rx="4" fill={A} opacity={0.85} />
             <Rect x="43" y="45" width="6" height="6" rx="1" fill="#160A05" />
@@ -468,7 +477,7 @@ export function SoundArt({
       {type === 'forest' && (
         <>
           {[0, 1].map((k) => (
-            <Flicker key={k} duration={anim ? 3800 + k * 1400 : 0} min={0.12} delay={k * 1100}>
+            <Flicker key={k} duration={anim ? 5600 + k * 1800 : 0} min={0.12} delay={k * 1500}>
               <Layer>
                 {[[20, 44], [44, 38], [66, 48], [88, 34], [34, 56], [58, 30]]
                   .filter((_, i) => i % 2 === k)
@@ -483,7 +492,7 @@ export function SoundArt({
 
       {type === 'cat' && (
         <>
-          <Breathe duration={anim ? 5200 : 0}>
+          <Breathe duration={anim ? 6800 : 0}>
             <Layer>
               {/* curled sleeping cat */}
               <Ellipse cx="46" cy="94" rx="24" ry="14" fill="#1E0E06" />
@@ -497,7 +506,7 @@ export function SoundArt({
               <Path d="M27 89 q 3 2 6 0" stroke={GLOW} strokeWidth={1} fill="none" strokeLinecap="round" opacity={0.8} />
             </Layer>
           </Breathe>
-          <Sway duration={anim ? 6000 : 0} dx={0} dy={anim ? 1.5 : 0}>
+          <Sway duration={anim ? 8000 : 0} dx={0} dy={anim ? 1.5 : 0}>
             <Layer>
               {/* tail wrapped around, tip rising gently */}
               <Path d="M66 98 q 10 -2 8 -12 q -1 -6 -7 -6" stroke="#241109" strokeWidth={4.5} fill="none" strokeLinecap="round" />
@@ -508,12 +517,12 @@ export function SoundArt({
 
       {type === 'birds' && (
         <>
-          <Sway duration={anim ? 11000 : 0} dx={anim ? 9 : 0} dy={-2}>
+          <Sway duration={anim ? 16000 : 0} dx={anim ? 9 : 0} dy={-2}>
             <Layer>
               <Path d="M30 34 q 4 -5 8 0 q 4 -5 8 0" stroke="#241109" strokeWidth={1.8} fill="none" strokeLinecap="round" />
             </Layer>
           </Sway>
-          <Sway duration={anim ? 14000 : 0} dx={anim ? -11 : 0} dy={3}>
+          <Sway duration={anim ? 20000 : 0} dx={anim ? -11 : 0} dy={3}>
             <Layer>
               <Path d="M62 22 q 3 -4 6 0 q 3 -4 6 0" stroke="#241109" strokeWidth={1.5} fill="none" strokeLinecap="round" />
               <Path d="M14 52 q 3 -4 6 0 q 3 -4 6 0" stroke="#241109" strokeWidth={1.4} fill="none" strokeLinecap="round" opacity={0.8} />

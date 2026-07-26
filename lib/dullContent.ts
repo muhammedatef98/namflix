@@ -12,11 +12,24 @@
 
 import type { Lang, Localized } from '@/lib/i18n';
 
-export type DullRoute = '/shuffle' | '/count' | '/imagery' | '/paradox' | '/breathe' | '/worry';
+export type DullRoute =
+  | '/shuffle'
+  | '/count'
+  | '/imagery'
+  | '/paradox'
+  | '/breathe'
+  | '/worry'
+  | '/pmr'
+  | '/bodyscan'
+  | '/autogenic';
+
+/** Which family a technique belongs to, so the hub can group them. */
+export type DullCategory = 'mind' | 'body';
 
 export interface DullActivity {
   id: string;
   route: DullRoute;
+  category: DullCategory;
   title: Localized;
   subtitle: Localized;
   science: Localized;
@@ -29,6 +42,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-shuffle',
     route: '/shuffle',
+    category: 'mind',
     title: L('The Cognitive Shuffle', 'الخلط الذهني'),
     subtitle: L(
       'picture a stream of random, unconnected things',
@@ -46,6 +60,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-imagery',
     route: '/imagery',
+    category: 'mind',
     title: L('Imagery Distraction', 'التشتيت بالتخيّل'),
     subtitle: L(
       'wander through one calm, unremarkable place',
@@ -63,6 +78,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-paradox',
     route: '/paradox',
+    category: 'mind',
     title: L('Try to Stay Awake', 'حاوِل أن تبقى مستيقظًا'),
     subtitle: L(
       'the paradox that lowers the pressure to perform',
@@ -80,6 +96,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-count',
     route: '/count',
+    category: 'mind',
     title: L('The Descending Count', 'العدّ التنازلي'),
     subtitle: L('one slow, monotone number at a time', 'رقمٌ بطيء رتيب واحد في كل مرة'),
     science: L(
@@ -94,6 +111,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-breathe',
     route: '/breathe',
+    category: 'body',
     title: L('4 · 7 · 8 Breathing', 'تنفّس ٤ · ٧ · ٨'),
     subtitle: L('trace the constellation, slow the body', 'تتبَّع البُرج، وأبطئ جسدك'),
     science: L(
@@ -108,6 +126,7 @@ export const DULL_ACTIVITIES: DullActivity[] = [
   {
     id: 'act-worry',
     route: '/worry',
+    category: 'mind',
     title: L('Constructive Worry', 'القلق البنّاء'),
     subtitle: L('burn the thought before it circles', 'أحرِق الفكرة قبل أن تدور'),
     science: L(
@@ -117,6 +136,51 @@ export const DULL_ACTIVITIES: DullActivity[] = [
     basis: L(
       'Constructive / scheduled worry, a standard CBT-I technique with good clinical support for reducing bedtime rumination.',
       'القلق البنّاء / المجدوَل، أسلوب معتمد في العلاج المعرفي السلوكي للأرق، وله دعم سريري جيّد في تقليل الاجترار قبل النوم.',
+    ),
+  },
+  {
+    id: 'act-pmr',
+    route: '/pmr',
+    category: 'body',
+    title: L('Progressive Muscle Release', 'ترخية العضلات المتدرّجة'),
+    subtitle: L('tense, then let go — one muscle group at a time', 'شُدّ ثم أرخِ — مجموعة عضلية في كل مرة'),
+    science: L(
+      'You gently tense one muscle group, then release it, moving slowly through the body. Feeling the contrast teaches the body to drop physical tension, and the plodding, repetitive routine leaves no room for racing thoughts.',
+      'تشُدّ مجموعة عضلية بلطف ثم تُرخيها، متنقّلًا ببطء في الجسد كلّه. والإحساس بالفرق يُعلّم الجسد أن يتخلّى عن التوتّر الجسدي، والروتين البطيء المتكرّر لا يترك مجالًا للأفكار المتسارعة.',
+    ),
+    basis: L(
+      'Progressive muscle relaxation (Jacobson). A core relaxation component of CBT-I, with meta-analytic evidence for improving sleep onset — one of the strongest-evidenced techniques here.',
+      'ترخية العضلات المتدرّجة (جاكوبسون). مكوّن استرخاء أساسي في العلاج المعرفي السلوكي للأرق، وله دعم من التحليلات البَعدية في تحسين بدء النوم — من أقوى الأساليب هنا دليلًا.',
+    ),
+  },
+  {
+    id: 'act-bodyscan',
+    route: '/bodyscan',
+    category: 'body',
+    title: L('The Body Scan', 'مسح الجسد'),
+    subtitle: L('move attention slowly from head to toe', 'انقُل انتباهك ببطء من الرأس إلى القدم'),
+    science: L(
+      'You move your attention slowly through the body, part by part, simply noticing sensation without trying to change it. Anchoring attention in the body — instead of in thought — quiets mental arousal and gently narrows awareness toward sleep.',
+      'تنقُل انتباهك ببطء عبر الجسد، جزءًا جزءًا، ملاحظًا الإحساس فقط دون محاولة تغييره. وتثبيتُ الانتباه في الجسد — بدل الأفكار — يُهدّئ الاستثارة الذهنية ويُضيّق الوعي برفق نحو النوم.',
+    ),
+    basis: L(
+      'Mindfulness body scan (MBSR). Randomised trials and meta-analyses find mindfulness meditation reduces insomnia severity; the body scan is its most sleep-friendly practice.',
+      'مسح الجسد الذهني (اليقظة الذهنية MBSR). تجارب عشوائية وتحليلات بَعدية تجد أن تأمّل اليقظة الذهنية يقلّل شِدّة الأرق، ومسحُ الجسد أكثر ممارساتها ملاءمةً للنوم.',
+    ),
+  },
+  {
+    id: 'act-autogenic',
+    route: '/autogenic',
+    category: 'body',
+    title: L('Heavy & Warm', 'ثِقل ودفء'),
+    subtitle: L('repeat calm phrases of heaviness and warmth', 'كرّر عبارات هادئة عن الثِقل والدفء'),
+    science: L(
+      'You silently repeat simple phrases — "my arms are heavy, my arms are warm" — letting the sensations follow. The suggestions guide the body into the heavy, warm, settled state that precedes sleep, and the slow repetition itself is calming.',
+      'تُكرّر بصمت عبارات بسيطة — «ذراعاي ثقيلتان، ذراعاي دافئتان» — تاركًا الإحساس يتبعها. توجّه هذه الإيحاءات الجسدَ إلى الحالة الثقيلة الدافئة المستقرّة التي تسبق النوم، والتكرار البطيء نفسه مُهدّئ.',
+    ),
+    basis: L(
+      'Autogenic training (Schultz). A recognised relaxation method; systematic reviews report modest benefit for sleep and anxiety through lowering physiological arousal.',
+      'التدريب الذاتي (شولتز). طريقة استرخاء معترف بها؛ تُبلّغ المراجعات المنهجية عن فائدة متواضعة للنوم والقلق عبر خفض الاستثارة الفسيولوجية.',
     ),
   },
 ];

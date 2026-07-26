@@ -9,6 +9,9 @@ import { DullCard } from '@/components/DullCard';
 import { DULL_ACTIVITIES } from '@/lib/dullContent';
 import { useRecordTool } from '@/hooks/useRecordTool';
 
+const MIND = DULL_ACTIVITIES.filter((a) => a.category === 'mind');
+const BODY = DULL_ACTIVITIES.filter((a) => a.category === 'body');
+
 export default function BoringScreen() {
   useRecordTool('boring');
   const { t, isRTL } = useLocale();
@@ -22,8 +25,13 @@ export default function BoringScreen() {
           <Text style={[styles.title, isRTL && styles.textRTL]}>{t('boringTitle')}</Text>
           <Text style={[styles.sub, isRTL && styles.textRTL]}>{t('boringSub')}</Text>
 
-          <Text style={[styles.section, isRTL && styles.textRTL]}>{t('secActivities')}</Text>
-          {DULL_ACTIVITIES.map((item) => (
+          <Text style={[styles.section, isRTL && styles.textRTL]}>{t('secMind')}</Text>
+          {MIND.map((item) => (
+            <DullCard key={item.id} item={item} />
+          ))}
+
+          <Text style={[styles.section, isRTL && styles.textRTL]}>{t('secBody')}</Text>
+          {BODY.map((item) => (
             <DullCard key={item.id} item={item} />
           ))}
 

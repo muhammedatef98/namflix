@@ -1,25 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Text, View, Pressable, ScrollView, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BackButton } from '@/components/BackButton';
 import { StarField } from '@/components/StarField';
 import { SoundArt } from '@/components/SoundArt';
 import { NightPalette, FONT } from '@/constants/theme';
-import { SOUND_TRACKS, tracksForLang, type SoundTrack } from '@/lib/mediaLibrary';
+import { tracksForLang } from '@/lib/mediaLibrary';
+import { useMixer, MAX_LAYERS } from '@/contexts/MixerContext';
 import { useRecordTool } from '@/hooks/useRecordTool';
-
-const MAX_LAYERS = 3;
-const DEFAULT_VOLUME = 0.7;
-
-interface Layer {
-  track: SoundTrack;
-  volume: number;
-}
 
 // Curated starter blends — one tap to a known-good mix.
 const PRESETS: { id: string; labelKey: string; trackIds: string[] }[] = [
@@ -32,78 +24,13 @@ export default function MixerScreen() {
   useRecordTool('mixer');
   const { t, tc, lang, isRTL } = useLocale();
   const { accent } = useTheme();
-  const [layers, setLayers] = useState<Layer[]>([]);
-  const [playing, setPlaying] = useState(true);
+  // Mix state lives in MixerContext so it keeps playing across the app.
+  const { layers, playing, addLayer, removeLayer, setVolume, toggle, applyPreset } = useMixer();
   const [pickerOpen, setPickerOpen] = useState(false);
-  // Imperative players live outside React state; keyed by track id.
-  const playersRef = useRef<Map<string, AudioPlayer>>(new Map());
 
-  useEffect(() => {
-    setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(
-      () => undefined,
-    );
-    const players = playersRef.current;
-    return () => {
-      for (const p of players.values()) {
-        p.release();
-      }
-      players.clear();
-    };
-  }, []);
-
-  const addLayer = (track: SoundTrack) => {
-    if (layers.length >= MAX_LAYERS || layers.some((l) => l.track.id === track.id)) return;
-    const player = createAudioPlayer({ uri: track.audioUrl });
-    player.loop = true;
-    player.volume = DEFAULT_VOLUME;
-    if (playing) player.play();
-    playersRef.current.set(track.id, player);
-    setLayers((prev) => [...prev, { track, volume: DEFAULT_VOLUME }]);
+  const addAndClose = (track: Parameters<typeof addLayer>[0]) => {
+    addLayer(track);
     setPickerOpen(false);
-  };
-
-  const removeLayer = (trackId: string) => {
-    const player = playersRef.current.get(trackId);
-    if (player) {
-      player.release();
-      playersRef.current.delete(trackId);
-    }
-    setLayers((prev) => prev.filter((l) => l.track.id !== trackId));
-  };
-
-  const setVolume = (trackId: string, volume: number) => {
-    const player = playersRef.current.get(trackId);
-    if (player) player.volume = volume;
-    setLayers((prev) => prev.map((l) => (l.track.id === trackId ? { ...l, volume } : l)));
-  };
-
-  const togglePlay = () => {
-    const next = !playing;
-    setPlaying(next);
-    for (const p of playersRef.current.values()) {
-      if (next) p.play();
-      else p.pause();
-    }
-  };
-
-  const applyPreset = (trackIds: string[]) => {
-    for (const l of layers) removeLayer(l.track.id);
-    // removeLayer is async through state; rebuild directly from a clean slate.
-    for (const p of playersRef.current.values()) p.release();
-    playersRef.current.clear();
-    const picked = trackIds
-      .map((id) => SOUND_TRACKS.find((tr) => tr.id === id))
-      .filter((tr): tr is SoundTrack => tr !== undefined);
-    const fresh: Layer[] = picked.map((track) => {
-      const player = createAudioPlayer({ uri: track.audioUrl });
-      player.loop = true;
-      player.volume = DEFAULT_VOLUME;
-      player.play();
-      playersRef.current.set(track.id, player);
-      return { track, volume: DEFAULT_VOLUME };
-    });
-    setLayers(fresh);
-    setPlaying(true);
   };
 
   const available = tracksForLang(lang).filter(
@@ -169,11 +96,16 @@ export default function MixerScreen() {
           )}
 
           {pickerOpen && (
-            <View style={styles.picker}>
+            <ScrollView
+              style={styles.picker}
+              contentContainerStyle={styles.pickerContent}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+            >
               {available.map((tr) => (
                 <Pressable
                   key={tr.id}
-                  onPress={() => addLayer(tr)}
+                  onPress={() => addAndClose(tr)}
                   style={({ pressed }) => [styles.pickRow, isRTL && styles.rowRTL, pressed && styles.pressed]}
                 >
                   <View style={styles.pickThumb}>
@@ -184,13 +116,13 @@ export default function MixerScreen() {
                   </Text>
                 </Pressable>
               ))}
-            </View>
+            </ScrollView>
           )}
 
           {/* Transport */}
           {layers.length > 0 && (
             <Pressable
-              onPress={togglePlay}
+              onPress={toggle}
               style={({ pressed }) => [styles.playBtn, { backgroundColor: accent }, pressed && styles.pressed]}
             >
               <Text style={styles.playText}>{playing ? t('mixerPause') : t('mixerPlay')}</Text>
@@ -246,10 +178,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(140,42,18,0.3)',
     backgroundColor: 'rgba(20,10,5,0.7)',
-    padding: 8,
     marginBottom: 12,
     maxHeight: 340,
   },
+  pickerContent: { padding: 8 },
   pickRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 8, borderRadius: 10 },
   pickThumb: { width: 30, height: 30, borderRadius: 8, overflow: 'hidden' },
   pickName: { flex: 1, color: NightPalette.textPrimary, fontSize: 13, lineHeight: 20 },

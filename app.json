@@ -4,12 +4,11 @@
     "slug": "namflix",
     "scheme": "namflix",
     "version": "1.0.0",
+    "platforms": ["ios", "android"],
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0503",
     "splash": {
-      "image": "./assets/icon.png",
-      "resizeMode": "contain",
       "backgroundColor": "#0A0503"
     },
     "plugins": [

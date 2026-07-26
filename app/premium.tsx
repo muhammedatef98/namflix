@@ -11,19 +11,30 @@ import { StarField } from '@/components/StarField';
 import { Logo } from '@/components/Logo';
 import { NightPalette, FONT } from '@/constants/theme';
 
-// Prices are display-only until native In-App Purchase is wired at store level.
-const MONTHLY_PRICE = '$4.99';
-const YEARLY_PRICE = '$39.99';
-
 export default function PremiumScreen() {
   const router = useRouter();
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
-  const { plan, unlockLifetimeFree } = usePremium();
+  const { plan, config, unlockLifetimeFree } = usePremium();
+
+  // Prices and Lifetime behaviour come from the admin remote config.
+  const MONTHLY_PRICE = config.monthlyPrice;
+  const YEARLY_PRICE = config.yearlyPrice;
+  const lifetimeMode = config.lifetimeMode;
 
   const chooseFree = async () => {
     await unlockLifetimeFree();
     router.back();
+  };
+
+  // When the admin has switched Lifetime to paid but the App Store product
+  // isn't live yet, fall back to the "coming soon" notice instead of granting.
+  const chooseLifetime = async () => {
+    if (lifetimeMode === 'free') {
+      await chooseFree();
+      return;
+    }
+    Alert.alert(t('premiumTitle'), t('planPaidSoon'));
   };
 
   const choosePaid = async (plan: PaidPlan) => {
@@ -54,23 +65,29 @@ export default function PremiumScreen() {
             </View>
           )}
 
-          {/* Lifetime — the free launch offer (the hero) */}
-          <Pressable
-            onPress={chooseFree}
-            style={({ pressed }) => [styles.planCard, styles.heroCard, { borderColor: accent }, pressed && styles.pressed]}
-          >
-            <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-              <Text style={[styles.planName, isRTL && styles.rtl]}>{t('planLifetime')}</Text>
-              <View style={[styles.ribbon, { backgroundColor: accent }]}>
-                <Text style={styles.ribbonText}>{t('bestValue')}</Text>
+          {/* Lifetime — hero card. Free at launch; hidden when admin sets 'off'. */}
+          {lifetimeMode !== 'off' && (
+            <Pressable
+              onPress={chooseLifetime}
+              style={({ pressed }) => [styles.planCard, styles.heroCard, { borderColor: accent }, pressed && styles.pressed]}
+            >
+              <View style={[styles.planTop, isRTL && styles.rowRTL]}>
+                <Text style={[styles.planName, isRTL && styles.rtl]}>{t('planLifetime')}</Text>
+                <View style={[styles.ribbon, { backgroundColor: accent }]}>
+                  <Text style={styles.ribbonText}>{t('bestValue')}</Text>
+                </View>
               </View>
-            </View>
-            <Text style={[styles.freePrice, { color: accent }, isRTL && styles.rtl]}>{t('planLifetimeFree')}</Text>
-            <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planLifetimeNote')}</Text>
-            <View style={[styles.cta, { backgroundColor: accent }]}>
-              <Text style={styles.ctaText}>{t('planLifetimeCta')}</Text>
-            </View>
-          </Pressable>
+              {lifetimeMode === 'free' && (
+                <Text style={[styles.freePrice, { color: accent }, isRTL && styles.rtl]}>{t('planLifetimeFree')}</Text>
+              )}
+              <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planLifetimeNote')}</Text>
+              <View style={[styles.cta, { backgroundColor: accent }]}>
+                <Text style={styles.ctaText}>
+                  {lifetimeMode === 'free' ? t('planLifetimeCta') : t('planPaidCta')}
+                </Text>
+              </View>
+            </Pressable>
+          )}
 
           {/* Paid tiers — presented now, chargeable once IAP is added */}
           <Pressable onPress={() => choosePaid('yearly')} style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}>

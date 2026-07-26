@@ -3,6 +3,7 @@ import Svg, { Path, Rect } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { useLocale } from '@/contexts/LocaleContext';
 import { usePlayback } from '@/contexts/PlaybackContext';
+import { useMixer } from '@/contexts/MixerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { SoundArt } from '@/components/SoundArt';
 import { NightPalette, FONT } from '@/constants/theme';
@@ -18,7 +19,8 @@ export function MiniPlayer({ bottom }: { bottom: number }) {
   const { accent } = useTheme();
   const router = useRouter();
 
-  if (!track) return null;
+  // No single track loaded → fall back to the mixer bar (if a blend is on).
+  if (!track) return <MixBar bottom={bottom} />;
 
   return (
     <Pressable
@@ -47,6 +49,60 @@ export function MiniPlayer({ bottom }: { bottom: number }) {
         </Pressable>
 
         <Pressable onPress={stop} hitSlop={10} style={styles.stopBtn}>
+          <Svg width={13} height={13} viewBox="0 0 24 24">
+            <Path
+              d="M6 6 L18 18 M18 6 L6 18"
+              stroke={NightPalette.dimText}
+              strokeWidth={2.4}
+              strokeLinecap="round"
+            />
+          </Svg>
+        </Pressable>
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * The mixer's now-playing bar, shown when a blend is active but no single
+ * track is loaded. Tap → mixer screen; play/pause and a hard stop that clears
+ * every layer.
+ */
+function MixBar({ bottom }: { bottom: number }) {
+  const { layers, playing, hasMix, toggle, clear } = useMixer();
+  const { t, isRTL } = useLocale();
+  const { accent } = useTheme();
+  const router = useRouter();
+
+  if (!hasMix) return null;
+
+  return (
+    <Pressable
+      onPress={() => router.push('/mixer')}
+      style={({ pressed }) => [styles.bar, { bottom }, pressed && styles.pressed]}
+    >
+      <View style={[styles.row, isRTL && styles.rowRTL]}>
+        <View style={styles.thumb}>
+          <SoundArt type={layers[0].track.art} animated={false} />
+        </View>
+        <Text style={[styles.title, isRTL && styles.textRTL]} numberOfLines={1}>
+          {t('mixerTitle')} · {layers.length}
+        </Text>
+
+        <Pressable onPress={toggle} hitSlop={10} style={[styles.ctl, { backgroundColor: accent }]}>
+          <Svg width={16} height={16} viewBox="0 0 24 24">
+            {playing ? (
+              <>
+                <Rect x="6" y="5" width="4" height="14" rx="1.5" fill={NightPalette.voidBlack} />
+                <Rect x="14" y="5" width="4" height="14" rx="1.5" fill={NightPalette.voidBlack} />
+              </>
+            ) : (
+              <Path d="M8 5.5 L18 12 L8 18.5 Z" fill={NightPalette.voidBlack} />
+            )}
+          </Svg>
+        </Pressable>
+
+        <Pressable onPress={clear} hitSlop={10} style={styles.stopBtn}>
           <Svg width={13} height={13} viewBox="0 0 24 24">
             <Path
               d="M6 6 L18 18 M18 6 L6 18"

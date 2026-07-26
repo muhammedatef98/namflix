@@ -63,6 +63,8 @@ export const STRINGS = {
     ar: 'محتوًى مصمَّم كي يُنسى. فالعقل المتعب يبقى مستيقظًا لأنه يبقى مهتمًّا — وهنا لا شيء يستحق البقاء مستيقظًا لأجله.',
   },
   secActivities: { en: 'Wind-down activities', ar: 'أنشطة الاسترخاء' },
+  secMind: { en: 'Quiet the mind', ar: 'تهدئة العقل' },
+  secBody: { en: 'Settle the body', ar: 'تهدئة الجسد' },
   secStories: { en: 'Deliberately dull stories', ar: 'قصص مملّة عن قصد' },
   secWatch: { en: 'Slow, uneventful watching', ar: 'مشاهدة بطيئة بلا أحداث' },
   boringDisclaimer: {

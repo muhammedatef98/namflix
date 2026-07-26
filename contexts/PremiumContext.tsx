@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 
 const PLAN_KEY = 'namflix.plan';
 
@@ -17,6 +18,8 @@ type PremiumValue = {
   plan: Plan | null;
   isPremium: boolean;
   loading: boolean;
+  /** Admin-controlled remote config (lifetime mode + display prices). */
+  config: AppConfig;
   /** Grant the free lifetime plan (the launch offer). */
   unlockLifetimeFree: () => Promise<void>;
   /** Clear the entitlement (used on sign-out / testing). */
@@ -28,6 +31,7 @@ const PremiumContext = createContext<PremiumValue | null>(null);
 export function PremiumProvider({ children }: { children: ReactNode }) {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
 
   useEffect(() => {
     AsyncStorage.getItem(PLAN_KEY)
@@ -38,11 +42,17 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
+  // Pull the admin config once at launch; failures keep DEFAULT_CONFIG (free).
+  useEffect(() => {
+    fetchAppConfig().then(setConfig).catch(() => undefined);
+  }, []);
+
   const value = useMemo<PremiumValue>(
     () => ({
       plan,
       isPremium: plan != null,
       loading,
+      config,
       unlockLifetimeFree: async () => {
         setPlan('lifetime-free');
         await AsyncStorage.setItem(PLAN_KEY, 'lifetime-free').catch(() => undefined);
@@ -52,7 +62,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
         await AsyncStorage.removeItem(PLAN_KEY).catch(() => undefined);
       },
     }),
-    [plan, loading],
+    [plan, loading, config],
   );
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;

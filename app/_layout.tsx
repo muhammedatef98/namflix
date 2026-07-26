@@ -19,6 +19,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { PremiumProvider, usePremium } from '@/contexts/PremiumContext';
 import { FavoritesProvider } from '@/contexts/FavoritesContext';
 import { PlaybackProvider } from '@/contexts/PlaybackContext';
+import { MixerProvider } from '@/contexts/MixerContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { WarmthOverlay } from '@/components/WarmthOverlay';
 import { SplashLogo } from '@/components/SplashLogo';
@@ -105,10 +106,12 @@ function AppTree() {
           <PremiumProvider>
             <FavoritesProvider>
               <PlaybackProvider>
-                <StatusBar style="light" />
-                <RootNavigator />
-                <WarmthOverlay />
-                {!splashDone && <SplashLogo onDone={() => setSplashDone(true)} />}
+                <MixerProvider>
+                  <StatusBar style="light" />
+                  <RootNavigator />
+                  <WarmthOverlay />
+                  {!splashDone && <SplashLogo onDone={() => setSplashDone(true)} />}
+                </MixerProvider>
               </PlaybackProvider>
             </FavoritesProvider>
           </PremiumProvider>

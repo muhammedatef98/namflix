@@ -1,11 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withRepeat,
-  withDelay,
-  withSequence,
   withTiming,
   Easing,
 } from 'react-native-reanimated';
@@ -31,18 +28,28 @@ const STARS: [number, number, number][] = [
   [66, 90, 1.5], [4, 92, 1], [83, 96, 1], [30, 96, 1],
 ];
 
-// Each meteor: [startXpct, startYpct, travelAngleDeg, delayMs, restMs].
-// Angles are screen-space (y points down): ~150° = down-and-left (the classic
-// direction), ~28° = down-and-right. Long, irregular rests so a streak is a
-// rare, quiet surprise — never a loop you can feel.
-const METEORS: [number, number, number, number, number][] = [
-  [84, 5, 152, 2500, 15000],
-  [58, 2, 158, 9000, 24000],
-  [16, 12, 28, 19000, 20000],
-];
+// How many meteors can be streaking through the sky concurrently. Each one
+// re-randomises its start point and direction on every pass, so a streak can
+// appear anywhere on screen rather than from a few fixed spots.
+const METEOR_COUNT = 4;
 
 const TAIL_LEN = 118; // px — the visible streak length
 const STREAK_MS = 650; // real meteors cross in well under a second
+
+const rand = (min: number, max: number) => min + Math.random() * (max - min);
+
+// A fresh, random spawn: any point on screen, streaking on a downward diagonal
+// (down-left or down-right — the natural look), after a long irregular rest.
+function randomPass() {
+  const goRight = Math.random() < 0.5;
+  return {
+    startX: rand(5, 95),
+    startY: rand(2, 65),
+    // down-right ≈ 20–55°, down-left ≈ 125–160° (screen space, y points down)
+    angle: goRight ? rand(20, 55) : rand(125, 160),
+    rest: rand(6000, 22000),
+  };
+}
 
 /**
  * One realistic shooting star: a bright point (head) leading a tail that
@@ -50,44 +57,39 @@ const STREAK_MS = 650; // real meteors cross in well under a second
  * along its travel angle, brightening then fading, then rests dark for a long,
  * irregular gap before the next pass.
  */
-function Meteor({
-  startX,
-  startY,
-  angle,
-  delay,
-  rest,
-}: {
-  startX: number;
-  startY: number;
-  angle: number;
-  delay: number;
-  rest: number;
-}) {
+function Meteor({ initialDelay }: { initialDelay: number }) {
   const { width } = useWindowDimensions();
   const p = useSharedValue(0);
-  const rad = (angle * Math.PI) / 180;
+  const [pass, setPass] = useState(randomPass);
+
+  const rad = (pass.angle * Math.PI) / 180;
   const dist = width * 0.8;
   const dx = Math.cos(rad) * dist;
   const dy = Math.sin(rad) * dist;
 
+  // Self-scheduling loop: streak once, rest in the dark, then re-randomise the
+  // spawn and go again — so no two passes share a place or a direction.
   useEffect(() => {
-    p.value = 0;
-    p.value = withDelay(
-      delay,
-      withRepeat(
-        withSequence(
-          // the streak — fast, slight deceleration as it burns out
-          withTiming(1, { duration: STREAK_MS, easing: Easing.out(Easing.quad) }),
-          // hold at the end (invisible) through the long dark rest
-          withTiming(1, { duration: rest }),
-          // reset instantly for the next pass
-          withTiming(0, { duration: 0 }),
-        ),
-        -1,
-        false,
-      ),
-    );
-  }, [delay, rest, p]);
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const run = () => {
+      if (!alive) return;
+      p.value = 0;
+      p.value = withTiming(1, { duration: STREAK_MS, easing: Easing.out(Easing.quad) });
+      timer = setTimeout(() => {
+        if (!alive) return;
+        setPass(randomPass()); // fresh place + angle for the next pass
+      }, STREAK_MS + pass.rest);
+    };
+
+    timer = setTimeout(run, initialDelay);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+    // Re-run whenever a new random pass is set.
+  }, [pass, initialDelay, p]);
 
   const style = useAnimatedStyle(() => {
     'worklet';
@@ -104,7 +106,7 @@ function Meteor({
       transform: [
         { translateX: t * dx },
         { translateY: t * dy },
-        { rotate: `${angle}deg` },
+        { rotate: `${pass.angle}deg` },
       ],
     };
   });
@@ -112,7 +114,7 @@ function Meteor({
   return (
     <Animated.View
       pointerEvents="none"
-      style={[styles.meteor, { left: `${startX}%`, top: `${startY}%` }, style]}
+      style={[styles.meteor, { left: `${pass.startX}%`, top: `${pass.startY}%` }, style]}
     >
       <Svg width={TAIL_LEN} height={12} viewBox={`0 0 ${TAIL_LEN} 12`}>
         <Defs>
@@ -154,8 +156,8 @@ export function StarField({ opacity = 0.5 }: { opacity?: number }) {
           }}
         />
       ))}
-      {METEORS.map(([x, y, a, d, rest], i) => (
-        <Meteor key={i} startX={x} startY={y} angle={a} delay={d} rest={rest} />
+      {Array.from({ length: METEOR_COUNT }).map((_, i) => (
+        <Meteor key={i} initialDelay={2000 + i * 4000 + Math.random() * 3000} />
       ))}
     </View>
   );
