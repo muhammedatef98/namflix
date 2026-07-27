@@ -48,30 +48,47 @@ const roundMask = (w, h, r) => Buffer.from(
 
 async function makeSlide({ raw, headline, sub, rtl, out }) {
   const meta = await sharp(raw).metadata();
-  const devW = 1004;
+  const devW = 986;
   const devH = Math.round(devW * (meta.height / meta.width));
-  const screenR = 92; // iPhone-like corner rounding on the capture
+  const screenR = 96; // iPhone corner rounding on the capture
 
   const screen = await sharp(raw)
     .resize(devW, devH)
     .composite([{ input: roundMask(devW, devH, screenR), blend: 'dest-in' }])
     .png().toBuffer();
 
-  // clean iPhone frame: thin near-black bezel, no camera cutout (Dynamic Island is in the capture)
-  const bez = 16;
-  const fw = devW + bez * 2, fh = devH + bez * 2, fr = screenR + bez;
+  // Realistic iPhone body: titanium rim + black bezel + side buttons.
+  const RIM = 7, BLACK = 16, BTN = 8;
+  const bodyW = devW + (RIM + BLACK) * 2, bodyH = devH + (RIM + BLACK) * 2;
+  const bodyR = screenR + RIM + BLACK;
+  const fw = bodyW + BTN * 2, fh = bodyH;
+  const bx = BTN;                        // body left edge inside frame buffer
+  const sLeft = bx + RIM + BLACK, sTop = RIM + BLACK;
+  const leftX = bx - 3, rightX = bx + bodyW - BTN - 2, bw = BTN + 5;
+  const btn = (x, y, h) => `<rect x="${x}" y="${y.toFixed(0)}" width="${bw}" height="${h}" rx="4" ry="4" fill="url(#rail)"/>`;
   const frame = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}">
-       <rect width="${fw}" height="${fh}" rx="${fr}" ry="${fr}" fill="#0a0a0c"/>
-       <rect x="1.5" y="1.5" width="${fw - 3}" height="${fh - 3}" rx="${fr - 1}" ry="${fr - 1}"
-             fill="none" stroke="#2a2a2e" stroke-width="1.5"/>
+       <defs>
+         <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
+           <stop offset="0" stop-color="#52525a"/><stop offset="0.5" stop-color="#18181c"/><stop offset="1" stop-color="#42424a"/>
+         </linearGradient>
+         <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
+           <stop offset="0" stop-color="#5a5a62"/><stop offset="1" stop-color="#2a2a30"/>
+         </linearGradient>
+       </defs>
+       ${btn(leftX, bodyH * 0.15, 54)}
+       ${btn(leftX, bodyH * 0.235, 92)}
+       ${btn(leftX, bodyH * 0.345, 92)}
+       ${btn(rightX, bodyH * 0.215, 150)}
+       <rect x="${bx}" y="0" width="${bodyW}" height="${bodyH}" rx="${bodyR}" ry="${bodyR}" fill="url(#metal)"/>
+       <rect x="${bx + RIM}" y="${RIM}" width="${bodyW - RIM * 2}" height="${bodyH - RIM * 2}" rx="${bodyR - RIM}" ry="${bodyR - RIM}" fill="#0a0a0c"/>
      </svg>`);
 
-  const fx = Math.round((W - fw) / 2), fyTop = 560;
+  const fx = Math.round((W - fw) / 2), fyTop = 500;
   await sharp(Buffer.from(bgSvg(headline, sub, rtl)))
     .composite([
       { input: frame, left: fx, top: fyTop },
-      { input: screen, left: fx + bez, top: fyTop + bez },
+      { input: screen, left: fx + sLeft, top: fyTop + sTop },
     ])
     .png().toFile(out);
 }
