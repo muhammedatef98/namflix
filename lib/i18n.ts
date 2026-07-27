@@ -470,6 +470,14 @@ export const STRINGS = {
   premiumEntry: { en: 'Unlock everything — free for launch', ar: 'افتح كل المزايا — مجانًا مع الإطلاق' },
   premiumBadge: { en: 'PREMIUM', ar: 'بريميوم' },
   bestValue: { en: 'BEST VALUE', ar: 'الأفضل قيمة' },
+  restorePurchases: { en: 'Restore purchases', ar: 'استرجاع المشتريات' },
+  termsOfUse: { en: 'Terms of Use', ar: 'شروط الاستخدام' },
+  subDisclosure: {
+    en: 'Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Manage or cancel anytime in your App Store account settings.',
+    ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا ما لم يُلغَ قبل ٢٤ ساعة على الأقل من نهاية المدة. يمكنك الإدارة أو الإلغاء في أي وقت من إعدادات حساب App Store.',
+  },
+  restoreNone: { en: 'No previous purchase found.', ar: 'لم نجد أي عملية شراء سابقة.' },
+  purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'تعذّر إتمام الشراء. من فضلك حاول مرة أخرى.' },
 
   // descent rationale
   descentWhy: { en: 'Why this path', ar: 'لماذا هذا المسار' },

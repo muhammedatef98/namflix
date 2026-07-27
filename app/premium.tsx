@@ -1,34 +1,38 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePremium } from '@/contexts/PremiumContext';
-import { buyPlan, type PaidPlan } from '@/lib/purchases';
+import { type PaidPlan } from '@/lib/purchases';
 import { BackButton } from '@/components/BackButton';
 import { StarField } from '@/components/StarField';
 import { Logo } from '@/components/Logo';
 import { NightPalette, FONT } from '@/constants/theme';
 
+// Apple's standard EULA — satisfies the Terms-of-Use link that auto-renewable
+// subscriptions must show (Guideline 3.1.2).
+const EULA_URL = 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+
 export default function PremiumScreen() {
   const router = useRouter();
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
-  const { plan, config, unlockLifetimeFree } = usePremium();
+  const { plan, config, purchasablePlans, unlockLifetimeFree, purchase, restore } = usePremium();
 
-  // Prices and Lifetime behaviour come from the admin remote config.
-  const MONTHLY_PRICE = config.monthlyPrice;
-  const YEARLY_PRICE = config.yearlyPrice;
   const lifetimeMode = config.lifetimeMode;
+  // Paid cards are driven entirely by what the store actually offers, so a
+  // price is never shown without a working purchase behind it.
+  const hasPaid = purchasablePlans.length > 0;
+  const perLabel = (p: PaidPlan) => (p === 'yearly' ? t('perYear') : t('perMonth'));
+  const nameLabel = (p: PaidPlan) => (p === 'yearly' ? t('planYearly') : t('planMonthly'));
 
   const chooseFree = async () => {
     await unlockLifetimeFree();
     router.back();
   };
 
-  // When the admin has switched Lifetime to paid but the App Store product
-  // isn't live yet, fall back to the "coming soon" notice instead of granting.
   const chooseLifetime = async () => {
     if (lifetimeMode === 'free') {
       await chooseFree();
@@ -37,14 +41,23 @@ export default function PremiumScreen() {
     Alert.alert(t('premiumTitle'), t('planPaidSoon'));
   };
 
-  const choosePaid = async (plan: PaidPlan) => {
-    const res = await buyPlan(plan);
+  const choosePaid = async (paid: PaidPlan) => {
+    const res = await purchase(paid);
     if (res.ok) {
       router.back();
       return;
     }
-    // No native IAP yet — steer them to the free Lifetime offer for now.
-    Alert.alert(t('premiumTitle'), t('planPaidSoon'));
+    if (res.reason === 'cancelled') return; // user backed out — stay quiet
+    Alert.alert(t('premiumTitle'), t('purchaseFailed'));
+  };
+
+  const onRestore = async () => {
+    const res = await restore();
+    if (res.ok) {
+      router.back();
+      return;
+    }
+    Alert.alert(t('premiumTitle'), t('restoreNone'));
   };
 
   return (
@@ -89,33 +102,48 @@ export default function PremiumScreen() {
             </Pressable>
           )}
 
-          {/* Paid tiers — presented now, chargeable once IAP is added */}
-          <Pressable onPress={() => choosePaid('yearly')} style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}>
-            <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-              <Text style={[styles.planName, isRTL && styles.rtl]}>{t('planYearly')}</Text>
-              <Text style={[styles.priceRow, isRTL && styles.rtl]}>
-                <Text style={styles.price}>{YEARLY_PRICE}</Text>
-                <Text style={styles.per}> {t('perYear')}</Text>
-              </Text>
-            </View>
-            <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planYearlyNote')}</Text>
-            <View style={styles.ctaGhost}>
-              <Text style={[styles.ctaGhostText, { color: accent }]}>{t('planPaidCta')}</Text>
-            </View>
-          </Pressable>
+          {/* Paid App Store tiers — only rendered for plans the store actually
+              sells, always with the real StoreKit price. */}
+          {purchasablePlans.map(({ plan: paid, priceString }) => (
+            <Pressable
+              key={paid}
+              onPress={() => choosePaid(paid)}
+              style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}
+            >
+              <View style={[styles.planTop, isRTL && styles.rowRTL]}>
+                <Text style={[styles.planName, isRTL && styles.rtl]}>{nameLabel(paid)}</Text>
+                <Text style={[styles.priceRow, isRTL && styles.rtl]}>
+                  <Text style={styles.price}>{priceString}</Text>
+                  <Text style={styles.per}> {perLabel(paid)}</Text>
+                </Text>
+              </View>
+              {paid === 'yearly' && (
+                <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planYearlyNote')}</Text>
+              )}
+              <View style={styles.ctaGhost}>
+                <Text style={[styles.ctaGhostText, { color: accent }]}>{t('planPaidCta')}</Text>
+              </View>
+            </Pressable>
+          ))}
 
-          <Pressable onPress={() => choosePaid('monthly')} style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}>
-            <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-              <Text style={[styles.planName, isRTL && styles.rtl]}>{t('planMonthly')}</Text>
-              <Text style={[styles.priceRow, isRTL && styles.rtl]}>
-                <Text style={styles.price}>{MONTHLY_PRICE}</Text>
-                <Text style={styles.per}> {t('perMonth')}</Text>
-              </Text>
-            </View>
-            <View style={styles.ctaGhost}>
-              <Text style={[styles.ctaGhostText, { color: accent }]}>{t('planPaidCta')}</Text>
-            </View>
+          {/* Auto-renew disclosure — required next to subscription purchases. */}
+          {hasPaid && (
+            <Text style={[styles.disclosure, isRTL && styles.rtl]}>{t('subDisclosure')}</Text>
+          )}
+
+          {/* Restore + legal links (Apple requires restore + Terms + Privacy). */}
+          <Pressable onPress={onRestore} hitSlop={8} style={styles.restoreBtn}>
+            <Text style={[styles.restoreText, { color: accent }]}>{t('restorePurchases')}</Text>
           </Pressable>
+          <View style={styles.legalRow}>
+            <Pressable onPress={() => Linking.openURL(EULA_URL)} hitSlop={8}>
+              <Text style={styles.legalLink}>{t('termsOfUse')}</Text>
+            </Pressable>
+            <Text style={styles.legalDot}>·</Text>
+            <Pressable onPress={() => router.push('/privacy')} hitSlop={8}>
+              <Text style={styles.legalLink}>{t('privacyLink')}</Text>
+            </Pressable>
+          </View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -170,4 +198,17 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(140,42,18,0.4)',
   },
   ctaGhostText: { fontSize: 14, fontFamily: FONT.medium, lineHeight: 20 },
+
+  disclosure: {
+    color: NightPalette.dimText,
+    fontSize: 11,
+    lineHeight: 17,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  restoreBtn: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
+  restoreText: { fontSize: 14, fontFamily: FONT.medium, lineHeight: 20 },
+  legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 2 },
+  legalLink: { color: NightPalette.dimText, fontSize: 12, lineHeight: 18, textDecorationLine: 'underline' },
+  legalDot: { color: NightPalette.dimText, fontSize: 12 },
 });
