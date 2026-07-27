@@ -43,50 +43,65 @@ function bgSvg(headline, sub, rtl) {
   </svg>`;
 }
 
-const roundMask = (w, h, r) => Buffer.from(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${r}" ry="${r}" fill="#fff"/></svg>`);
+const APPLE_MASK = __dirname + '/ios17pm-mask.png'; // Apple's exact iPhone 17 Pro Max screen-corner shape
+const MASK_W = 1320, MASK_H = 2868;
 
 async function makeSlide({ raw, headline, sub, rtl, out }) {
-  const meta = await sharp(raw).metadata();
-  const devW = 986;
-  const devH = Math.round(devW * (meta.height / meta.width));
-  const screenR = 96; // iPhone corner rounding on the capture
+  const devW = 940;
+  const devH = Math.round(devW * (MASK_H / MASK_W)); // match Apple screen aspect
+  const screenR = Math.round(devW * 0.141);          // Apple corner radius at this scale
 
+  // round the capture with Apple's real corner shape
+  const mask = await sharp(APPLE_MASK).resize(devW, devH).ensureAlpha().toBuffer();
   const screen = await sharp(raw)
     .resize(devW, devH)
-    .composite([{ input: roundMask(devW, devH, screenR), blend: 'dest-in' }])
+    .composite([{ input: mask, blend: 'dest-in' }])
     .png().toBuffer();
 
-  // Realistic iPhone body: titanium rim + black bezel + side buttons.
-  const RIM = 7, BLACK = 16, BTN = 8;
-  const bodyW = devW + (RIM + BLACK) * 2, bodyH = devH + (RIM + BLACK) * 2;
-  const bodyR = screenR + RIM + BLACK;
-  const fw = bodyW + BTN * 2, fh = bodyH;
-  const bx = BTN;                        // body left edge inside frame buffer
-  const sLeft = bx + RIM + BLACK, sTop = RIM + BLACK;
-  const leftX = bx - 3, rightX = bx + bodyW - BTN - 2, bw = BTN + 5;
-  const btn = (x, y, h) => `<rect x="${x}" y="${y.toFixed(0)}" width="${bw}" height="${h}" rx="4" ry="4" fill="url(#rail)"/>`;
+  // iPhone 17 Pro Max titanium body: thin black bezel + brushed titanium rail + side buttons
+  const BLK = 16, RAIL = 15, BTN = 7;
+  const bodyW = devW + (BLK + RAIL) * 2, bodyH = devH + (BLK + RAIL) * 2;
+  const bodyR = screenR + BLK + RAIL;
+  const fw = bodyW + BTN * 2, fh = bodyH + 4;
+  const bx = BTN, by = 0;
+  const sLeft = bx + BLK + RAIL, sTop = by + BLK + RAIL;
+
+  const lX = bx - 4, rX = bx + bodyW - BTN + 1, bwid = BTN + 6;
+  const btn = (x, y, h) => `<rect x="${x}" y="${(by + bodyH * y).toFixed(0)}" width="${bwid}" height="${h}" rx="3.5" fill="url(#rail)"/>`;
+
   const frame = Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}">
        <defs>
-         <linearGradient id="metal" x1="0" y1="0" x2="1" y2="0">
-           <stop offset="0" stop-color="#52525a"/><stop offset="0.5" stop-color="#18181c"/><stop offset="1" stop-color="#42424a"/>
+         <linearGradient id="ti" x1="0" y1="0" x2="1" y2="0">
+           <stop offset="0" stop-color="#6f6f77"/><stop offset="0.10" stop-color="#3a3a40"/>
+           <stop offset="0.5" stop-color="#26262b"/><stop offset="0.90" stop-color="#3a3a40"/>
+           <stop offset="1" stop-color="#6f6f77"/>
          </linearGradient>
          <linearGradient id="rail" x1="0" y1="0" x2="1" y2="0">
-           <stop offset="0" stop-color="#5a5a62"/><stop offset="1" stop-color="#2a2a30"/>
+           <stop offset="0" stop-color="#7a7a82"/><stop offset="1" stop-color="#2c2c31"/>
          </linearGradient>
        </defs>
-       ${btn(leftX, bodyH * 0.15, 54)}
-       ${btn(leftX, bodyH * 0.235, 92)}
-       ${btn(leftX, bodyH * 0.345, 92)}
-       ${btn(rightX, bodyH * 0.215, 150)}
-       <rect x="${bx}" y="0" width="${bodyW}" height="${bodyH}" rx="${bodyR}" ry="${bodyR}" fill="url(#metal)"/>
-       <rect x="${bx + RIM}" y="${RIM}" width="${bodyW - RIM * 2}" height="${bodyH - RIM * 2}" rx="${bodyR - RIM}" ry="${bodyR - RIM}" fill="#0a0a0c"/>
+       <!-- side buttons: Action + Volume up/down (left), Side + Camera Control (right) -->
+       ${btn(lX, 0.150, 46)}
+       ${btn(lX, 0.235, 92)}
+       ${btn(lX, 0.345, 92)}
+       ${btn(rX, 0.205, 118)}
+       ${btn(rX, 0.360, 66)}
+       <!-- titanium body -->
+       <rect x="${bx}" y="${by}" width="${bodyW}" height="${bodyH}" rx="${bodyR}" fill="url(#ti)"/>
+       <!-- inner black bezel -->
+       <rect x="${bx + RAIL}" y="${by + RAIL}" width="${bodyW - RAIL * 2}" height="${bodyH - RAIL * 2}" rx="${bodyR - RAIL}" fill="#060607"/>
      </svg>`);
+
+  // soft contact shadow under the device
+  const shadow = await sharp(Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}"><rect x="10" y="24" width="${fw - 20}" height="${fh - 20}" rx="${bodyR}" fill="#000"/></svg>`))
+    .blur(38).png().toBuffer();
 
   const fx = Math.round((W - fw) / 2), fyTop = 500;
   await sharp(Buffer.from(bgSvg(headline, sub, rtl)))
     .composite([
+      { input: shadow, left: fx, top: fyTop + 8, opacity: 0.55 },
       { input: frame, left: fx, top: fyTop },
       { input: screen, left: fx + sLeft, top: fyTop + sTop },
     ])
