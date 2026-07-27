@@ -11,7 +11,7 @@
  * free Lifetime offer with NO paid buttons — so Apple never sees a price with
  * no working purchase behind it (Guideline 2.1 / 3.1.2).
  *
- * ── ACTIVATION (once, to start charging) ─────────────────────────────────────
+ * ── ACTIVATION — iOS (once, to start charging) ───────────────────────────────
  *   1. RevenueCat: create the project + iOS app, copy the PUBLIC iOS API key
  *      into .env  →  EXPO_PUBLIC_REVENUECAT_IOS_KEY=appl_xxx
  *   2. App Store Connect → create auto-renewable subscriptions in ONE group:
@@ -21,8 +21,21 @@
  *      packages point at the two products above.
  *   4. Sign the Paid Applications Agreement + banking/tax in App Store Connect.
  *   5. New EAS build, submit WITH the IAP products for review.
+ *
+ * ── ACTIVATION — Android (Google Play) ───────────────────────────────────────
+ *   1. Google Play Console → create the two subscriptions with the SAME ids
+ *      (namflix.premium.monthly / .yearly). Product ids are shared across
+ *      stores in RevenueCat's offering, so reuse them.
+ *   2. RevenueCat: add a Play Store app to the same project, connect it with a
+ *      Google Play service-account credential, and attach BOTH products to the
+ *      existing "premium" entitlement + "default" offering.
+ *   3. Copy the PUBLIC Android API key (starts goog_) into .env  →
+ *        EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=goog_xxx
+ *   4. EAS build (android) + `eas submit --platform android`.
  * ─────────────────────────────────────────────────────────────────────────────
  */
+
+import { Platform } from 'react-native';
 
 export type PaidPlan = 'monthly' | 'yearly';
 
@@ -66,9 +79,20 @@ export function isIapReady(): boolean {
   return ready;
 }
 
+/**
+ * The public RevenueCat API key for the platform we're running on.
+ * iOS keys start `appl_`, Android (Google Play) keys start `goog_`. Each store
+ * needs its own key; using the wrong one makes `configure()` silently useless.
+ */
+function platformApiKey(): string | undefined {
+  return Platform.OS === 'android'
+    ? process.env.EXPO_PUBLIC_REVENUECAT_ANDROID_KEY
+    : process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY;
+}
+
 /** Initialise the store SDK. No-ops safely when key or native module is absent. */
 export async function configurePurchases(): Promise<boolean> {
-  const key = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY;
+  const key = platformApiKey();
   if (!key) return false;
   const sdk = loadSdk();
   if (!sdk) return false;
