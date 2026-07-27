@@ -1,117 +1,138 @@
 /**
  * Namflix — Google Play phone screenshots generator.
- * Brand-styled "ad" screenshots: warm dark gradient + Tajawal Arabic headline
- * + the real app screen inside a rounded device card. Output 1080x1920 (9:16).
+ * Brand-styled "ad" screenshots on a MODERN ANDROID phone frame (thin bezel +
+ * centered hole-punch, no iOS status bar). Tajawal headlines. 1080x1920 (9:16).
+ * Produces both English (en) and Arabic (ar) localized sets.
  */
 const sharp = require('sharp');
-const path = require('path');
+const fs = require('fs');
 
 const RAW = '/Users/mohamed/Desktop/namflix/namflix-app/store/screens-raw';
-const OUT = '/Users/mohamed/Desktop/namflix/namflix-app/store/android/screenshots/phone';
+const OUTBASE = '/Users/mohamed/Desktop/namflix/namflix-app/store/android/screenshots/phone';
 const W = 1080, H = 1920;
+const IOS_BAR = 182; // px of iOS status bar to crop off the top of each capture
 
-// escape XML for text
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// deterministic-ish scattered stars
 function stars(n) {
-  let s = '';
-  let seed = 7;
+  let s = '', seed = 7;
   const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
   for (let i = 0; i < n; i++) {
-    const x = Math.round(rnd() * W);
-    const y = Math.round(rnd() * H * 0.72);
-    const r = rnd() * 1.6 + 0.4;
-    const o = rnd() * 0.35 + 0.08;
-    s += `<circle cx="${x}" cy="${y}" r="${r.toFixed(1)}" fill="#F2C9A6" opacity="${o.toFixed(2)}"/>`;
+    const x = Math.round(rnd() * W), y = Math.round(rnd() * H * 0.7);
+    const r = (rnd() * 1.6 + 0.4).toFixed(1), o = (rnd() * 0.32 + 0.08).toFixed(2);
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#F2C9A6" opacity="${o}"/>`;
   }
   return s;
 }
 
-function bgSvg(headline, sub) {
+function bgSvg(headline, sub, rtl) {
+  const dir = rtl ? ' direction="rtl"' : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="0.3" y2="1">
-        <stop offset="0" stop-color="#241109"/>
-        <stop offset="0.5" stop-color="#140a05"/>
-        <stop offset="1" stop-color="#070301"/>
+        <stop offset="0" stop-color="#241109"/><stop offset="0.5" stop-color="#140a05"/><stop offset="1" stop-color="#070301"/>
       </linearGradient>
-      <radialGradient id="glow" cx="50%" cy="60%" r="55%">
-        <stop offset="0" stop-color="#C24E1A" stop-opacity="0.30"/>
-        <stop offset="1" stop-color="#C24E1A" stop-opacity="0"/>
+      <radialGradient id="glow" cx="50%" cy="58%" r="55%">
+        <stop offset="0" stop-color="#C24E1A" stop-opacity="0.30"/><stop offset="1" stop-color="#C24E1A" stop-opacity="0"/>
       </radialGradient>
     </defs>
     <rect width="${W}" height="${H}" fill="url(#bg)"/>
     ${stars(90)}
     <rect width="${W}" height="${H}" fill="url(#glow)"/>
-    <text x="${W / 2}" y="235" text-anchor="middle" direction="rtl"
-      font-family="Tajawal" font-weight="700" font-size="82" fill="#F5E9DC"
-      letter-spacing="0.5">${esc(headline)}</text>
-    <text x="${W / 2}" y="320" text-anchor="middle" direction="rtl"
-      font-family="Tajawal" font-weight="500" font-size="40" fill="#E0A06A"
-      opacity="0.95">${esc(sub)}</text>
+    <text x="${W / 2}" y="232" text-anchor="middle"${dir} font-family="Tajawal" font-weight="700" font-size="80" fill="#F5E9DC" letter-spacing="0.4">${esc(headline)}</text>
+    <text x="${W / 2}" y="316" text-anchor="middle"${dir} font-family="Tajawal" font-weight="500" font-size="39" fill="#E0A06A" opacity="0.95">${esc(sub)}</text>
   </svg>`;
 }
 
-// rounded-corner mask for the device screen
-function roundedMask(w, h, r) {
-  return Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect x="0" y="0" width="${w}" height="${h}" rx="${r}" ry="${r}" fill="#fff"/></svg>`
-  );
+const roundMask = (w, h, r) => Buffer.from(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${r}" ry="${r}" fill="#fff"/></svg>`);
+
+const STRIP = 120; // px of app-bg added above the content so the camera sits clear of UI
+
+async function topBg(buf) {
+  const s = await sharp(buf)
+    .extract({ left: Math.round((await sharp(buf).metadata()).width / 2) - 20, top: 3, width: 40, height: 8 })
+    .stats();
+  const [r, g, b] = s.channels.map((c) => Math.round(c.mean));
+  return { r, g, b };
 }
 
-async function makeSlide({ raw, headline, sub, out }) {
-  const bg = Buffer.from(bgSvg(headline, sub));
-
-  // device screen: fixed display width, bleeds off the bottom
-  const devW = 792;
+async function makeSlide({ raw, headline, sub, rtl, out }) {
   const meta = await sharp(raw).metadata();
-  const devH = Math.round(devW * (meta.height / meta.width));
-  const radius = 56;
-
-  const screen = await sharp(raw)
-    .resize(devW, devH)
-    .composite([{ input: roundedMask(devW, devH, radius), blend: 'dest-in' }])
-    .png()
+  // crop off the iOS status bar
+  const noBar = await sharp(raw)
+    .extract({ left: 0, top: IOS_BAR, width: meta.width, height: meta.height - IOS_BAR })
     .toBuffer();
+  // add a top strip of the app's own background so the hole-punch camera sits in empty space
+  const bg = await topBg(noBar);
+  const cropped = await sharp(noBar)
+    .extend({ top: STRIP, background: bg })
+    .toBuffer();
+  const cm = await sharp(cropped).metadata();
 
-  // bezel: slightly larger dark rounded rect behind the screen
-  const bezelPad = 12;
-  const bezW = devW + bezelPad * 2, bezH = devH + bezelPad * 2;
-  const bezel = Buffer.from(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${bezW}" height="${bezH}">
-       <rect x="0" y="0" width="${bezW}" height="${bezH}" rx="${radius + bezelPad}" ry="${radius + bezelPad}"
-         fill="#050302" stroke="#3a2416" stroke-width="2"/>
-     </svg>`
-  );
+  const devW = 800;
+  const devH = Math.round(devW * (cm.height / cm.width));
+  const screenR = 60;
 
-  const devX = Math.round((W - devW) / 2);
-  const devTop = 430; // below the headline block
+  const screen = await sharp(cropped)
+    .resize(devW, devH)
+    .composite([{ input: roundMask(devW, devH, screenR), blend: 'dest-in' }])
+    .png().toBuffer();
 
-  await sharp(bg)
+  // modern Android frame: thin uniform near-black bezel + centered hole-punch camera
+  const bez = 15;
+  const fw = devW + bez * 2, fh = devH + bez * 2, fr = screenR + bez;
+  const camCx = fw / 2, camCy = bez + 34;
+  const frame = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}">
+       <rect width="${fw}" height="${fh}" rx="${fr}" ry="${fr}" fill="#0a0a0c"/>
+       <rect x="1.5" y="1.5" width="${fw - 3}" height="${fh - 3}" rx="${fr - 1}" ry="${fr - 1}"
+             fill="none" stroke="#2a2a2e" stroke-width="1.5"/>
+     </svg>`);
+  // hole-punch camera drawn on top of the screen
+  const cam = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}">
+       <circle cx="${camCx}" cy="${camCy}" r="13" fill="#050505"/>
+       <circle cx="${camCx}" cy="${camCy}" r="13" fill="none" stroke="#3a2a1f" stroke-width="1"/>
+       <circle cx="${camCx - 4}" cy="${camCy - 4}" r="3" fill="#1b1b22"/>
+     </svg>`);
+
+  const fx = Math.round((W - fw) / 2), fyTop = 430;
+  await sharp(Buffer.from(bgSvg(headline, sub, rtl)))
     .composite([
-      { input: bezel, left: devX - bezelPad, top: devTop - bezelPad },
-      { input: screen, left: devX, top: devTop },
+      { input: frame, left: fx, top: fyTop },
+      { input: screen, left: fx + bez, top: fyTop + bez },
+      { input: cam, left: fx, top: fyTop },
     ])
-    .png()
-    .toFile(out);
-  console.log('wrote', path.basename(out));
+    .png().toFile(out);
 }
 
-const SLIDES = [
-  { raw: `${RAW}/01-home.png`,    headline: 'رحلتك إلى النوم',      sub: 'مصمَّمة لتهدّيك، لا لتشدّك' },
-  { raw: `${RAW}/02-methods.png`, headline: 'علاج الأرق بالأدلّة',   sub: 'أساليب نوم مثبتة علميًا' },
-  { raw: `${RAW}/03-sounds.png`,  headline: 'أصوات تُذيب الأرق',     sub: 'مطر وأمواج وسكون بلا نهاية' },
-  { raw: `${RAW}/04-mixer.png`,   headline: 'امزج ليلتك المثالية',  sub: 'حتى ٣ أصوات، بمستواك الخاص' },
-];
+const DECKS = {
+  en: [
+    { raw: 'en-01-home.png',    headline: 'Your journey to sleep',      sub: 'Built to calm you, not grab you', rtl: false },
+    { raw: 'en-02-methods.png', headline: 'Beat insomnia with evidence', sub: 'Clinically-proven sleep methods', rtl: false },
+    { raw: 'en-03-sounds.png',  headline: 'Sounds that melt insomnia',   sub: 'Rain, waves, endless calm', rtl: false },
+    { raw: 'en-04-mixer.png',   headline: 'Mix your perfect night',      sub: 'Up to 3 sounds, your levels', rtl: false },
+  ],
+  ar: [
+    { raw: '01-home.png',    headline: 'رحلتك إلى النوم',     sub: 'مصمَّمة لتهدّيك، لا لتشدّك', rtl: true },
+    { raw: '02-methods.png', headline: 'علاج الأرق بالأدلّة',  sub: 'أساليب نوم مثبتة علميًا', rtl: true },
+    { raw: '03-sounds.png',  headline: 'أصوات تُذيب الأرق',    sub: 'مطر وأمواج وسكون بلا نهاية', rtl: true },
+    { raw: '04-mixer.png',   headline: 'امزج ليلتك المثالية', sub: 'حتى ٣ أصوات، بمستواك الخاص', rtl: true },
+  ],
+};
 
 (async () => {
-  const fs = require('fs');
-  fs.mkdirSync(OUT, { recursive: true });
-  let i = 1;
-  for (const s of SLIDES) {
-    await makeSlide({ ...s, out: `${OUT}/${String(i).padStart(2, '0')}.png` });
-    i++;
+  for (const [locale, slides] of Object.entries(DECKS)) {
+    const dir = `${OUTBASE}/${locale}`;
+    fs.mkdirSync(dir, { recursive: true });
+    let i = 1;
+    for (const s of slides) {
+      const out = `${dir}/${String(i).padStart(2, '0')}.png`;
+      await makeSlide({ ...s, raw: `${RAW}/${s.raw}`, out });
+      console.log('wrote', locale, String(i).padStart(2, '0'));
+      i++;
+    }
   }
-  console.log('done →', OUT);
+  console.log('done →', OUTBASE);
 })();
