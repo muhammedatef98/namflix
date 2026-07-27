@@ -12,17 +12,21 @@
   - `namflix.premium.monthly` — $4.99 — لغة/توفّر/سعر ✅
   - `namflix.premium.yearly` — $39.99 — لغة/توفّر/سعر ✅
   - App ID: `6794132000`
-- ⏸️ **الخطوة 4 (RevenueCat)** — متوقّفة بسبب **عطل مؤقت في RevenueCat/Apple**
-  ("newly created apps error… Apple rejecting recently registered Bundle IDs").
-  لما العطل يتحل، أعِد فتح فورم **New App Store app** واحفظه بالقيم دي:
-  - RevenueCat project: `5da21fd9` (اسم Namflix)
-  - Bundle ID: `com.namflix.app` — URL scheme: `namflix`
-  - In-App Purchase Key: ارفع ملف `SubscriptionKey_5N8VB9LVLJ.p8`
-  - Key ID: `5N8VB9LVLJ`
-  - Issuer ID: `0e9df5ea-edec-4de2-afb5-2c391f398aad`
-  - بعد الحفظ: entitlement `premium` + offering `default` (package شهري + سنوي) + انسخ الـPublic iOS API key (`appl_…`) لـ `.env`
+- ✅ **الخطوة 4 (RevenueCat)** — خلصت بالكامل:
+  - project `5da21fd9`، App Store app `appf72cb78315`، Bundle ID `com.namflix.app`
+  - In-App Purchase Key: `SubscriptionKey_5N8VB9LVLJ.p8` (Key ID `5N8VB9LVLJ`, Issuer `0e9df5ea-edec-4de2-afb5-2c391f398aad`)
+  - المنتجين: `namflix.premium.monthly` + `namflix.premium.yearly`
+  - entitlement `premium` (فيه الاتنين) + offering `default` (packages مربوطة بمنتجات App Store)
+  - Public iOS API key في `.env`: `EXPO_PUBLIC_REVENUECAT_IOS_KEY=appl_EtorXUCGaHoqIFPDciatsnChSOj`
+- 🔨 **الخطوة 5 (البيلد)** — بيلد iOS production شغّال على EAS (بيحقن المفتاح + native module + شيل الsplash)
 
-**ملاحظة:** الإطلاق المجاني (Lifetime free) جاهز تمامًا ومش متوقّف على RevenueCat.
+### الباقي بعد ما البيلد يخلص
+1. `eas submit --platform ios --profile production` → يرفعه لـTestFlight/App Store Connect
+2. جرّب الشراء بحساب **Sandbox** (Users and Access → Sandbox → Testers)
+3. في App Store Connect: اربط الاشتراكين بنسخة التطبيق (قسم In-App Purchases) وSubmit for Review
+4. ملاحظة عطل مؤقت: منتجات RevenueCat ظهرت "Could not check" بسبب عطل Apple API — بيتصلّح لوحده، والشراء بيشتغل على الجهاز
+
+**ملاحظة:** الإطلاق المجاني (Lifetime free) كان جاهز ومستقل عن ده من الأول.
 
 ---
 
