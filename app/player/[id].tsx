@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -15,6 +15,7 @@ import Animated, {
 import { useLocale } from '@/contexts/LocaleContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { usePlayback } from '@/contexts/PlaybackContext';
+import { useFeatureGate } from '@/contexts/PremiumContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BackButton } from '@/components/BackButton';
 import { NightPalette, FONT } from '@/constants/theme';
@@ -67,6 +68,8 @@ export default function PlayerScreen() {
   const { accent } = useTheme();
   const { isFavorite, toggleFavorite } = useFavorites();
   const playback = usePlayback();
+  const { isLocked } = useFeatureGate();
+  const router = useRouter();
 
   const screenTrack = trackById(id);
 
@@ -76,11 +79,19 @@ export default function PlayerScreen() {
   const blackoutOpacity = useSharedValue(0);
   const tipOpacity = useSharedValue(0);
 
+  // Deep links (namflix://player/…) skip the cards, so the gate is enforced
+  // here too: a premium sound reached directly sends the user to the paywall
+  // instead of playing.
+  const gated = screenTrack != null && isLocked(`/player/${screenTrack.id}`);
+  useEffect(() => {
+    if (gated) router.replace('/premium');
+  }, [gated, router]);
+
   // Hand this track to the global player (no-op if it's already the one playing).
   useEffect(() => {
-    if (screenTrack) playback.play(screenTrack.id);
+    if (screenTrack && !gated) playback.play(screenTrack.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [screenTrack?.id]);
+  }, [screenTrack?.id, gated]);
 
   const isThisTrack = playback.track?.id === screenTrack?.id;
   const playing = isThisTrack && playback.playing;

@@ -160,8 +160,8 @@ export const SLEEP_METHODS: SleepMethod[] = [
     name: L('Sleep Hygiene', 'نظافة النوم'),
     summary: L('The baseline habits that protect good sleep.', 'العادات الأساسية التي تحمي نومًا جيّدًا.'),
     how: L(
-      'Keep a regular schedule; a dark, cool, quiet room; no caffeine late; limited alcohol and heavy meals near bed; wind down before lights-out. Hygiene alone rarely cures insomnia but supports every other method.',
-      'حافظ على جدول منتظم، وغرفة مظلمة باردة هادئة، وتجنّب الكافيين متأخرًا، وقلّل الكحول والوجبات الثقيلة قرب النوم، واسترخِ قبل إطفاء الضوء. النظافة وحدها نادرًا ما تشفي الأرق، لكنها تدعم كل أسلوب آخر.',
+      'Keep a regular schedule; a dark, cool, quiet room; no caffeine late; no heavy meals near bed; wind down before lights-out. Hygiene alone rarely cures insomnia but supports every other method.',
+      'حافظ على جدول منتظم، وغرفة مظلمة باردة هادئة، وتجنّب الكافيين متأخرًا والوجبات الثقيلة قرب النوم، واسترخِ قبل إطفاء الضوء. النظافة وحدها نادرًا ما تشفي الأرق، لكنها تدعم كل أسلوب آخر.',
     ),
     evidence: L(
       'Endorsed across sleep-medicine guidelines as a supportive foundation; most effective when combined with CBT-I components rather than used alone.',
@@ -435,20 +435,6 @@ export const SLEEP_METHODS: SleepMethod[] = [
     ),
   },
   {
-    id: 'alcohol',
-    category: 'lifestyle',
-    name: L('Limit Evening Alcohol', 'تقليل الكحول مساءً'),
-    summary: L('A nightcap fragments the second half of the night.', 'شرابُ ما قبل النوم يفتّت النصف الثاني من الليل.'),
-    how: L(
-      'Alcohol may feel sedating but it worsens sleep quality and causes more waking later in the night; keep the evening free of it.',
-      'قد يبدو الكحول مهدّئًا لكنه يسوّئ جودة النوم ويزيد الاستيقاظ في وقت متأخر من الليل؛ فاجعل مساءك خاليًا منه.',
-    ),
-    evidence: L(
-      'Reviews of alcohol and sleep show it reduces REM early and fragments sleep in the second half of the night.',
-      'تُظهر مراجعات الكحول والنوم أنه يقلّل نوم حركة العين السريعة مبكرًا ويفتّت النوم في النصف الثاني من الليل.',
-    ),
-  },
-  {
     id: 'exercise',
     category: 'lifestyle',
     name: L('Regular Exercise', 'ممارسة الرياضة بانتظام'),
@@ -612,11 +598,6 @@ export function routeForMethod(m: SleepMethod): string | undefined {
 
 export const METHOD_ORDER: MethodCategory[] = ['cbti', 'relaxation', 'cognitive', 'environment', 'lifestyle', 'info'];
 
-/** Methods hidden from the Arabic edition (culturally irrelevant advice). */
-const AR_HIDDEN = new Set(['alcohol']);
-
-export function methodsByCategory(category: MethodCategory, lang?: string): SleepMethod[] {
-  return SLEEP_METHODS.filter(
-    (m) => m.category === category && (lang !== 'ar' || !AR_HIDDEN.has(m.id)),
-  );
+export function methodsByCategory(category: MethodCategory): SleepMethod[] {
+  return SLEEP_METHODS.filter((m) => m.category === category);
 }

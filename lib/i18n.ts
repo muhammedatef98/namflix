@@ -183,6 +183,7 @@ export const STRINGS = {
   methodHow: { en: 'How to do it', ar: 'كيف تطبّقها' },
   methodEvidence: { en: 'The evidence', ar: 'الدليل العلمي' },
   methodOpen: { en: 'Open the tool', ar: 'افتح الأداة' },
+  methodOpenLocked: { en: 'Open the tool (Premium)', ar: 'افتح الأداة (بريميوم)' },
   methodsDisclaimer: {
     en: 'Educational, evidence-informed content — not medical advice. Persistent insomnia warrants clinician-guided CBT-I.',
     ar: 'محتوى تعليمي قائم على الأدلة — وليس نصيحة طبية. الأرق المستمر يستدعي علاجًا معرفيًّا سلوكيًّا بإشراف مختصّ.',
@@ -370,21 +371,8 @@ export const STRINGS = {
   toolWindowTitle: { en: 'Your Sleep Window', ar: 'نافذة نومك' },
   toolWindowSub: { en: 'sleep-restriction calculator', ar: 'حاسبة تقييد النوم' },
 
-  // account section (home footer)
-  accountSection: { en: 'Account', ar: 'الحساب' },
+  // links row (home footer)
   privacyLink: { en: 'Privacy policy', ar: 'سياسة الخصوصية' },
-  deleteAccount: { en: 'Delete account', ar: 'حذف الحساب' },
-  deleteConfirmTitle: { en: 'Delete your account?', ar: 'أتريد حذف حسابك؟' },
-  deleteConfirmBody: {
-    en: 'This permanently deletes your account and its data. This cannot be undone.',
-    ar: 'سيُحذف حسابك وبياناته نهائيًّا، ولا يمكن التراجع عن ذلك.',
-  },
-  deleteConfirmYes: { en: 'Delete permanently', ar: 'احذف نهائيًّا' },
-  deleteCancel: { en: 'Cancel', ar: 'إلغاء' },
-  deleteFailed: {
-    en: 'Deletion failed. Check your connection and try again.',
-    ar: 'تعذّر الحذف. تحقّق من اتصالك وحاوِل مرة أخرى.',
-  },
 
   // listen shortcut
   surpriseMe: { en: 'Play something for me', ar: 'شغِّل لي شيئًا' },
@@ -425,25 +413,6 @@ export const STRINGS = {
   worryPlaceholder: { en: "what's keeping you awake?", ar: 'ما الذي يُبقيك مستيقظًا؟' },
   worryRelease: { en: 'Release', ar: 'أطلِقها' },
 
-  // login screen
-  welcomeBack: { en: 'welcome back', ar: 'أهلًا بعودتك' },
-  restStarts: { en: 'rest starts here', ar: 'الراحة تبدأ هنا' },
-  emailField: { en: 'email', ar: 'البريد الإلكتروني' },
-  guestEnter: { en: 'Continue as guest', ar: 'الدخول كضيف' },
-  loginFailed: { en: 'Sign-in failed', ar: 'فشل تسجيل الدخول' },
-  // passwordless email-code flow
-  authIntro: {
-    en: 'Enter your email and we’ll send you a sign-in code.',
-    ar: 'أدخِل بريدك وسنرسل لك رمز دخول.',
-  },
-  sendCode: { en: 'Send code', ar: 'أرسِل الرمز' },
-  emailMissing: { en: 'Enter your email first.', ar: 'أدخِل بريدك أولًا.' },
-  codeSentTo: { en: 'We sent a sign-in code to', ar: 'أرسلنا رمز دخول إلى' },
-  codeField: { en: 'verification code', ar: 'رمز الدخول' },
-  verifyCode: { en: 'Verify & enter', ar: 'تأكيد ودخول' },
-  codeMissing: { en: 'Enter the code from your email.', ar: 'أدخِل الرمز الموجود في بريدك.' },
-  resendCode: { en: 'Resend code', ar: 'إعادة إرسال الرمز' },
-  changeEmail: { en: 'Change email', ar: 'تغيير البريد' },
   codeResent: { en: 'A new code is on its way.', ar: 'رمز جديد في الطريق إليك.' },
 
   // premium / plans
@@ -452,12 +421,35 @@ export const STRINGS = {
     en: 'Every method, every sound, the full guided descent — unlocked.',
     ar: 'كل الأساليب، كل الأصوات، الرحلة الموجَّهة كاملة — مفتوحة لك.',
   },
+  // what the subscription actually buys — Apple requires the purchase screen to
+  // describe this next to the price (Guideline 3.1.2(c) / 2.3.2)
+  premiumIncludes: { en: 'Every plan includes', ar: 'كل باقة تشمل' },
+  premiumFeat1: {
+    en: '40+ looping sleep sounds, favourites and a 3-layer mixer',
+    ar: '‏٤٠+ صوتًا للنوم بتكرار مستمر، والمفضّلة، ومازج من ٣ طبقات',
+  },
+  premiumFeat2: {
+    en: '30+ evidence-based methods, plus Drift and Night Rescue',
+    ar: '‏٣٠+ أسلوبًا قائمًا على الأدلة، مع «السكينة» و«الإنقاذ الليلي»',
+  },
+  premiumFeat3: {
+    en: 'The 14-night CBT-I program, sleep window and personal insights',
+    ar: 'برنامج الـ١٤ ليلة للعلاج المعرفي السلوكي، ونافذة النوم، وتحليلك الشخصي',
+  },
+  premiumFeat4: {
+    en: 'No ads and no tracking — on every device you sign in with',
+    ar: 'بلا إعلانات ولا تتبّع — على كل جهاز تسجّل الدخول منه',
+  },
   planMonthly: { en: 'Monthly', ar: 'شهري' },
   planYearly: { en: 'Yearly', ar: 'سنوي' },
   planLifetime: { en: 'Lifetime', ar: 'مدى الحياة' },
   perMonth: { en: '/mo', ar: '/شهر' },
   perYear: { en: '/yr', ar: '/سنة' },
-  planYearlyNote: { en: 'Save 33% vs monthly', ar: 'وفّر ٣٣٪ عن الشهري' },
+  planYearlyNote: { en: 'Save 58% vs monthly', ar: 'وفّر ٥٨٪ عن الشهري' },
+  planLifetimePaidNote: {
+    en: 'One payment. Yours for good — no renewal.',
+    ar: 'دفعة واحدة. لك إلى الأبد — بلا تجديد.',
+  },
   planLifetimeFree: { en: 'Free', ar: 'مجانًا' },
   planLifetimeNote: { en: 'Launch offer — limited time', ar: 'عرض الإطلاق — لوقت محدود' },
   planLifetimeCta: { en: 'Unlock free for life', ar: 'افتحه مجانًا مدى الحياة' },
@@ -471,7 +463,39 @@ export const STRINGS = {
   premiumBadge: { en: 'PREMIUM', ar: 'بريميوم' },
   bestValue: { en: 'BEST VALUE', ar: 'الأفضل قيمة' },
   restorePurchases: { en: 'Restore purchases', ar: 'استرجاع المشتريات' },
+  redeemCode: { en: 'Redeem a code', ar: 'استخدام رمز' },
+  redeemDone: {
+    en: 'Code accepted — everything is unlocked.',
+    ar: 'تم قبول الرمز — كل شيء مفتوح الآن.',
+  },
+  redeemNone: {
+    en: 'No code was redeemed.',
+    ar: 'لم يُستخدم أي رمز.',
+  },
+  redeemAndroid: {
+    en: 'Open the Play Store, tap your profile, then Payments and subscriptions → Redeem code.',
+    ar: 'افتح متجر Play، واضغط صورتك، ثم المدفوعات والاشتراكات ← استخدام رمز.',
+  },
+  restorePrompt: {
+    en: 'Reinstalled, or on a new phone? Your subscription is tied to your store account.',
+    ar: 'أعدتَ التثبيت أو انتقلت إلى هاتف جديد؟ اشتراكك مرتبط بحساب المتجر.',
+  },
   termsOfUse: { en: 'Terms of Use', ar: 'شروط الاستخدام' },
+  // free-trial copy. Only rendered when the store actually reports a trial —
+  // `trialThen` is completed with the real billed price by `trialLabel()`.
+  trialThen: { en: 'free, then', ar: 'مجانًا، ثم' },
+  trialUnitDay: { en: 'days', ar: 'أيام' },
+  trialUnitDay1: { en: 'day', ar: 'يوم' },
+  trialUnitWeek: { en: 'weeks', ar: 'أسابيع' },
+  trialUnitWeek1: { en: 'week', ar: 'أسبوع' },
+  trialUnitMonth: { en: 'months', ar: 'أشهر' },
+  trialUnitMonth1: { en: 'month', ar: 'شهر' },
+  trialUnitYear: { en: 'years', ar: 'سنوات' },
+  trialUnitYear1: { en: 'year', ar: 'سنة' },
+  trialDisclosure: {
+    en: 'The free trial converts to a paid subscription automatically unless you cancel at least 24 hours before it ends. Cancel anytime in your App Store account settings.',
+    ar: 'تتحوّل التجربة المجانية إلى اشتراك مدفوع تلقائيًّا ما لم تُلغِها قبل انتهائها بـ٢٤ ساعة على الأقل. يمكنك الإلغاء في أي وقت من إعدادات حساب App Store.',
+  },
   subDisclosure: {
     en: 'Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Manage or cancel anytime in your App Store account settings.',
     ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا ما لم يُلغَ قبل ٢٤ ساعة على الأقل من نهاية المدة. يمكنك الإدارة أو الإلغاء في أي وقت من إعدادات حساب App Store.',
@@ -479,8 +503,69 @@ export const STRINGS = {
   restoreNone: { en: 'No previous purchase found.', ar: 'لم نجد أي عملية شراء سابقة.' },
   purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'تعذّر إتمام الشراء. من فضلك حاول مرة أخرى.' },
 
+  // limited-time free Lifetime offer (countdown + claim flow)
+  offerEndsIn: { en: 'Free offer ends in', ar: 'ينتهي العرض المجاني خلال' },
+  afterOfferPaid: { en: 'After it ends, access becomes paid.', ar: 'بعد انتهائه، يصبح الوصول مدفوعًا.' },
+  cdDays: { en: 'days', ar: 'يوم' },
+  cdHours: { en: 'hrs', ar: 'ساعة' },
+  cdMins: { en: 'min', ar: 'دقيقة' },
+  cdSecs: { en: 'sec', ar: 'ثانية' },
+  claimFree: { en: 'Claim it free', ar: 'احصل عليه مجانًا' },
+  notNow: { en: 'Not now — keep looking around', ar: 'لاحقًا — أكمل التصفّح' },
+  claiming: { en: 'Activating…', ar: 'جارٍ التفعيل…' },
+  claimed: { en: 'Activated ✓', ar: 'تم التفعيل ✓' },
+
   // descent rationale
   descentWhy: { en: 'Why this path', ar: 'لماذا هذا المسار' },
+
+  // voluntary support (tip jar) — unlocks nothing, ever
+  supportSection: { en: 'Support', ar: 'الدعم' },
+  supportCardTitle: { en: 'Keep Namflix free', ar: 'أبقِ نامفلكس مجانيًّا' },
+  supportCardSub: {
+    en: 'no ads, no tracking — support it if it helped',
+    ar: 'بلا إعلانات ولا تتبّع — ادعمه إن نفعك',
+  },
+  supportTitle: { en: 'Support Namflix', ar: 'ادعم نامفلكس' },
+  supportIntro: {
+    en: 'Namflix has no ads, no trackers, and nothing that watches you at 3 a.m. It is built and paid for by one person.',
+    ar: 'نامفلكس بلا إعلانات ولا أدوات تتبّع، ولا شيء يراقبك في الثالثة فجرًا. يبنيه ويتحمّل تكاليفه شخص واحد.',
+  },
+  supportWhy: {
+    en: 'What your support pays for',
+    ar: 'ما الذي يذهب إليه دعمك',
+  },
+  supportWhyBody: {
+    en: 'Audio hosting and streaming, the accounts backend, developer fees, and the hours behind each new evidence-based tool.',
+    ar: 'استضافة الأصوات وبثّها، وخوادم الحسابات، ورسوم النشر، والساعات وراء كل أداة جديدة قائمة على الأدلة.',
+  },
+  supportCta: { en: 'Buy me a coffee', ar: 'ادعمني بفنجان قهوة' },
+  supportOpensBrowser: {
+    en: 'Opens ko-fi.com in your browser. Any amount, once — no subscription.',
+    ar: 'يفتح ko-fi.com في متصفّحك. أيّ مبلغ، مرّة واحدة — بلا اشتراك.',
+  },
+  supportUnlocksNothing: {
+    en: 'This unlocks nothing. Everything you already have stays yours, and nothing in the app is hidden behind a donation.',
+    ar: 'هذا لا يفتح أي ميزة. ما لديك يبقى لك، ولا شيء في التطبيق محجوب خلف تبرّع.',
+  },
+  supportNoObligation: {
+    en: 'If money is tight, skip this — telling one person who cannot sleep about the app helps just as much.',
+    ar: 'إن كان الوضع ضيّقًا فتجاوز هذا — أن تُخبر شخصًا يعاني الأرق عن التطبيق يعينني بالقدر نفسه.',
+  },
+  // health disclaimer — the app cites studies and sits in Health & Fitness, so
+  // Apple 1.4.1 wants a visible "see a clinician" reminder, not a buried one
+  medicalDisclaimer: {
+    en: 'Namflix offers evidence-based education and self-help, not medical care. It does not diagnose or treat, and it is not a substitute for a clinician — if sleep problems persist or you take sleep medication, speak to a doctor.',
+    ar: 'يقدّم نامفلكس محتوى تعليميًّا ومساعدة ذاتية قائمة على الأدلة، وليس رعاية طبية. لا يُشخّص ولا يعالج، ولا يغني عن الطبيب — إن استمرّت مشكلات النوم أو كنت تتناول أدوية للنوم فاستشر طبيبًا.',
+  },
+  contactSupport: { en: 'Contact support', ar: 'تواصل مع الدعم' },
+  contactFailed: {
+    en: 'Could not open mail. Write to Namflix.sleep@gmail.com',
+    ar: 'تعذّر فتح البريد. راسلنا على Namflix.sleep@gmail.com',
+  },
+  supportFailed: {
+    en: 'Could not open the link. Try again from your browser: ko-fi.com/muhammedatef98',
+    ar: 'تعذّر فتح الرابط. جرّب من متصفّحك: ko-fi.com/muhammedatef98',
+  },
 } as const;
 
 export type StringKey = keyof typeof STRINGS;

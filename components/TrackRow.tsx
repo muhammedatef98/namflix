@@ -8,12 +8,14 @@ import { SoundArt } from '@/components/SoundArt';
 import type { SoundTrack } from '@/lib/mediaLibrary';
 
 function TrackCard({ track }: { track: SoundTrack }) {
-  const { open, isPremium } = useFeatureGate();
+  const { open, isLocked } = useFeatureGate();
   const { tc, isRTL } = useLocale();
+  const route = `/player/${track.id}`;
+  const locked = isLocked(route);
 
   return (
     <Pressable
-      onPress={() => open(`/player/${track.id}`)}
+      onPress={() => open(route)}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <SoundArt type={track.art} />
@@ -26,7 +28,7 @@ function TrackCard({ track }: { track: SoundTrack }) {
           <View style={styles.durationPill}>
             <Text style={styles.durationText}>{tc(track.duration)}</Text>
           </View>
-          {!isPremium && (
+          {locked && (
             <View style={styles.lockPill}>
               <Svg width={11} height={11} viewBox="0 0 24 24">
                 <Path d="M7 10 V7 a5 5 0 0 1 10 0 V10" stroke="#F2C9A6" strokeWidth={2.4} fill="none" strokeLinecap="round" />

@@ -1,5 +1,6 @@
 import { View, StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -42,6 +43,7 @@ function TabIcon({ name, color }: { name: IconName; color: string }) {
 export default function TabsLayout() {
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const screens: { name: string; title: string; icon: IconName }[] = [
     { name: 'index', title: t('tabHome'), icon: 'home' },
@@ -64,8 +66,11 @@ export default function TabsLayout() {
             backgroundColor: '#150A05',
             borderTopColor: 'rgba(140,42,18,0.25)',
             borderTopWidth: 1,
-            height: TAB_BAR_HEIGHT,
+            // Add the bottom safe-area inset so the Android system nav bar
+            // (3-button or gesture) never crowds the tab icons/labels.
+            height: TAB_BAR_HEIGHT + insets.bottom,
             paddingTop: 8,
+            paddingBottom: insets.bottom,
           },
           tabBarLabelStyle: { fontFamily: FONT.medium, fontSize: 11, marginTop: 2 },
         }}
@@ -78,7 +83,7 @@ export default function TabsLayout() {
           />
         ))}
       </Tabs>
-      <MiniPlayer bottom={TAB_BAR_HEIGHT + 10} />
+      <MiniPlayer bottom={TAB_BAR_HEIGHT + insets.bottom + 10} />
     </View>
   );
 }

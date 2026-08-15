@@ -1,12 +1,8 @@
-import { supabase } from './supabase';
-import { DEMO_MODE } from './config';
-
-/** Fire-and-forget: persist the worry so it can be reviewed tomorrow. */
-export async function releaseWorry(body: string): Promise<void> {
-  const text = body.trim();
-  if (!text || DEMO_MODE) return;
-  const { data } = await supabase.auth.getUser();
-  const userId = data.user?.id;
-  if (!userId) return; // not signed in — the animation still runs
-  await supabase.from('worry_entries').insert({ user_id: userId, body: text });
+/**
+ * The worry dump is deliberately write-nowhere: what you type is released, not
+ * filed. Nothing is stored, on device or off — the point of the exercise is
+ * that the thought stops being yours to hold overnight.
+ */
+export async function releaseWorry(_body: string): Promise<void> {
+  // Intentionally empty. Kept async so callers keep their await-shaped flow.
 }

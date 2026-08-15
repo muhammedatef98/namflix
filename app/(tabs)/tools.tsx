@@ -45,9 +45,8 @@ const GROUPS: { headingKey: string; tools: ToolEntry[] }[] = [
 ];
 
 export default function ToolsScreen() {
-  const { open, isPremium } = useFeatureGate();
+  const { open, isLocked } = useFeatureGate();
   const { t, isRTL } = useLocale();
-  const locked = !isPremium;
 
   return (
     <LinearGradient colors={[NightPalette.deepEmber, NightPalette.voidBlack]} style={styles.fill}>
@@ -68,7 +67,7 @@ export default function ToolsScreen() {
                   accent={tool.accent}
                   title={t(tool.titleKey as never)}
                   subtitle={t(tool.subKey as never)}
-                  locked={locked}
+                  locked={isLocked(tool.route)}
                   onPress={() => open(tool.route)}
                 />
               ))}

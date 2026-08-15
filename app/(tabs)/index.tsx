@@ -1,11 +1,10 @@
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, THEMES } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { usePremium, useFeatureGate } from '@/contexts/PremiumContext';
 import { useLocale } from '@/contexts/LocaleContext';
 import { NightPalette, FONT, WORDMARK } from '@/constants/theme';
@@ -16,6 +15,7 @@ import { MorningCheckIn } from '@/components/MorningCheckIn';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { TrackRow } from '@/components/TrackRow';
 import { tracksForLang } from '@/lib/mediaLibrary';
+import { SUPPORT_EMAIL } from '@/lib/support';
 
 const HERO_STARS = [
   [14, 24], [82, 16], [40, 32], [68, 46], [24, 64], [90, 72], [54, 80], [10, 86],
@@ -23,26 +23,21 @@ const HERO_STARS = [
 
 export default function HomeScreen() {
   const { intensity, setIntensity, accent, theme, setThemeId } = useTheme();
-  const { signOut, deleteAccount, isGuest } = useAuth();
-  const { isPremium } = usePremium();
-  const { open } = useFeatureGate();
+  const { isPremium, plan } = usePremium();
+  const { open, isLocked } = useFeatureGate();
   const { lang, t, tc, isRTL } = useLocale();
   const router = useRouter();
-  const locked = !isPremium;
+  // Everyone except a paying subscriber (paid plans set the store entitlement,
+  // never a local `plan`) — i.e. free users and free-Lifetime holders.
+  const showSupport = !isPremium || plan === 'lifetime-free';
 
   const sounds = tracksForLang(lang);
 
-  const confirmDelete = () => {
-    Alert.alert(t('deleteConfirmTitle'), t('deleteConfirmBody'), [
-      { text: t('deleteCancel'), style: 'cancel' },
-      {
-        text: t('deleteConfirmYes'),
-        style: 'destructive',
-        onPress: () => {
-          deleteAccount().catch(() => Alert.alert(t('deleteAccount'), t('deleteFailed')));
-        },
-      },
-    ]);
+  // Support contact — the same address the App Store / Play listings publish.
+  const openSupportMail = () => {
+    Linking.openURL(`mailto:${SUPPORT_EMAIL}?subject=Namflix`).catch(() =>
+      Alert.alert(t('contactSupport'), t('contactFailed')),
+    );
   };
 
   return (
@@ -58,30 +53,6 @@ export default function HomeScreen() {
             </View>
             <View style={[styles.headerRight, isRTL && styles.rowRTL]}>
               <LanguageToggle />
-              <Pressable
-                onPress={signOut}
-                hitSlop={12}
-                style={({ pressed }) => [styles.exitBtn, pressed && styles.exitPressed]}
-              >
-                <Svg width={18} height={18} viewBox="0 0 24 24">
-                  <Path
-                    d="M14 8V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2v-2"
-                    stroke={NightPalette.textPrimary}
-                    strokeWidth={1.7}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                  <Path
-                    d="M10 12h9m0 0-3-3m3 3-3 3"
-                    stroke={accent}
-                    strokeWidth={1.7}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
-                </Svg>
-              </Pressable>
             </View>
           </View>
 
@@ -125,7 +96,13 @@ export default function HomeScreen() {
                   <Text style={[styles.heroSub, isRTL && styles.textRTL]}>{t('toolDescentSub')}</Text>
                   <View style={[styles.heroCta, isRTL && styles.rowRTL]}>
                     <Text style={[styles.heroCtaText, { backgroundColor: accent }]}>{t('descentBegin')}</Text>
-                    <Text style={[styles.heroArrow, { color: accent }]}>{isRTL ? '←' : '→'}</Text>
+                    {/* Say up front that this one is premium, instead of
+                        letting the tap be the way people find out. */}
+                    {isLocked('/descent') ? (
+                      <Text style={[styles.heroLock, { color: accent }]}>{t('premiumBadge')}</Text>
+                    ) : (
+                      <Text style={[styles.heroArrow, { color: accent }]}>{isRTL ? '←' : '→'}</Text>
+                    )}
                   </View>
                 </View>
               </LinearGradient>
@@ -163,25 +140,25 @@ export default function HomeScreen() {
           <View style={styles.padded}>
             <SoundscapeCard
               accent
-              locked={locked}
+              locked={isLocked('/boring')}
               title={t('toolBoringTitle')}
               subtitle={t('toolBoringSub')}
               onPress={() => open('/boring')}
             />
             <SoundscapeCard
-              locked={locked}
+              locked={isLocked('/breathe')}
               title={t('toolBreatheTitle')}
               subtitle={t('toolBreatheSub')}
               onPress={() => open('/breathe')}
             />
             <SoundscapeCard
-              locked={locked}
+              locked={isLocked('/worry')}
               title={t('toolWorryTitle')}
               subtitle={t('toolWorrySub')}
               onPress={() => open('/worry')}
             />
             <SoundscapeCard
-              locked={locked}
+              locked={isLocked('/insights')}
               title={t('toolInsightsTitle')}
               subtitle={t('toolInsightsSub')}
               onPress={() => open('/insights')}
@@ -224,9 +201,23 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Account — privacy link + in-app account deletion (App Store 5.1.1) */}
+          {/* Support — a voluntary tip, never a gate. Only shown to people on
+              the free / free-Lifetime side; paying subscribers already fund it
+              and are not asked twice. */}
+          {showSupport && (
+            <View style={[styles.padded, styles.supportArea]}>
+              <Text style={[styles.label, isRTL && styles.textRTL]}>{t('supportSection')}</Text>
+              <SoundscapeCard
+                title={t('supportCardTitle')}
+                subtitle={t('supportCardSub')}
+                onPress={() => router.push('/support')}
+              />
+            </View>
+          )}
+
+          {/* Namflix keeps no accounts, so there is nothing here to delete or
+              sign out of — just the two links every store listing needs. */}
           <View style={[styles.padded, styles.accountArea]}>
-            <Text style={[styles.label, isRTL && styles.textRTL]}>{t('accountSection')}</Text>
             <View style={[styles.accountRow, isRTL && styles.rowRTL]}>
               <Pressable
                 onPress={() => router.push('/privacy')}
@@ -234,16 +225,20 @@ export default function HomeScreen() {
               >
                 <Text style={styles.accountText}>{t('privacyLink')}</Text>
               </Pressable>
-              {!isGuest && (
-                <Pressable
-                  onPress={confirmDelete}
-                  style={({ pressed }) => [styles.accountBtn, styles.dangerBtn, pressed && styles.accountPressed]}
-                >
-                  <Text style={styles.dangerText}>{t('deleteAccount')}</Text>
-                </Pressable>
-              )}
+              <Pressable
+                onPress={openSupportMail}
+                style={({ pressed }) => [styles.accountBtn, pressed && styles.accountPressed]}
+              >
+                <Text style={styles.accountText}>{t('contactSupport')}</Text>
+              </Pressable>
             </View>
           </View>
+
+          {/* Health disclaimer — the app cites sleep science, so the "this is
+              not medical care, see a clinician" reminder stays visible. */}
+          <Text style={[styles.padded, styles.disclaimer, isRTL && styles.textRTL]}>
+            {t('medicalDisclaimer')}
+          </Text>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -372,6 +367,9 @@ const styles = StyleSheet.create({
   themeDot: { width: 16, height: 16, borderRadius: 8 },
   themeLabel: { color: NightPalette.dimText, fontSize: 13, lineHeight: 18 },
   themeLabelOn: { color: '#F2C9A6', fontFamily: FONT.medium },
+  supportArea: { marginTop: 26 },
+  heroLock: { fontSize: 10, fontFamily: FONT.bold, lineHeight: 16, marginHorizontal: 10, opacity: 0.9 },
+  disclaimer: { marginTop: 22, color: NightPalette.dimText, fontSize: 11, lineHeight: 18, opacity: 0.9 },
   accountArea: { marginTop: 26 },
   accountRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
   accountBtn: {

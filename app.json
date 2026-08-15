@@ -20,15 +20,24 @@
     "icon": "./assets/icon.png",
     "ios": {
       "bundleIdentifier": "com.namflix.app",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "UIBackgroundModes": ["audio"],
         "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyTrackingDomains": [],
+        "NSPrivacyCollectedDataTypes": []
       }
     },
     "android": {
       "package": "com.namflix.app",
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"],
+      "allowBackup": true,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundImage": "./assets/adaptive-background.png",

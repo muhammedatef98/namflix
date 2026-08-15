@@ -36,22 +36,65 @@
  */
 
 import { Platform } from 'react-native';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 
-export type PaidPlan = 'monthly' | 'yearly';
+// RevenueCat's native billing module can't reach the store inside Expo Go, so
+// `configure()` throws "Invalid API key" and spams a red console error. Detect
+// Expo Go and skip the SDK there entirely — the free Lifetime offer is
+// app-side and still works. Dev-client and production builds are unaffected.
+const IS_EXPO_GO =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient ||
+  Constants.appOwnership === 'expo';
+
+// `lifetime` is a NON-consumable one-off, not a subscription — it rides the same
+// purchase path because RevenueCat serves it as just another package in the
+// current offering. Keep it last in PLAN_ORDER so the paywall reads
+// yearly → monthly → lifetime.
+export type PaidPlan = 'monthly' | 'yearly' | 'lifetime';
 
 export const PRODUCT_IDS: Record<PaidPlan, string> = {
   monthly: 'namflix.premium.monthly',
   yearly: 'namflix.premium.yearly',
+  lifetime: 'namflix.premium.lifetime',
 };
+
+/** Display order on the paywall — best value first. */
+const PLAN_ORDER: readonly PaidPlan[] = ['yearly', 'monthly', 'lifetime'];
 
 /** The RevenueCat entitlement that means "premium unlocked". */
 export const ENTITLEMENT_ID = 'premium';
+
+/**
+ * An introductory free trial, as the store reports it. Only ever populated from
+ * StoreKit/Play — never assumed — so the paywall cannot advertise a trial that
+ * the product does not actually carry (Guideline 3.1.2(a) / 2.3.1).
+ */
+export type FreeTrial = {
+  /** How many units the trial runs for, e.g. 7. */
+  count: number;
+  /** The unit the store reported. */
+  unit: 'day' | 'week' | 'month' | 'year';
+};
 
 /** A plan the user can actually buy right now, with its store-formatted price. */
 export type PurchasablePlan = {
   plan: PaidPlan;
   priceString: string; // ALWAYS from StoreKit, never hardcoded
+  /** Present only when the store offers a zero-price introductory period. */
+  trial?: FreeTrial;
 };
+
+/** Read a free (price 0) introductory offer off a store product, if any. */
+function readFreeTrial(product: {
+  introPrice?: { price: number; periodUnit?: string; periodNumberOfUnits?: number } | null;
+}): FreeTrial | undefined {
+  const intro = product.introPrice;
+  if (!intro || intro.price !== 0) return undefined;
+  const unit = String(intro.periodUnit ?? '').toLowerCase();
+  if (unit !== 'day' && unit !== 'week' && unit !== 'month' && unit !== 'year') return undefined;
+  const count = intro.periodNumberOfUnits ?? 0;
+  return count > 0 ? { count, unit } : undefined;
+}
 
 export type PurchaseResult =
   | { ok: true }
@@ -64,6 +107,7 @@ let Purchases: PurchasesModule | null = null;
 let ready = false;
 
 function loadSdk(): PurchasesModule | null {
+  if (IS_EXPO_GO) return null; // native store unavailable in Expo Go
   if (Purchases) return Purchases;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -92,6 +136,7 @@ function platformApiKey(): string | undefined {
 
 /** Initialise the store SDK. No-ops safely when key or native module is absent. */
 export async function configurePurchases(): Promise<boolean> {
+  if (ready) return true; // idempotent: configure once, then only re-identify
   const key = platformApiKey();
   if (!key) return false;
   const sdk = loadSdk();
@@ -127,9 +172,15 @@ export async function getPurchasablePlans(): Promise<PurchasablePlan[]> {
     const offerings = await Purchases.getOfferings();
     const packages = offerings.current?.availablePackages ?? [];
     const out: PurchasablePlan[] = [];
-    for (const plan of ['yearly', 'monthly'] as PaidPlan[]) {
+    for (const plan of PLAN_ORDER) {
       const pkg = packages.find((p) => p.product.identifier === PRODUCT_IDS[plan]);
-      if (pkg) out.push({ plan, priceString: pkg.product.priceString });
+      if (pkg) {
+        out.push({
+          plan,
+          priceString: pkg.product.priceString,
+          trial: readFreeTrial(pkg.product),
+        });
+      }
     }
     return out;
   } catch {
@@ -165,6 +216,43 @@ export async function restorePurchases(): Promise<PurchaseResult> {
     return info.entitlements.active[ENTITLEMENT_ID]
       ? { ok: true }
       : { ok: false, reason: 'error' };
+  } catch (e: unknown) {
+    return { ok: false, reason: 'error', message: (e as { message?: string })?.message };
+  }
+}
+
+
+/**
+ * Whether an offer code can be redeemed from inside the app.
+ *
+ * iOS only. StoreKit provides a native redemption sheet; Play has no in-app
+ * equivalent, so on Android the code is redeemed in the Play Store app itself
+ * and the entitlement arrives on the next entitlement sync.
+ */
+export function canRedeemInApp(): boolean {
+  return Platform.OS === 'ios' && ready && Purchases != null;
+}
+
+/**
+ * Show Apple's offer-code redemption sheet.
+ *
+ * Apple owns the whole flow — we never see or validate the code, which is the
+ * point: codes are created, limited and REVOKED from App Store Connect, so a
+ * giveaway can be switched off without shipping a build. Redemption is silent
+ * to us, so the caller re-reads the entitlement afterwards rather than trusting
+ * a return value.
+ */
+export async function redeemOfferCode(): Promise<PurchaseResult> {
+  if (!canRedeemInApp() || !Purchases) return { ok: false, reason: 'unavailable' };
+  try {
+    await Purchases.presentCodeRedemptionSheet();
+    // The sheet resolves as soon as it is dismissed, redeemed or not, so ask
+    // the store what actually changed instead of assuming success.
+    await Purchases.invalidateCustomerInfoCache();
+    const info = await Purchases.getCustomerInfo();
+    return info.entitlements.active[ENTITLEMENT_ID] != null
+      ? { ok: true }
+      : { ok: false, reason: 'cancelled' };
   } catch (e: unknown) {
     return { ok: false, reason: 'error', message: (e as { message?: string })?.message };
   }

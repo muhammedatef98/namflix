@@ -9,7 +9,7 @@ import type { Localized } from '@/lib/i18n';
 
 // The full policy, shown in the user's app language. Content mirrors the
 // hosted page (functions/v1/privacy) that App Store Connect links to.
-const UPDATED: Localized = { en: 'Last updated: 22 July 2026', ar: 'آخر تحديث: ٢٢ يوليو ٢٠٢٦' };
+const UPDATED: Localized = { en: 'Last updated: 9 August 2026', ar: 'آخر تحديث: ٩ أغسطس ٢٠٢٦' };
 const INTRO: Localized = {
   en: 'Namflix is a sleep-support app. We collect as little as possible.',
   ar: 'نامفلكس تطبيق للمساعدة على النوم، ونجمع أقلّ قدر ممكن من البيانات.',
@@ -19,8 +19,8 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'What we collect', ar: 'ما الذي نجمعه؟' },
     body: {
-      en: 'Your email address — only if you sign in — used solely to send your one-time login code and identify your account. Guest mode requires no account at all. Preferences (theme, language, favourite sounds, subscription state) are stored locally on your device.',
-      ar: 'بريدك الإلكتروني — فقط إذا سجّلت الدخول — ويُستخدم حصرًا لإرسال رمز الدخول ولتعريف حسابك. وضع الضيف لا يحتاج حسابًا إطلاقًا. أما التفضيلات (السِمة، اللغة، الأصوات المفضّلة، حالة الاشتراك) فتُحفظ محليًّا على جهازك.',
+      en: 'Nothing that identifies you. Namflix has no accounts, no sign-in and no email address to give us. Everything you do here — preferences, favourite sounds, your nightly check-ins and their history, subscription state — is stored only on your device.',
+      ar: 'لا شيء يعرّف بك. نامفلكس بلا حسابات ولا تسجيل دخول ولا بريد إلكتروني تعطينا إياه. كل ما تفعله هنا — التفضيلات، والأصوات المفضّلة، وتسجيلاتك الصباحية وسجلّها، وحالة الاشتراك — محفوظ على جهازك وحده.',
     },
   },
   {
@@ -33,15 +33,15 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'Where data lives', ar: 'أين تُحفظ البيانات؟' },
     body: {
-      en: 'Account data is stored with our backend provider, Supabase (EU region, London). Sounds are streamed from the same infrastructure.',
-      ar: 'بيانات الحساب محفوظة لدى مزوّد الخدمة Supabase (منطقة الاتحاد الأوروبي — لندن)، وتُبثّ الأصوات من البنية نفسها.',
+      en: 'On your phone. We hold no user data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you.',
+      ar: 'على هاتفك. لا نحتفظ بأي بيانات مستخدم على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية.',
     },
   },
   {
-    title: { en: 'Deleting your account', ar: 'حذف حسابك' },
+    title: { en: 'Deleting your data', ar: 'حذف بياناتك' },
     body: {
-      en: 'You can delete your account and its data at any time from inside the app (Home → Delete account). Deletion is immediate and permanent.',
-      ar: 'يمكنك حذف حسابك وبياناته في أي وقت من داخل التطبيق (الرئيسية ← حذف الحساب). الحذف فوري ونهائي.',
+      en: 'Because everything lives on your device, deleting the app deletes all of it. There is no account of yours for us to hold, and nothing for you to request back.',
+      ar: 'بما أنّ كل شيء على جهازك، فحذف التطبيق يحذفه بالكامل. لا يوجد حساب لك لدينا، ولا شيء تحتاج لطلب استرجاعه.',
     },
   },
   {
@@ -54,8 +54,8 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'Contact & support', ar: 'التواصل والدعم' },
     body: {
-      en: 'Questions or help: muhammedatef98@gmail.com',
-      ar: 'للأسئلة أو المساعدة: muhammedatef98@gmail.com',
+      en: 'Questions or help: Namflix.sleep@gmail.com',
+      ar: 'للأسئلة أو المساعدة: Namflix.sleep@gmail.com',
     },
   },
 ];

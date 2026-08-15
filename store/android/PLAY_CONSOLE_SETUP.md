@@ -1,8 +1,10 @@
 # Namflix — Google Play Console Setup Pack
 
 Everything needed to publish Namflix on Google Play. Values are ready to paste.
-Steps marked **(you only)** require your Google account / legal / financial action
-and cannot be automated.
+Steps marked **(you only)** need your Google account / legal / financial action, or a
+file upload — neither can be automated from here.
+
+_Last verified: 2026-08-01, right after the iOS 1.0 submission (build 13)._
 
 ---
 
@@ -11,19 +13,28 @@ and cannot be automated.
 | Item | Status |
 |---|---|
 | Package name | `com.namflix.app` |
-| Android build (.aab) | building on EAS — version code **5** (`eas build:list --platform android`) |
-| App signing key | managed by EAS (reused across builds) |
+| Android build (.aab) | version code **8** building on EAS — id `7cafb7d5-3380-4428-a32a-34e6b2d0652e` |
+| App signing key | managed by EAS (same key reused across builds) |
+| RevenueCat Android key | ✅ already on EAS production (`EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=goog_…`) |
 | Privacy Policy URL | ✅ live → `https://eqwkyyrahwvhjflweado.supabase.co/functions/v1/privacy` |
-| Support email | `muhammedatef98@gmail.com` |
+| Support URL | ✅ live → `https://eqwkyyrahwvhjflweado.supabase.co/functions/v1/support` |
+| Support email | `Namflix.sleep@gmail.com` |
 | Play hi-res icon (512²) | ✅ `store/android/playstore-icon-512.png` |
 | Feature graphic (1024×500) | ✅ `store/android/playstore-feature-1024x500.png` |
-| Phone screenshots (min 2) | ⛔ still needed — capture from the running app |
+| Phone screenshots | ✅ 4 EN + 4 AR, 1080×1920 → `store/android/screenshots/phone/{en,ar}/` |
 
-> ⚠️ **IAP ordering:** Android in-app purchases need (a) the RevenueCat **Android**
-> key `goog_…` set as an EAS env var, and (b) a **rebuild** afterwards. That key
-> doesn't exist until you finish the RevenueCat + Play subscription setup below,
-> so the *current* build (vc 5) is for getting the listing/testing track live —
-> the **final** production build comes after step 6.
+> **Build 8 already contains the RevenueCat Android key**, so unlike the old note in this
+> file there is no "build twice" problem: this .aab can go straight to production once the
+> Play subscriptions exist. Products are only *read* at runtime — creating them in Play
+> after uploading needs no rebuild.
+
+### ⚠️ Personal-account gate (check this first)
+
+If your Play developer account is a **personal** account (not an organization), Google
+requires a **closed test with at least 12 testers opted in for 14 continuous days**
+before you can apply for production access. Organization accounts are exempt.
+Check Play Console → Dashboard; if that requirement is showing, plan for the 14 days —
+everything below still applies, you just release to closed testing first.
 
 ---
 
@@ -31,9 +42,9 @@ and cannot be automated.
 
 Play Console → **Create app**
 - App name: **Namflix**
-- Default language: **العربية (ar-EG)**  *(add English (US) later as a second listing)*
+- Default language: **العربية (ar)** *(add English (US) as a second listing)*
 - App or game: **App**
-- Free or paid: **Free**
+- Free or paid: **Free** (with in-app purchases)
 - Declarations: tick Developer Program Policies + US export laws
 
 ## 2. Store listing → Main store listing
@@ -42,83 +53,101 @@ Play Console → **Create app**
 - **Short description (80):**
   - AR: `نوم أعمق بأصوات وتنفّس وهدوء قائم على الأدلة — ممل عن قصد.`
   - EN: `Evidence-based sleep sounds, breathing & calm — boring on purpose.`
-- **Full description (4000):** see `listing-ar.txt` / `listing-en.txt` below.
-- **App icon:** upload `playstore-icon-512.png`
-- **Feature graphic:** upload `playstore-feature-1024x500.png`
-- **Phone screenshots:** 2–8, PNG/JPG, 16:9 or 9:16, min edge ≥ 320px, max ≥ 1080px.
-- **App category:** **Health & Fitness** (alt: Lifestyle)
+- **Full description (4000):** see the copy blocks at the bottom of this file.
+- **App icon:** `playstore-icon-512.png`
+- **Feature graphic:** `playstore-feature-1024x500.png`
+- **Phone screenshots:** upload `screenshots/phone/en/*.png` to the English listing and
+  `screenshots/phone/ar/*.png` to the Arabic one (min 2, we have 4 each).
+- **App category:** **Health & Fitness**
 - **Tags:** sleep, relaxation, meditation, sounds
-- **Contact:** email `muhammedatef98@gmail.com`
+- **Contact:** email `Namflix.sleep@gmail.com`, website = the support URL above
 
 ## 3. Dashboard "Set up your app" answers
 
 | Section | Answer |
 |---|---|
-| **App access** | All functionality available without special access *(guest mode needs no login)* |
+| **App access** | All functionality available without special access — the app has no sign-in at all. (Premium is a purchase, not restricted access; no test account required.) |
 | **Ads** | **No**, the app has no ads |
-| **Content rating** | Start questionnaire; category **Reference / Health**; answers: no violence, no sexual content, no profanity, no drugs, no gambling → expect **Everyone / PEGI 3**. Email: `muhammedatef98@gmail.com` |
-| **Target audience** | Age groups: **18 and over** (avoid Families policy). Not appealing to children: **No** |
+| **Content rating** | Questionnaire → category **Reference, News, or Educational**; no violence / sex / profanity / drugs / gambling. Answer **Yes** to references to health & medical topics if asked (the CBT-I program + sleep-restriction calculator) — this is the same driver that made iOS 13+. Email: `Namflix.sleep@gmail.com` |
+| **Target audience** | Age groups: **18 and over**. Appeals to children: **No** |
 | **News app** | No |
-| **Health apps** | It's wellness/education, **not** a medical device. If asked, declare it does **not** provide medical/health-monitoring features |
+| **Health apps** | Declare it as a **wellness / health-education** app: **not** a medical device, does **not** provide diagnosis, treatment or health monitoring. No health data is collected. |
 | **Government app** | No |
 | **Financial features** | No |
+| **Data safety** | See section 4 |
 | **Privacy Policy** | `https://eqwkyyrahwvhjflweado.supabase.co/functions/v1/privacy` |
 
-## 4. Data safety form
+## 4. Data safety form — declare exactly this
 
-Namflix collects very little. Declare exactly:
+Namflix collects almost nothing. **Match this to the privacy policy, not to an ideal —
+the policy promises no accounts, no ads, no ad identifiers, no analytics trackers.**
 
-- **Does your app collect or share user data?** Yes (minimal).
+⚠️ Updated 2026-08-09: accounts were removed from the app. If Email address or
+User IDs are still declared on the form from an earlier submission, **remove them** —
+a Data safety form that overstates collection is itself a policy violation.
+
+- **Does your app collect or share user data?** → **Yes** (purchase history only).
 - **Data types:**
-  - **Email address** — Collected, **not** shared. Purpose: *Account management*.
-    Optional (only if the user signs in; guest mode collects none). Not for ads.
-  - **Purchase history** — Collected (via Google Play Billing / RevenueCat), not shared.
-    Purpose: *App functionality* (unlock premium, restore).
-  - **Crash logs & Diagnostics** — Collected (Sentry), not shared. Purpose: *Analytics /
-    App functionality* (crash fixing). No advertising ID.
-- **Security:** Data is **encrypted in transit** — Yes.
-- **Deletion:** Users **can request data deletion** — Yes. In-app: Home → Delete account
-  (immediate & permanent). Also documented in the privacy policy.
-- **No** ad ID, **no** location, **no** contacts, **no** health data, **no** data sold.
+  - **Purchase history** — Collected, **not** shared. Purpose: **App functionality**
+    (unlock premium, restore purchases). Required for purchasers.
+  - **Email address** — **NO.** There is no sign-in and no e-mail is ever requested.
+  - **User IDs** — **NO.** RevenueCat keys the entitlement to the Google account;
+    the app itself holds no user identifier.
+- **Do NOT declare crash logs / diagnostics.** There is **no Sentry, no analytics SDK and
+  no crash reporter** in the app — the stale `EXPO_PUBLIC_SENTRY_DSN` env var on EAS is
+  unused by any code. Declaring it would be a false statement on the form.
+- **No** ad ID, **no** location, **no** contacts, **no** health data, **no** data sold,
+  **no** data shared with third parties.
+- **Security:** encrypted in transit → **Yes**.
+- **Deletion:** there is no account to delete, and no server-side user data. All app
+  data is on-device and goes with an uninstall — state this rather than supplying a
+  web deletion URL, which Play only requires for apps that create accounts.
 
-## 5. In-app products → Subscriptions  **(you only, needs a build uploaded first)**
+## 5. Monetization
 
-Monetize → Subscriptions → **Create subscription** (use the SAME ids as iOS):
+### 5a. Subscriptions  **(you only — needs a build uploaded first)**
 
-| Subscription ID | Name | Base plan | Billing period | Price (base, USD) | Auto-renew |
+Monetize → Subscriptions → **Create subscription** (same ids as iOS, RevenueCat shares them):
+
+| Subscription ID | Name | Base plan | Billing period | Price (USD) | Auto-renew |
 |---|---|---|---|---|---|
 | `namflix.premium.monthly` | Namflix Premium (Monthly) | `monthly-auto` | 1 month | **$4.99** | On |
 | `namflix.premium.yearly` | Namflix Premium (Yearly) | `yearly-auto` | 1 year | **$39.99** | On |
 
-- Let Google auto-convert to local prices (175 markets, same as App Store).
-- Grace period / account hold: keep Google defaults.
-- Benefits text (optional): "Unlock every soundscape, program & mixer."
+- Let Google auto-convert to local prices; keep default grace period / account hold.
+- Benefit text: "Unlock every soundscape, program and mixer."
+- A free trial is optional and needs **no rebuild** — the paywall only shows a trial line
+  when the store actually reports a zero-price intro offer (`readFreeTrial` in `lib/purchases.ts`).
 
-## 6. RevenueCat — Android side  **(you only)**
+### 5b. The Ko-fi tip is allowed, but keep it clean
 
-1. Play Console → API access → create/link a **Google service account**, grant it
-   Play permissions (Financial data, Manage orders).
-2. RevenueCat → project `5da21fd9` → **+ New app → Play Store**, upload that service
-   account JSON, set package `com.namflix.app`.
-3. Attach both products to the existing entitlement **`premium`** and offering **`default`**.
-4. Copy the **public Android SDK key** (starts `goog_`).
-5. Set it on EAS + local:
-   ```bash
-   eas env:create production --name EXPO_PUBLIC_REVENUECAT_ANDROID_KEY --value goog_XXX --visibility sensitive --non-interactive
-   ```
-   (and uncomment the line in local `.env`)
-6. **Rebuild + submit:**
-   ```bash
-   eas build --platform android --profile production
-   eas submit --platform android --profile production --latest
-   ```
+`app/support.tsx` opens `https://ko-fi.com/muhammedatef98` in the **system browser**.
+Google Play permits collecting **voluntary donations** outside Play Billing — the rule it
+would break is unlocking anything for the payment. Ours unlocks nothing and says so on
+screen, and the link never appears on the paywall. Leave it that way.
 
-## 7. Release  **(you only)**
+### 5c. RevenueCat — verify the Play side  **(you only)**
 
-1. Testing → **Internal testing** → create release → upload the .aab (or use
-   `eas submit`) → add your email as a tester → install & verify (icon, sounds,
-   paywall shows real prices once step 6 is done).
-2. When happy → **Production** → create release → roll out.
+The `goog_…` key already exists, so most of this is probably done. Confirm:
+1. Play Console → API access → a **Google service account** linked with Financial data +
+   Manage orders permissions.
+2. RevenueCat → Play Store app, package `com.namflix.app`, that service-account JSON uploaded.
+3. Both products attached to entitlement **`premium`** and offering **`default`**.
+
+## 6. Release  **(you only)**
+
+1. Testing → **Closed testing** (or Internal testing) → create release → upload the .aab →
+   add testers → install and verify: icon, sounds streaming, Arabic layout, real prices on
+   the paywall once 5a is done.
+2. If the 12-testers/14-days gate applies, run closed testing for the full 14 days.
+3. **Production** → create release → roll out.
+
+Once the app exists in Play Console and a service-account key is in `eas.json`
+(`submit.production.android.serviceAccountKeyPath`), later uploads can be automated with:
+
+```bash
+eas submit --platform android --profile production --latest
+```
 
 ---
 
@@ -132,6 +161,7 @@ Monetize → Subscriptions → **Create subscription** (use the SAME ids as iOS)
 • مكتبة أصوات نوم تقدر تمزجها بنفسك: مطر، أمواج، ضجيج أبيض، ليل، ونار هادئة.
 • تمارين تنفّس ومسح للجسد واسترخاء عضلي تدريجي — كلها بأدلة سريرية.
 • قسم "ملل عن قصد" لتهدئة العقل والجسد وقت الأرق.
+• وضع "الإنقاذ الليلي" لصحوة الثالثة فجرًا.
 • وضع ضيف بدون حساب، وثيم داكن دافئ مريح للعين ليلاً.
 • بدون إعلانات، وبدون تتبّع، وبأقلّ قدر من البيانات.
 
@@ -148,7 +178,8 @@ Instead of grabbing your attention, Namflix is built to let it go:
 • A library of sleep sounds you mix yourself: rain, waves, white noise, night, soft fire.
 • Breathing, body-scan and progressive muscle relaxation — all clinically grounded.
 • A "Boring on Purpose" section to quiet the mind and body when sleep won't come.
-• Guest mode with no account, and a warm dark theme that's easy on night-time eyes.
+• Night Rescue, a dedicated mode for the 3 a.m. wake-up.
+• No sign-up, no account — just open it. Warm dark theme that's easy on night-time eyes.
 • No ads, no trackers, minimal data.
 
 Namflix offers educational relaxation content; it is not a medical device or medical advice.

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isFreeRoute } from '@/lib/freeTier';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
   configurePurchases,
@@ -64,17 +65,20 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
     fetchAppConfig().then(setConfig).catch(() => undefined);
   }, []);
 
-  // Bring up the App Store SDK, then sync entitlement + real prices. All calls
-  // no-op safely when IAP isn't configured, leaving the free offer intact.
+  // Bring up the store SDK, then sync entitlement + real prices. There is no
+  // app-level account to alias to: RevenueCat keys the entitlement to the store
+  // account (Apple ID / Google account), which is what "Restore purchases"
+  // reads. All calls no-op safely when IAP isn't configured (Expo Go).
   useEffect(() => {
     let cancelled = false;
-    configurePurchases().then(async (ok) => {
+    (async () => {
+      const ok = await configurePurchases(); // idempotent
       if (!ok || cancelled) return;
       const [active, plans] = await Promise.all([hasActiveEntitlement(), getPurchasablePlans()]);
       if (cancelled) return;
       setStorePremium(active);
       setPurchasablePlans(plans);
-    });
+    })();
     return () => {
       cancelled = true;
     };
@@ -100,6 +104,9 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       config,
       purchasablePlans,
       unlockLifetimeFree: async () => {
+        // Local grant, on device. Without an app account there is no identity to
+        // hang a server-side entitlement on, so the claim lives in storage and
+        // does not survive a reinstall — acceptable for a time-boxed giveaway.
         setPlan('lifetime-free');
         await AsyncStorage.setItem(PLAN_KEY, 'lifetime-free').catch(() => undefined);
       },
@@ -123,16 +130,18 @@ export function usePremium(): PremiumValue {
 }
 
 /**
- * Returns an `open(route)` that navigates to a locked feature only when the
- * user is premium; otherwise it sends them to the paywall. Central gate so
- * every feature surface stays consistent — one tap through the free Lifetime
- * offer unlocks them all.
+ * The single navigation gate. `open(route)` goes where the user asked when the
+ * route is premium-unlocked or part of the permanently free tier, and to the
+ * paywall otherwise; `isLocked(route)` answers the same question for padlock
+ * badges, so what a card shows and what tapping it does can never disagree.
  */
 export function useFeatureGate() {
   const { isPremium } = usePremium();
   const router = useRouter();
+  const isLocked = (route: string) => !isPremium && !isFreeRoute(route);
   return {
     isPremium,
-    open: (route: string) => router.push((isPremium ? route : '/premium') as never),
+    isLocked,
+    open: (route: string) => router.push((isLocked(route) ? '/premium' : route) as never),
   };
 }

@@ -9,10 +9,10 @@ import {
   Platform,
   UIManager,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useFeatureGate } from '@/contexts/PremiumContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { StarField } from '@/components/StarField';
 import { NightPalette, FONT } from '@/constants/theme';
@@ -29,8 +29,10 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 function MethodCard({ method }: { method: SleepMethod }) {
-  const router = useRouter();
-  const { t, tc, isRTL, lang } = useLocale();
+  // The library itself is free to read; only the interactive tool behind a
+  // method follows the gate, same as everywhere else.
+  const { open: openRoute, isLocked } = useFeatureGate();
+  const { t, tc, isRTL } = useLocale();
   const [open, setOpen] = useState(false);
   const route = routeForMethod(method);
 
@@ -62,9 +64,11 @@ function MethodCard({ method }: { method: SleepMethod }) {
           {route && (
             <Pressable
               style={[styles.openBtn, isRTL && styles.alignSelfEnd]}
-              onPress={() => router.push(route as never)}
+              onPress={() => openRoute(route)}
             >
-              <Text style={styles.openBtnText}>{t('methodOpen')} {isRTL ? '←' : '→'}</Text>
+              <Text style={styles.openBtnText}>
+                {isLocked(route) ? t('methodOpenLocked') : t('methodOpen')} {isRTL ? '←' : '→'}
+              </Text>
             </Pressable>
           )}
         </View>
@@ -74,7 +78,7 @@ function MethodCard({ method }: { method: SleepMethod }) {
 }
 
 export default function MethodsScreen() {
-  const { t, tc, isRTL, lang } = useLocale();
+  const { t, tc, isRTL } = useLocale();
 
   return (
     <LinearGradient colors={[NightPalette.deepEmber, NightPalette.voidBlack]} style={styles.fill}>
@@ -89,7 +93,7 @@ export default function MethodsScreen() {
 
           {METHOD_ORDER.map((cat) => {
             const meta = CATEGORY_META[cat];
-            const methods = methodsByCategory(cat, lang);
+            const methods = methodsByCategory(cat);
             return (
               <View key={cat} style={styles.group}>
                 <Text style={[styles.catLabel, isRTL && styles.textRTL]}>{tc(meta.label)}</Text>

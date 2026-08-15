@@ -10,7 +10,8 @@ import { StarField } from '@/components/StarField';
 import { TrackRow } from '@/components/TrackRow';
 import { NightPalette, FONT } from '@/constants/theme';
 import { useFavorites } from '@/contexts/FavoritesContext';
-import { CATEGORY_LABEL, MEDIA_ORDER, tracksByCategory, randomTrack, trackById } from '@/lib/mediaLibrary';
+import { CATEGORY_LABEL, MEDIA_ORDER, tracksByCategory, tracksForLang, randomTrack, trackById } from '@/lib/mediaLibrary';
+import { isFreeTrack } from '@/lib/freeTier';
 import type { SoundTrack } from '@/lib/mediaLibrary';
 
 const ORDER = MEDIA_ORDER;
@@ -33,9 +34,21 @@ function ShuffleGlyph({ color }: { color: string }) {
 
 export default function ListenScreen() {
   const { lang, t, tc, isRTL } = useLocale();
-  const { open } = useFeatureGate();
+  const { open, isPremium } = useFeatureGate();
   const { accent } = useTheme();
   const { favoriteIds } = useFavorites();
+
+  // "Play something for me" should always actually play something: for a free
+  // user it draws from the free sounds instead of bouncing them to the paywall.
+  const playSomething = () => {
+    if (isPremium) {
+      open(`/player/${randomTrack(lang).id}`);
+      return;
+    }
+    const free = tracksForLang(lang).filter((tr) => isFreeTrack(tr.id));
+    const pick = free[Math.floor(Math.random() * free.length)];
+    open(`/player/${pick ? pick.id : randomTrack(lang).id}`);
+  };
 
   const favoriteTracks = favoriteIds
     .map(trackById)
@@ -53,7 +66,7 @@ export default function ListenScreen() {
           <Text style={[styles.sub, isRTL && styles.textRTL]}>{t('mediaSub')}</Text>
 
           <Pressable
-            onPress={() => open(`/player/${randomTrack(lang).id}`)}
+            onPress={playSomething}
             style={({ pressed }) => [
               styles.surprise,
               { borderColor: accent },
