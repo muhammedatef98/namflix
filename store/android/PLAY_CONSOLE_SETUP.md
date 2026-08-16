@@ -116,6 +116,26 @@ the policy promises no accounts, no ads, no ad identifiers, no analytics tracker
 User IDs are still declared on the form from an earlier submission, **remove them** —
 a Data safety form that overstates collection is itself a policy violation.
 
+**Why Purchase history and nothing else — the authoritative source.** The RevenueCat
+iOS pod ships its own privacy manifest (`ios/Pods/RevenueCat/Sources/PrivacyInfo.xcprivacy`),
+and it declares exactly one collected type:
+
+```
+NSPrivacyCollectedDataType         PurchaseHistory
+NSPrivacyCollectedDataTypePurposes AppFunctionality
+NSPrivacyCollectedDataTypeLinked   false     ← not linked to identity
+NSPrivacyCollectedDataTypeTracking false     ← not used for tracking
+```
+
+That is the SDK's own statement of what it collects, and it lines up with the published
+Apple App Privacy (Purchase History) and with the Play answers below: **Collected, not
+Shared, App functionality**. `Linked: false` is why no identifier is declared — the id
+RevenueCat uses is random and device-side, not you.
+
+It is also why the app's *own* manifest in `app.json` has an empty
+`NSPrivacyCollectedDataTypes` and that is correct, not an oversight: the app collects
+nothing itself, and Apple aggregates the app manifest with each SDK's manifest.
+
 ### 4a. Walkthrough — do all three steps in ONE pass  **(outstanding)**
 
 > **Status: not yet saved.** A previous attempt was deliberately discarded rather than

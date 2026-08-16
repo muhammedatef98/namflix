@@ -56,11 +56,17 @@ off — this is the app's core function.
 
 PRIVACY
 No ads, no ad identifiers, no analytics or tracking SDKs, so no ATT prompt.
-No personal data is collected at all: there are no accounts, so there is no
-e-mail address and nothing held on our servers. Preferences, favourites and
+No personal data is collected: there are no accounts, so there is no e-mail
+address and nothing of yours held on our servers. Preferences, favourites and
 nightly check-ins live only on the device and go when the app is deleted, so
-there is no account-deletion flow to provide. Privacy policy is in-app (Home →
-Privacy policy) and at
+there is no account-deletion flow to provide.
+
+The one thing that exists off-device is the purchase record, which is why App
+Privacy declares Purchase History (App Functionality) and nothing else. It is
+handled by RevenueCat against a random device-side identifier — not linked to
+identity and not used for tracking, matching the SDK's own privacy manifest.
+The privacy policy states this in both languages. Privacy policy is in-app
+(Home → Privacy policy) and at
 https://eqwkyyrahwvhjflweado.supabase.co/functions/v1/privacy
 
 HEALTH
