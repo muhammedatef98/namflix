@@ -40,3 +40,9 @@ yarn-error.*
 google-services.json
 GoogleService-Info.plist
 *-service-account*.json
+
+# Supabase CLI scratch state (link target, not config)
+supabase/.temp/
+
+# Local build logs
+build-error.txt

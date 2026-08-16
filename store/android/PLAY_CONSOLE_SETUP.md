@@ -111,13 +111,44 @@ Monetize → Subscriptions → **Create subscription** (same ids as iOS, Revenue
 
 | Subscription ID | Name | Base plan | Billing period | Price (USD) | Auto-renew |
 |---|---|---|---|---|---|
-| `namflix.premium.monthly` | Namflix Premium (Monthly) | `monthly-auto` | 1 month | **$4.99** | On |
+| `namflix.premium.monthly` | Namflix Premium (Monthly) | `monthly-auto` | 1 month | **$7.99** | On |
 | `namflix.premium.yearly` | Namflix Premium (Yearly) | `yearly-auto` | 1 year | **$39.99** | On |
 
-- Let Google auto-convert to local prices; keep default grace period / account hold.
+- **Do not let Google auto-convert every market.** Auto-conversion prices Egypt at US
+  parity, which is a non-starter in the largest Arabic market. Match iOS by hand:
+
+| | Monthly | Yearly | Lifetime |
+|---|---|---|---|
+| 🇺🇸 US | $7.99 | $39.99 | $99.99 |
+| 🇸🇦 Saudi | SAR 34.99 | SAR 179.99 | auto |
+| 🇦🇪 UAE | AED 29.99 | AED 149.99 | auto |
+| 🇪🇬 **Egypt** | **E£99.99** | **E£499.99** | **E£1,299.99** |
+
+  Monthly at $7.99 (not $4.99) is what takes the annual discount from 33% → 58%, which
+  is the whole reason the yearly plan converts. Keep default grace period / account hold.
 - Benefit text: "Unlock every soundscape, program and mixer."
 - A free trial is optional and needs **no rebuild** — the paywall only shows a trial line
   when the store actually reports a zero-price intro offer (`readFreeTrial` in `lib/purchases.ts`).
+
+### 5a-ii. Lifetime — one-time product  **(you only — outstanding)**
+
+Monetize → **In-app products** (NOT Subscriptions) → Create product:
+
+| Product ID | Name | Type | Price (USD) |
+|---|---|---|---|
+| `namflix.premium.lifetime` | Namflix Premium (Lifetime) | one-time | **$99.99** |
+
+Then in RevenueCat: add it to the **Play Store** app and to the **`$rc_lifetime`**
+package of the `default` offering, alongside the App Store product that is already there.
+
+> ⚠️ **Set it Non-consumable in RevenueCat, and treat that as immutable.**
+> From Play Billing 8 Google removed the ability to query *consumed* one-time purchases,
+> and RevenueCat auto-consumes anything configured as a consumable. In an app with no
+> accounts — exactly this one — a consumable Lifetime becomes **permanently
+> unrecoverable** on reinstall, with no way back for the buyer.
+
+The card only renders when `lifetime_mode = 'paid'` in `app_config` (it is), so the
+product must exist on Play before an Android user opens the paywall.
 
 ### 5b. The Ko-fi tip is allowed, but keep it clean
 
@@ -162,7 +193,7 @@ eas submit --platform android --profile production --latest
 • تمارين تنفّس ومسح للجسد واسترخاء عضلي تدريجي — كلها بأدلة سريرية.
 • قسم "ملل عن قصد" لتهدئة العقل والجسد وقت الأرق.
 • وضع "الإنقاذ الليلي" لصحوة الثالثة فجرًا.
-• وضع ضيف بدون حساب، وثيم داكن دافئ مريح للعين ليلاً.
+• بدون تسجيل ولا حساب — افتحه فيشتغل. وثيم داكن دافئ مريح للعين ليلاً.
 • بدون إعلانات، وبدون تتبّع، وبأقلّ قدر من البيانات.
 
 نامفلكس محتوى تعليمي للاسترخاء والنوم، وليس جهازًا طبيًا أو نصيحة طبية.
