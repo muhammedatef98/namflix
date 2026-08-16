@@ -19,8 +19,8 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'What we collect', ar: 'ما الذي نجمعه؟' },
     body: {
-      en: 'Nothing that identifies you. Namflix has no accounts, no sign-in and no email address to give us. Everything you do here — preferences, favourite sounds, your nightly check-ins and their history, subscription state — is stored only on your device.',
-      ar: 'لا شيء يعرّف بك. نامفلكس بلا حسابات ولا تسجيل دخول ولا بريد إلكتروني تعطينا إياه. كل ما تفعله هنا — التفضيلات، والأصوات المفضّلة، وتسجيلاتك الصباحية وسجلّها، وحالة الاشتراك — محفوظ على جهازك وحده.',
+      en: 'Nothing that identifies you. Namflix has no accounts, no sign-in and no email address to give us. Everything you do here — preferences, favourite sounds, your nightly check-ins and their history — is stored only on your device.',
+      ar: 'لا شيء يعرّف بك. نامفلكس بلا حسابات ولا تسجيل دخول ولا بريد إلكتروني تعطينا إياه. كل ما تفعله هنا — التفضيلات، والأصوات المفضّلة، وتسجيلاتك الصباحية وسجلّها — محفوظ على جهازك وحده.',
     },
   },
   {
@@ -33,8 +33,8 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'Where data lives', ar: 'أين تُحفظ البيانات؟' },
     body: {
-      en: 'On your phone. We hold no user data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you.',
-      ar: 'على هاتفك. لا نحتفظ بأي بيانات مستخدم على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية.',
+      en: 'On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The one exception is the purchase record described below.',
+      ar: 'على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناء الوحيد هو سجلّ الشراء الموضّح أدناه.',
     },
   },
   {
@@ -42,6 +42,13 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
     body: {
       en: 'Because everything lives on your device, deleting the app deletes all of it. There is no account of yours for us to hold, and nothing for you to request back.',
       ar: 'بما أنّ كل شيء على جهازك، فحذف التطبيق يحذفه بالكامل. لا يوجد حساب لك لدينا، ولا شيء تحتاج لطلب استرجاعه.',
+    },
+  },
+  {
+    title: { en: 'Purchases', ar: 'المشتريات' },
+    body: {
+      en: 'Subscriptions are processed by Apple or Google, never by us, and we never see your payment details. To unlock premium we use RevenueCat, which keeps a record of the purchase itself — which plan, and whether it is still active — against a random identifier created on your device. It never receives your name, your email or any way to contact you, because we never ask you for those. This purchase record is the only data of yours that exists off your device, and it is what makes "Restore purchases" work.',
+      ar: 'الاشتراكات تعالجها Apple أو Google لا نحن، ولا نرى بيانات الدفع إطلاقًا. ولفتح المزايا المدفوعة نستخدم RevenueCat، وهو يحتفظ بسجلّ عملية الشراء نفسها — أي باقة، وهل ما زالت فعّالة — مرتبطًا بمعرّف عشوائي يُنشأ على جهازك. ولا يصله اسمك ولا بريدك الإلكتروني ولا أي وسيلة للتواصل معك، لأننا لا نطلب منك شيئًا من ذلك أصلًا. وسجلّ الشراء هذا هو البيانات الوحيدة الخاصة بك خارج جهازك، وهو ما يجعل زرّ «استرجاع المشتريات» يعمل.',
     },
   },
   {
