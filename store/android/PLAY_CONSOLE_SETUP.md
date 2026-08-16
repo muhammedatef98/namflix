@@ -4,7 +4,7 @@ Everything needed to publish Namflix on Google Play. Values are ready to paste.
 Steps marked **(you only)** need your Google account / legal / financial action, or a
 file upload — neither can be automated from here.
 
-_Last verified: 2026-08-01, right after the iOS 1.0 submission (build 13)._
+_Last verified: 2026-08-16, after iOS 1.0 build 14 went to Waiting for Review._
 
 ---
 
@@ -13,7 +13,7 @@ _Last verified: 2026-08-01, right after the iOS 1.0 submission (build 13)._
 | Item | Status |
 |---|---|
 | Package name | `com.namflix.app` |
-| Android build (.aab) | version code **8** building on EAS — id `7cafb7d5-3380-4428-a32a-34e6b2d0652e` |
+| Android build (.aab) | ✅ version code **10** — id `edbfbb04-da69-4e62-9598-eed5ab5d17d1` |
 | App signing key | managed by EAS (same key reused across builds) |
 | RevenueCat Android key | ✅ already on EAS production (`EXPO_PUBLIC_REVENUECAT_ANDROID_KEY=goog_…`) |
 | Privacy Policy URL | ✅ live → `https://eqwkyyrahwvhjflweado.supabase.co/functions/v1/privacy` |
@@ -23,10 +23,23 @@ _Last verified: 2026-08-01, right after the iOS 1.0 submission (build 13)._
 | Feature graphic (1024×500) | ✅ `store/android/playstore-feature-1024x500.png` |
 | Phone screenshots | ✅ 4 EN + 4 AR, 1080×1920 → `store/android/screenshots/phone/{en,ar}/` |
 
-> **Build 8 already contains the RevenueCat Android key**, so unlike the old note in this
-> file there is no "build twice" problem: this .aab can go straight to production once the
-> Play subscriptions exist. Products are only *read* at runtime — creating them in Play
-> after uploading needs no rebuild.
+> 🚫 **Ship version code 10. Never ship version code 8.**
+> vc8 (1 Aug) predates the fix for the free-Lifetime leak — in that build any failed
+> `app_config` fetch granted a permanent free Lifetime. vc10 (16 Aug) is the post-fix
+> artifact: accounts removed, leak closed, paid Lifetime and the redeem control present.
+>
+> A note on provenance, because it looks wrong at a glance: EAS labels vc10 with commit
+> `da61e8d`, which is one commit *before* the account-removal commit `dfb9b7e`. That is
+> because the tree was still uncommitted when the build ran and EAS archived the working
+> tree. The build genuinely contains the new code — confirmed by the redeem control being
+> visible in the shipped app, which exists only in the post-fix source.
+>
+> vc10 already contains the RevenueCat Android key, so there is no "build twice" problem:
+> this .aab can go straight up once the Play products exist. Products are only *read* at
+> runtime — creating them in Play after uploading needs no rebuild.
+>
+> ⚠️ `eas submit --platform android` fails non-interactively ("Google Service Account Keys
+> cannot be set up in --non-interactive mode"). Upload the .aab by hand.
 
 ### ⚠️ Personal-account gate (check this first)
 
@@ -35,6 +48,23 @@ requires a **closed test with at least 12 testers opted in for 14 continuous day
 before you can apply for production access. Organization accounts are exempt.
 Check Play Console → Dashboard; if that requirement is showing, plan for the 14 days —
 everything below still applies, you just release to closed testing first.
+
+### What is actually outstanding (as of 2026-08-16)
+
+iOS is done and awaiting review. Android is the whole remaining half:
+
+- [ ] **Data safety form** — see §4a. The one item deliberately left unsaved.
+- [ ] **Create `namflix.premium.lifetime`** as a one-time product — see §5a-ii.
+- [ ] **RevenueCat Play side** — add that product to the Play app + `$rc_lifetime`.
+- [ ] **Regional pricing** on all three products, Egypt set by hand — see §5a.
+- [ ] **Sweep the English listing** for guest-mode / $4.99 copy. The Arabic listing was
+      already corrected in console; English was believed clean but is unverified.
+- [ ] **Closed testing** — 12 testers × 14 continuous days, if this is a personal account.
+
+Still unverified on **both** platforms: a real production (non-sandbox) purchase, and on
+Android a buy → uninstall → reinstall to confirm Auto Backup actually restores the
+entitlement. Auto Backup is the entire Android restore story and it rests on
+`android.allowBackup: true` in `app.json` — load-bearing despite the innocuous name.
 
 ---
 
@@ -85,6 +115,38 @@ the policy promises no accounts, no ads, no ad identifiers, no analytics tracker
 ⚠️ Updated 2026-08-09: accounts were removed from the app. If Email address or
 User IDs are still declared on the form from an earlier submission, **remove them** —
 a Data safety form that overstates collection is itself a policy violation.
+
+### 4a. Walkthrough — do all three steps in ONE pass  **(outstanding)**
+
+> **Status: not yet saved.** A previous attempt was deliberately discarded rather than
+> saved half-corrected. Nothing was damaged, but nothing was fixed either — the live
+> form still declares **"Username and other authentication"** and a **Delete account
+> URL**, both describing an app that no longer exists.
+
+**Why it must be one pass:** the wizard would not navigate *backwards* to the Data
+types step — clicking the step tabs and the Back button both bounced forward to
+Preview. If you correct the account question and then try to return for the data
+types, you can get stuck on a form that reads **"No data collection declared"**, which
+is *under*-declaring. RevenueCat receives purchase data off-device, so **Purchase
+history must be declared** — and it must match the Apple App Privacy declaration,
+which is already published as Purchase History only.
+
+Play Console → Policy → **App content** → **Data safety** → Manage.
+
+| # | Step | Do exactly this |
+|---|---|---|
+| 1 | **Data collection and security** | Select **"My app does not allow users to create an account."** The Delete account URL field disappears on its own — do not go looking for it. Answer the two follow-up questions **No**. |
+| 2 | **Data types** | Tick **Purchase history** only. **Untick Email address. Untick User IDs.** Leave every other category unticked — no crash logs, no diagnostics, no ad ID, no location. |
+| 3 | **Data usage and handling** | Purchase history → **Collected**, **not Shared**, processed **not** ephemerally. Purpose: **App functionality** only. Users can't request deletion → it is a store-side purchase record. Mark **Required**. |
+| 4 | **Preview** | Must read **"Purchase history"**. If it says **"No data collection declared"**, step 2 did not take — start the wizard again rather than saving. |
+
+Then **Save**, reload the page, and re-read it. Play Console has bitten this project
+before by appearing to accept a change that did not persist.
+
+⚠️ **Do not click by coordinates in this form.** Coordinate-based clicking lands one
+row off here, and it once ticked **"Username, password, and other authentication"** by
+accident — the precise opposite of the correction being made. Use the keyboard, or
+verify every click by re-reading the row label afterwards.
 
 - **Does your app collect or share user data?** → **Yes** (purchase history only).
 - **Data types:**
@@ -172,6 +234,10 @@ The `goog_…` key already exists, so most of this is probably done. Confirm:
    the paywall once 5a is done.
 2. If the 12-testers/14-days gate applies, run closed testing for the full 14 days.
 3. **Production** → create release → roll out.
+
+**The first upload is by hand.** `eas submit --platform android` fails with "Google
+Service Account Keys cannot be set up in --non-interactive mode" until the key already
+exists — that is the setup step failing, not the upload.
 
 Once the app exists in Play Console and a service-account key is in `eas.json`
 (`submit.production.android.serviceAccountKeyPath`), later uploads can be automated with:
