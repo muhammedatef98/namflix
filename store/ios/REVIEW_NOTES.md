@@ -22,14 +22,21 @@ cognitive shuffle, the "Boring on Purpose" hub, Night Rescue (the 3 a.m. mode)
 and six ambient sounds are permanently free. The rest is premium.
 
 IN-APP PURCHASES
-Two auto-renewable subscriptions in one group, entitlement handled by
-RevenueCat:
-  namflix.premium.monthly  — $4.99 / month
-  namflix.premium.yearly   — $39.99 / year
-Both are reachable from the paywall (home banner "PREMIUM", or any locked
+Two auto-renewable subscriptions in one group plus one non-consumable,
+entitlement handled by RevenueCat:
+  namflix.premium.monthly   — $7.99 / month
+  namflix.premium.yearly    — $39.99 / year
+  namflix.premium.lifetime  — $99.99 one-time (non-consumable)
+All are reachable from the paywall (home banner "PREMIUM", or any locked
 feature). The paywall lists what the subscription includes, the billed price,
 Restore Purchases, and tappable Terms of Use (Apple standard EULA) and Privacy
 Policy links.
+
+OFFER CODES
+The paywall also carries a "Redeem a code" control, which calls StoreKit's
+own code-redemption sheet (presentCodeRedemptionSheet). We never see or
+validate a code ourselves — Apple does. It is there so a free-Lifetime offer
+code can be redeemed without leaving the app.
 
 LIMITED-TIME LAUNCH OFFER
 Until 28 August 2026 the app also offers a free "Lifetime" unlock (no charge,
