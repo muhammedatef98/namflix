@@ -2,7 +2,7 @@ import { Text, View, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate, usePreloadRewardedOnFocus } from '@/hooks/useFeatureGate';
 import { SoundscapeCard } from '@/components/SoundscapeCard';
 import { StarField } from '@/components/StarField';
 import { NightPalette, FONT } from '@/constants/theme';
@@ -45,9 +45,9 @@ const GROUPS: { headingKey: string; tools: ToolEntry[] }[] = [
 ];
 
 export default function ToolsScreen() {
-  const { open, isPremium } = useFeatureGate();
+  const { open, isUnlocked, unlockBadge } = useFeatureGate();
   const { t, isRTL } = useLocale();
-  const locked = !isPremium;
+  usePreloadRewardedOnFocus();
 
   return (
     <LinearGradient colors={[NightPalette.deepEmber, NightPalette.voidBlack]} style={styles.fill}>
@@ -68,7 +68,8 @@ export default function ToolsScreen() {
                   accent={tool.accent}
                   title={t(tool.titleKey as never)}
                   subtitle={t(tool.subKey as never)}
-                  locked={locked}
+                  locked={!isUnlocked(tool.route)}
+                  badge={unlockBadge(tool.route)}
                   onPress={() => open(tool.route)}
                 />
               ))}

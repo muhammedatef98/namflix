@@ -37,6 +37,8 @@ type MixerValue = {
   applyPreset: (trackIds: string[]) => void;
   /** Full stop: releases every layer and clears the mix. */
   clear: () => void;
+  /** Pause for an interruption (e.g. an ad); returns a function restoring the exact mix. */
+  suspend: () => () => void;
 };
 
 const MixerContext = createContext<MixerValue | null>(null);
@@ -46,6 +48,13 @@ export function MixerProvider({ children }: { children: ReactNode }) {
   const [playing, setPlaying] = useState(true);
   // Imperative players live outside React state; keyed by track id.
   const playersRef = useRef<Map<string, AudioPlayer>>(new Map());
+  const playingRef = useRef(true);
+  // Bumped on every real mix change so a stale suspend() can't resume.
+  const versionRef = useRef(0);
+
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
 
   useEffect(() => {
     setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(
@@ -87,6 +96,7 @@ export function MixerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggle = useCallback(() => {
+    versionRef.current += 1;
     setPlaying((prev) => {
       const next = !prev;
       for (const p of playersRef.current.values()) {
@@ -98,6 +108,7 @@ export function MixerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const applyPreset = useCallback((trackIds: string[]) => {
+    versionRef.current += 1;
     for (const p of playersRef.current.values()) p.release();
     playersRef.current.clear();
     const fresh: MixLayer[] = trackIds
@@ -116,10 +127,23 @@ export function MixerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clear = useCallback(() => {
+    versionRef.current += 1;
     for (const p of playersRef.current.values()) p.release();
     playersRef.current.clear();
     setLayers([]);
     setPlaying(true);
+  }, []);
+
+  const suspend = useCallback(() => {
+    const players = [...playersRef.current.values()];
+    if (players.length === 0 || !playingRef.current) return () => undefined;
+    for (const p of players) p.pause();
+    const version = versionRef.current;
+    return () => {
+      if (versionRef.current !== version) return;
+      // Same players, same volumes — the mix comes back exactly as it was.
+      for (const p of players) if ([...playersRef.current.values()].includes(p)) p.play();
+    };
   }, []);
 
   const value = useMemo<MixerValue>(
@@ -133,8 +157,9 @@ export function MixerProvider({ children }: { children: ReactNode }) {
       toggle,
       applyPreset,
       clear,
+      suspend,
     }),
-    [layers, playing, addLayer, removeLayer, setVolume, toggle, applyPreset, clear],
+    [layers, playing, addLayer, removeLayer, setVolume, toggle, applyPreset, clear, suspend],
   );
 
   return <MixerContext.Provider value={value}>{children}</MixerContext.Provider>;

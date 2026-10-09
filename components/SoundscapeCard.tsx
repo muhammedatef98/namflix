@@ -10,6 +10,8 @@ type Props = {
   onPress?: () => void;
   accent?: boolean;
   locked?: boolean;
+  /** Small "18h left" note for an item opened by a rewarded ad. */
+  badge?: string | null;
 };
 
 /** A soft circular chevron that points the way in, in the app's warm accent. */
@@ -44,7 +46,7 @@ function LockGlyph({ color }: { color: string }) {
   );
 }
 
-export function SoundscapeCard({ title, subtitle, onPress, accent = false, locked = false }: Props) {
+export function SoundscapeCard({ title, subtitle, onPress, accent = false, locked = false, badge = null }: Props) {
   const { isRTL } = useLocale();
   const { accent: accentColor } = useTheme();
 
@@ -62,6 +64,7 @@ export function SoundscapeCard({ title, subtitle, onPress, accent = false, locke
       <View style={styles.text}>
         <Text style={[styles.title, isRTL && styles.textRTL]}>{title}</Text>
         <Text style={[styles.subtitle, isRTL && styles.textRTL]}>{subtitle}</Text>
+        {badge ? <Text style={[styles.badge, isRTL && styles.textRTL]}>{badge}</Text> : null}
       </View>
       <View
         style={[
@@ -112,5 +115,6 @@ const styles = StyleSheet.create({
   text: { flex: 1 },
   title: { fontSize: 16, color: NightPalette.textPrimary, lineHeight: 24 },
   subtitle: { fontSize: 12, color: NightPalette.dimText, marginTop: 2, lineHeight: 18 },
+  badge: { fontSize: 11, color: '#E0A878', marginTop: 4, lineHeight: 16 },
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
 });

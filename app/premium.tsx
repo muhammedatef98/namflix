@@ -1,11 +1,12 @@
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePremium } from '@/contexts/PremiumContext';
 import { type PaidPlan } from '@/lib/purchases';
+import { track, type PurchaseSource } from '@/lib/analytics';
 import { BackButton } from '@/components/BackButton';
 import { StarField } from '@/components/StarField';
 import { Logo } from '@/components/Logo';
@@ -20,6 +21,11 @@ export default function PremiumScreen() {
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
   const { plan, config, purchasablePlans, unlockLifetimeFree, purchase, restore } = usePremium();
+  // Where the paywall was opened from — lets purchases be attributed to the
+  // lock sheet / daily-cap message vs. the regular paywall.
+  const params = useLocalSearchParams<{ source?: string }>();
+  const source: PurchaseSource =
+    params.source === 'lock_screen' || params.source === 'cap_message' ? params.source : 'paywall';
 
   const lifetimeMode = config.lifetimeMode;
   // Paid cards are driven entirely by what the store actually offers, so a
@@ -30,6 +36,7 @@ export default function PremiumScreen() {
 
   const chooseFree = async () => {
     await unlockLifetimeFree();
+    track('purchase_completed', { plan: 'lifetime-free', source });
     router.back();
   };
 
@@ -44,6 +51,7 @@ export default function PremiumScreen() {
   const choosePaid = async (paid: PaidPlan) => {
     const res = await purchase(paid);
     if (res.ok) {
+      track('purchase_completed', { plan: paid, source });
       router.back();
       return;
     }
@@ -70,6 +78,10 @@ export default function PremiumScreen() {
             <Logo size={52} color={accent} />
             <Text style={[styles.title, isRTL && styles.rtl]}>{t('premiumTitle')}</Text>
             <Text style={[styles.sub, isRTL && styles.rtl]}>{t('premiumSub')}</Text>
+            <View style={[styles.benefit, isRTL && styles.rowRTL]}>
+              <Text style={[styles.benefitTick, { color: accent }]}>✓</Text>
+              <Text style={[styles.benefitText, isRTL && styles.rtl]}>{t('premiumNoAds')}</Text>
+            </View>
           </View>
 
           {plan === 'lifetime-free' && (
@@ -158,6 +170,9 @@ const styles = StyleSheet.create({
   sub: { fontSize: 14, lineHeight: 22, color: NightPalette.dimText, textAlign: 'center', marginTop: 8, maxWidth: 320 },
   rtl: { textAlign: 'right', writingDirection: 'rtl' },
   rowRTL: { flexDirection: 'row-reverse' },
+  benefit: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12 },
+  benefitTick: { fontSize: 14, fontFamily: FONT.bold, lineHeight: 20 },
+  benefitText: { color: '#F2C9A6', fontSize: 13, lineHeight: 20 },
 
   activeBanner: {
     borderWidth: 1,

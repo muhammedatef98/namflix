@@ -117,6 +117,30 @@ export async function hasActiveEntitlement(): Promise<boolean> {
 }
 
 /**
+ * Subscribe to entitlement changes pushed by RevenueCat (purchase, renewal,
+ * expiry, restore on another device). Returns an unsubscribe function. Lets
+ * premium — and therefore "no ads" — update live without a restart.
+ */
+export function onEntitlementChange(listener: (active: boolean) => void): () => void {
+  if (!ready || !Purchases) return () => undefined;
+  const sdk = Purchases;
+  const handler = (info: { entitlements: { active: Record<string, unknown> } }) =>
+    listener(info.entitlements.active[ENTITLEMENT_ID] != null);
+  try {
+    sdk.addCustomerInfoUpdateListener(handler);
+  } catch {
+    return () => undefined;
+  }
+  return () => {
+    try {
+      sdk.removeCustomerInfoUpdateListener(handler);
+    } catch {
+      // ignore
+    }
+  };
+}
+
+/**
  * The plans the user can buy right now, each with its real StoreKit price.
  * Returns [] when the store isn't ready — so the paywall hides paid buttons
  * rather than ever showing a price that can't be purchased.

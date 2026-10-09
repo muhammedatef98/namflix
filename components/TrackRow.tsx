@@ -2,18 +2,20 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 import { NightPalette, FONT } from '@/constants/theme';
 import { SoundArt } from '@/components/SoundArt';
 import type { SoundTrack } from '@/lib/mediaLibrary';
 
 function TrackCard({ track }: { track: SoundTrack }) {
-  const { open, isPremium } = useFeatureGate();
+  const { open, isUnlocked, unlockBadge } = useFeatureGate();
   const { tc, isRTL } = useLocale();
+  const route = `/player/${track.id}`;
+  const badge = unlockBadge(route);
 
   return (
     <Pressable
-      onPress={() => open(`/player/${track.id}`)}
+      onPress={() => open(route)}
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <SoundArt type={track.art} />
@@ -26,7 +28,11 @@ function TrackCard({ track }: { track: SoundTrack }) {
           <View style={styles.durationPill}>
             <Text style={styles.durationText}>{tc(track.duration)}</Text>
           </View>
-          {!isPremium && (
+          {badge ? (
+            <View style={styles.timePill}>
+              <Text style={styles.timeText}>{badge}</Text>
+            </View>
+          ) : !isUnlocked(route) && (
             <View style={styles.lockPill}>
               <Svg width={11} height={11} viewBox="0 0 24 24">
                 <Path d="M7 10 V7 a5 5 0 0 1 10 0 V10" stroke="#F2C9A6" strokeWidth={2.4} fill="none" strokeLinecap="round" />
@@ -113,6 +119,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(10,5,3,0.55)',
   },
+  timePill: {
+    backgroundColor: 'rgba(10,5,3,0.55)',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    flexShrink: 1,
+  },
+  timeText: { color: '#E0A878', fontSize: 10, lineHeight: 15 },
   durationText: { color: NightPalette.textPrimary, fontSize: 10, lineHeight: 15 },
   title: { color: '#F2C9A6', fontSize: 15, fontFamily: FONT.bold, lineHeight: 22 },
   subtitle: { color: '#E0A878', fontSize: 11, marginTop: 3, lineHeight: 17 },

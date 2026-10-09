@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
-import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
   configurePurchases,
   hasActiveEntitlement,
   getPurchasablePlans,
+  onEntitlementChange,
   buyPlan as iapBuyPlan,
   restorePurchases as iapRestore,
   type PaidPlan,
@@ -68,8 +68,13 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
   // no-op safely when IAP isn't configured, leaving the free offer intact.
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: () => void = () => undefined;
     configurePurchases().then(async (ok) => {
       if (!ok || cancelled) return;
+      // Live updates: subscribing anywhere flips premium (and removes ads) at once.
+      unsubscribe = onEntitlementChange((active) => {
+        if (!cancelled) setStorePremium(active);
+      });
       const [active, plans] = await Promise.all([hasActiveEntitlement(), getPurchasablePlans()]);
       if (cancelled) return;
       setStorePremium(active);
@@ -77,6 +82,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       cancelled = true;
+      unsubscribe();
     };
   }, []);
 
@@ -120,19 +126,4 @@ export function usePremium(): PremiumValue {
   const ctx = useContext(PremiumContext);
   if (!ctx) throw new Error('usePremium must be used within PremiumProvider');
   return ctx;
-}
-
-/**
- * Returns an `open(route)` that navigates to a locked feature only when the
- * user is premium; otherwise it sends them to the paywall. Central gate so
- * every feature surface stays consistent — one tap through the free Lifetime
- * offer unlocks them all.
- */
-export function useFeatureGate() {
-  const { isPremium } = usePremium();
-  const router = useRouter();
-  return {
-    isPremium,
-    open: (route: string) => router.push((isPremium ? route : '/premium') as never),
-  };
 }
