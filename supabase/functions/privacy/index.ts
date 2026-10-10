@@ -6,7 +6,8 @@
 //
 // ⚠️ Keep in sync with `app/privacy.tsx`, which shows the same policy in-app,
 // and with the App Privacy / Data safety declarations in the two store consoles.
-// Namflix has no accounts: every one of those four must say so.
+// Namflix has no accounts, and shows ads only in the free version: every one
+// of those four must say both.
 const HTML = `<!doctype html>
 <html lang="en">
 <head>
@@ -25,24 +26,27 @@ const HTML = `<!doctype html>
 </head>
 <body><main>
 <h1>Namflix — Privacy Policy</h1>
-<p class="muted">Last updated: 16 August 2026</p>
-<p>Namflix is a sleep-support app. We collect nothing about you.</p>
+<p class="muted">Last updated: 10 October 2026</p>
+<p>Namflix is a sleep-support app. We collect as little as possible.</p>
 
 <h2>What we collect</h2>
 <p>Nothing that identifies you. Namflix has no accounts, no sign-in, and no email address to give us. Everything you do here — preferences, favourite sounds, your nightly check-ins and their history — is stored only on your device.</p>
 
 <h2>What we do NOT collect</h2>
-<p>No ads, no ad identifiers, no analytics trackers, no location, no contacts, no health data, no third-party data sale — ever.</p>
+<p>No analytics trackers, no precise location, no contacts, no health data, and no selling of data to third parties — ever. Premium members see no ads at all, and no ad requests are made for them.</p>
+
+<h2>Ads in the free version</h2>
+<p>The free version can show ads from Google AdMob — for example when you choose to watch a short ad to unlock a sound or method for 24 hours. To serve and measure ads, Google may process your device’s advertising identifier (on iOS only if you allow tracking), IP address and approximate location, device information and ad interactions. Where the law requires it (e.g. EEA/UK) we ask for your consent first; if you decline consent or tracking you still get non-personalised ads, and the app works the same. Google’s policy: <a href="https://policies.google.com/technologies/partner-sites">policies.google.com/technologies/partner-sites</a></p>
 
 <h2>Where data lives</h2>
-<p>On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The one exception is the purchase record described under Purchases below.</p>
+<p>On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The exceptions are the purchase record (see Purchases) and, in the free version only, the ads described above.</p>
 
 <h2>Deleting your data</h2>
 <p>Because everything lives on your device, deleting the app deletes all of it. There is no account of yours for us to hold, and nothing for you to request back.</p>
 
 <h2>Purchases</h2>
 <p>Subscriptions are processed by Apple or Google, never by us. We never see your payment details. Your purchase is tied to your Apple ID or Google account, which is how "Restore purchases" finds it.</p>
-<p>To unlock premium we use RevenueCat, which keeps a record of the purchase itself — which plan, and whether it is still active — against a random identifier created on your device. It never receives your name, your email or any way to contact you, because we never ask you for those. This purchase record is the only data of yours that exists off your device, and it is what makes "Restore purchases" work.</p>
+<p>To unlock premium we use RevenueCat, which keeps a record of the purchase itself — which plan, and whether it is still active — against a random identifier created on your device. It never receives your name, your email or any way to contact you, because we never ask you for those. Apart from ads in the free version, this purchase record is the only data of yours that exists off your device, and it is what makes "Restore purchases" work.</p>
 
 <h2>Not medical advice</h2>
 <p>Namflix offers educational, evidence-informed content. It is not a medical device and not medical advice. Persistent insomnia warrants clinician-guided care.</p>
@@ -52,24 +56,27 @@ const HTML = `<!doctype html>
 
 <div class="ar">
 <h1>نامفلكس — سياسة الخصوصية</h1>
-<p class="muted">آخر تحديث: ١٦ أغسطس ٢٠٢٦</p>
-<p>نامفلكس تطبيق للمساعدة على النوم، ولا نجمع عنك شيئًا.</p>
+<p class="muted">آخر تحديث: ١٠ أكتوبر ٢٠٢٦</p>
+<p>نامفلكس تطبيق للمساعدة على النوم، ونجمع أقلّ قدر ممكن من البيانات.</p>
 
 <h2>ما الذي نجمعه؟</h2>
 <p>لا شيء يعرّف بك. نامفلكس بلا حسابات ولا تسجيل دخول ولا بريد إلكتروني تعطينا إياه. كل ما تفعله هنا — التفضيلات، والأصوات المفضّلة، وتسجيلاتك الصباحية وسجلّها — محفوظ على جهازك وحده.</p>
 
 <h2>ما الذي لا نجمعه</h2>
-<p>لا إعلانات، ولا معرّفات إعلانية، ولا أدوات تتبّع، ولا موقع، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا.</p>
+<p>لا أدوات تحليل أو تتبّع، ولا موقع دقيق، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا. ولا يرى مشتركو بريميوم أي إعلانات، ولا تُطلب لهم إعلانات أصلًا.</p>
+
+<h2>الإعلانات في النسخة المجانية</h2>
+<p>قد تعرض النسخة المجانية إعلانات من Google AdMob — مثلًا عندما تختار مشاهدة إعلان قصير لفتح صوت أو أسلوب لمدة ٢٤ ساعة. ولعرض الإعلانات وقياسها قد تعالج Google المعرّف الإعلاني لجهازك (على iOS فقط إن سمحتَ بالتتبّع)، وعنوان IP والموقع التقريبي، ومعلومات الجهاز، وتفاعلك مع الإعلانات. وحيث يشترط القانون ذلك (كالاتحاد الأوروبي والمملكة المتحدة) نطلب موافقتك أولًا؛ وإن رفضتَ الموافقة أو التتبّع تصلك إعلانات غير مخصّصة ويعمل التطبيق كما هو. سياسة Google: <a href="https://policies.google.com/technologies/partner-sites">policies.google.com/technologies/partner-sites</a></p>
 
 <h2>أين تُحفظ البيانات؟</h2>
-<p>على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناء الوحيد هو سجلّ الشراء الموضّح في قسم «المشتريات» أدناه.</p>
+<p>على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناءان هما سجلّ الشراء (انظر «المشتريات»)، والإعلانات في النسخة المجانية فقط كما وُضّح أعلاه.</p>
 
 <h2>حذف بياناتك</h2>
 <p>بما أنّ كل شيء على جهازك، فحذف التطبيق يحذفه بالكامل. لا يوجد حساب لك لدينا، ولا شيء تحتاج لطلب استرجاعه.</p>
 
 <h2>المشتريات</h2>
 <p>الاشتراكات تعالجها Apple أو Google لا نحن، ولا نرى بيانات الدفع إطلاقًا. اشتراكك مرتبط بحساب Apple أو Google، وبه يجد زرّ «استرجاع المشتريات» شراءك.</p>
-<p>ولفتح المزايا المدفوعة نستخدم RevenueCat، وهو يحتفظ بسجلّ عملية الشراء نفسها — أي باقة، وهل ما زالت فعّالة — مرتبطًا بمعرّف عشوائي يُنشأ على جهازك. ولا يصله اسمك ولا بريدك الإلكتروني ولا أي وسيلة للتواصل معك، لأننا لا نطلب منك شيئًا من ذلك أصلًا. وسجلّ الشراء هذا هو البيانات الوحيدة الخاصة بك خارج جهازك، وهو ما يجعل زرّ «استرجاع المشتريات» يعمل.</p>
+<p>ولفتح المزايا المدفوعة نستخدم RevenueCat، وهو يحتفظ بسجلّ عملية الشراء نفسها — أي باقة، وهل ما زالت فعّالة — مرتبطًا بمعرّف عشوائي يُنشأ على جهازك. ولا يصله اسمك ولا بريدك الإلكتروني ولا أي وسيلة للتواصل معك، لأننا لا نطلب منك شيئًا من ذلك أصلًا. وباستثناء الإعلانات في النسخة المجانية، فسجلّ الشراء هذا هو البيانات الوحيدة الخاصة بك خارج جهازك، وهو ما يجعل زرّ «استرجاع المشتريات» يعمل.</p>
 
 <h2>ليس نصيحة طبية</h2>
 <p>يقدّم نامفلكس محتوى تعليميًّا قائمًا على الأدلة، وليس جهازًا طبيًّا أو نصيحة طبية. الأرق المستمر يستدعي رعاية مختصّة.</p>

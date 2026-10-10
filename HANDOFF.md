@@ -331,7 +331,13 @@ cd /Users/mohamed/Desktop/namflix/namflix-app && npx eas-cli build --platform al
 
 ## Decisions worth not relitigating
 
-- **No ads.** Contradicts the published "no ads, no trackers" policy, wrong for a 3 a.m. sleep app, and worth roughly one yearly subscriber per month at this volume.
+- ~~**No ads.**~~ **Reversed (Oct 2026): optional rewarded ads for free users only.**
+  On a locked item a free user may watch one short AdMob ad to open it for 24h (3/day).
+  No app-open ads, no banners, interstitials off (`ENABLE_INTERSTITIALS`). Nothing ad-related
+  runs at launch; Premium of any kind (including `lifetime-free` / redeemed codes) makes no
+  ad requests. The in-app and hosted privacy policies, `app.json` privacy manifest,
+  `store/ios/REVIEW_NOTES.md` and `store/android/PLAY_CONSOLE_SETUP.md` §3/§4b were updated
+  to disclose it. See `ADS_SETUP.md`.
 - **Keep the free tier** (`lib/freeTier.ts` — breathing, cognitive shuffle, Night Rescue, 6 sounds). It is the word-of-mouth engine.
 - **Lifetime at 2.5× yearly**, not a token price. A cheap permanent unlock cannibalises the subscription forever.
 - **No hand-rolled redeem codes.** A code shipped in the bundle is extractable and cannot be revoked without a new build. Apple Offer Codes solve both.

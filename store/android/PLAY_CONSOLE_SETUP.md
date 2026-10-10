@@ -97,7 +97,7 @@ Play Console → **Create app**
 | Section | Answer |
 |---|---|
 | **App access** | All functionality available without special access — the app has no sign-in at all. (Premium is a purchase, not restricted access; no test account required.) |
-| **Ads** | **No**, the app has no ads |
+| **Ads** | **Yes, my app contains ads** — optional rewarded ads (Google AdMob) in the free version only; none for Premium |
 | **Content rating** | Questionnaire → category **Reference, News, or Educational**; no violence / sex / profanity / drugs / gambling. Answer **Yes** to references to health & medical topics if asked (the CBT-I program + sleep-restriction calculator) — this is the same driver that made iOS 13+. Email: `Namflix.sleep@gmail.com` |
 | **Target audience** | Age groups: **18 and over**. Appeals to children: **No** |
 | **News app** | No |
@@ -109,8 +109,9 @@ Play Console → **Create app**
 
 ## 4. Data safety form — declare exactly this
 
-Namflix collects almost nothing. **Match this to the privacy policy, not to an ideal —
-the policy promises no accounts, no ads, no ad identifiers, no analytics trackers.**
+Namflix collects almost nothing itself. **Match this to the privacy policy, not to an
+ideal — the policy promises no accounts and no analytics trackers, and discloses Google
+AdMob ads in the free version.** See §4b for the ad additions.
 
 ⚠️ Updated 2026-08-09: accounts were removed from the app. If Email address or
 User IDs are still declared on the form from an earlier submission, **remove them** —
@@ -135,6 +136,29 @@ RevenueCat uses is random and device-side, not you.
 It is also why the app's *own* manifest in `app.json` has an empty
 `NSPrivacyCollectedDataTypes` and that is correct, not an oversight: the app collects
 nothing itself, and Apple aggregates the app manifest with each SDK's manifest.
+
+### 4b. Ads additions (Google AdMob, free version only)
+
+The free version shows optional rewarded ads, so the Google Mobile Ads SDK's data must
+be declared on top of Purchase history. Declare what Google publishes for the SDK —
+**check each row against Google's "Data disclosure" page for the Google Mobile Ads
+SDK before saving**, since that page, not this table, is authoritative:
+
+| Data type | Collected | Shared | Purposes |
+|---|---|---|---|
+| Location → **Approximate location** (from IP) | Yes | Yes | Advertising or marketing, Analytics, Fraud prevention, security, and compliance |
+| App activity → **Other user-generated content / App interactions** | Yes | Yes | Advertising or marketing, Analytics |
+| App info and performance → **Crash logs**, **Diagnostics** | Yes | Yes | Analytics, Fraud prevention, security, and compliance |
+| Device or other IDs → **Device or other IDs** (advertising ID) | Yes | Yes | Advertising or marketing, Analytics, Fraud prevention, security, and compliance |
+
+- Data is **encrypted in transit** (SDK uses HTTPS).
+- These are collected only for free users who choose to watch an ad; still declare
+  them as collected, because Play has no "only sometimes" answer.
+- The Android manifest gets `com.google.android.gms.permission.AD_ID` from the SDK, so
+  **Advertising ID** in App content must be answered **Yes — Advertising or marketing**.
+
+The earlier note that Crash logs and Diagnostics were *over*-declared still holds for
+the app itself (no Sentry). They come back only as AdMob's declaration.
 
 ### 4a. Walkthrough — do all three steps in ONE pass  **(outstanding)**
 
@@ -297,7 +321,7 @@ Instead of grabbing your attention, Namflix is built to let it go:
 • A "Boring on Purpose" section to quiet the mind and body when sleep won't come.
 • Night Rescue, a dedicated mode for the 3 a.m. wake-up.
 • No sign-up, no account — just open it. Warm dark theme that's easy on night-time eyes.
-• No ads, no trackers, minimal data.
+• No trackers, minimal data. The free version has optional short ads; Premium has none.
 
 Namflix offers educational relaxation content; it is not a medical device or medical advice.
 

@@ -53,15 +53,26 @@ BACKGROUND AUDIO
 UIBackgroundModes: audio is used so sleep sounds keep playing with the screen
 off — this is the app's core function.
 
+ADS (FREE VERSION ONLY)
+The free version offers optional rewarded ads from Google AdMob: on a locked
+sound or method, the user can choose to watch one short ad to open that item
+for 24 hours (max 3 a day). There are no app-open ads and no banners;
+interstitials are disabled. Nothing ad-related runs at launch — the AdMob SDK,
+the consent form (EEA/UK) and the App Tracking Transparency prompt all appear
+only the first time the user taps "Watch a short ad". Declining tracking or
+consent still gets non-personalised ads. Premium users (any plan) see no ads
+and no ad requests are made for them.
+
 PRIVACY
-No ads, no ad identifiers, no analytics or tracking SDKs, so no ATT prompt.
-No personal data is collected: there are no accounts, so there is no e-mail
+No analytics or tracking SDKs other than AdMob in the free version (above).
+No personal data is collected by us: there are no accounts, so there is no e-mail
 address and nothing of yours held on our servers. Preferences, favourites and
 nightly check-ins live only on the device and go when the app is deleted, so
 there is no account-deletion flow to provide.
 
-The one thing that exists off-device is the purchase record, which is why App
-Privacy declares Purchase History (App Functionality) and nothing else. It is
+Two things exist off-device. The purchase record, declared as Purchase History
+(App Functionality), and in the free version the data Google AdMob processes to
+serve ads, declared under Third-Party Advertising (see the checklist below). It is
 handled by RevenueCat against a random device-side identifier — not linked to
 identity and not used for tracking, matching the SDK's own privacy manifest.
 The privacy policy states this in both languages. Privacy policy is in-app
@@ -94,9 +105,18 @@ Support: Namflix.sleep@gmail.com
       needed — the paywall reads the trial from StoreKit and only then shows
       "7 days free, then …" plus the required trial disclosure. If no trial is
       configured, none is advertised.
-- [ ] App Privacy answers match reality: **Purchase History only** (App
-      Functionality). Email Address and User ID must be REMOVED — accounts no
-      longer exist. No tracking, no third-party advertising.
+- [ ] App Privacy answers match reality and `ios.privacyManifests` in `app.json`.
+      Email Address and User ID must stay REMOVED — accounts no longer exist.
+      - **Purchase History** — App Functionality; not linked; not tracking.
+      - AdMob, free version only — all **not linked** to identity:
+        - **Device ID** — Third-Party Advertising; **used for tracking**
+        - **Advertising Data** — Third-Party Advertising; **used for tracking**
+        - **Product Interaction** — Third-Party Advertising
+        - **Coarse Location** — Third-Party Advertising
+        - **Crash Data**, **Performance Data** — App Functionality
+      - Tracking = Yes means the ATT prompt is required, and it is in the build.
+      - Cross-check against Google-Mobile-Ads' own `PrivacyInfo.xcprivacy` after
+        `pod install` (`ios/Pods/Google-Mobile-Ads-SDK/...`), as was done for RevenueCat.
 - [ ] Age rating questionnaire completed (expect 4+).
 - [ ] Category: Health & Fitness (alt: Lifestyle).
 - [ ] Screenshots show the app in use (no splash, and no login screen — it is
