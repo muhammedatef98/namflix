@@ -17,9 +17,15 @@
  * Every fetch falls back to DEFAULT_CONFIG. That fallback is deliberately the
  * stingy one: an unreachable config must never hand out a free Lifetime. The
  * giveaway is opt-in from the dashboard, never the consequence of a failure.
+ *
+ * The same row carries optional `ads_*` columns (supabase/app_config_ads.sql)
+ * that tune the ad policy — rewarded cap, interstitial flag, quiet hours, etc.
+ * The row is read with `select('*')` so a database without those columns
+ * still loads the lifetime fields and just uses DEFAULT_AD_POLICY.
  */
 import { supabase } from './supabase';
 import { DEMO_MODE } from './config';
+import { DEFAULT_AD_POLICY, parseAdPolicy, type AdPolicy } from './ads/policy';
 
 export type LifetimeMode = 'free' | 'paid' | 'off';
 
@@ -33,11 +39,13 @@ export type AppConfig = {
    * Supabase dashboard (app_config.free_until) — no build needed.
    */
   freeUntil: string | null;
+  ads: AdPolicy;
 };
 
 export const DEFAULT_CONFIG: AppConfig = {
   lifetimeMode: 'off',
   freeUntil: null,
+  ads: DEFAULT_AD_POLICY,
 };
 
 // Only an explicit 'free' from the dashboard opens the giveaway. Anything else —
@@ -55,7 +63,7 @@ export async function fetchAppConfig(): Promise<AppConfig> {
   try {
     const { data, error } = await supabase
       .from('app_config')
-      .select('lifetime_mode, free_until')
+      .select('*')
       .eq('id', 1)
       .single();
 
@@ -64,6 +72,7 @@ export async function fetchAppConfig(): Promise<AppConfig> {
     return {
       lifetimeMode: normaliseMode(data.lifetime_mode),
       freeUntil: normaliseInstant(data.free_until),
+      ads: parseAdPolicy(data as Record<string, unknown>),
     };
   } catch {
     return DEFAULT_CONFIG;

@@ -1,11 +1,14 @@
+import { useCallback } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Svg, { Path } from 'react-native-svg';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, THEMES } from '@/contexts/ThemeContext';
-import { usePremium, useFeatureGate } from '@/contexts/PremiumContext';
+import { usePremium } from '@/contexts/PremiumContext';
+import { useAds } from '@/contexts/AdsContext';
+import { useFeatureGate, usePreloadRewardedOnFocus } from '@/hooks/useFeatureGate';
 import { useLocale } from '@/contexts/LocaleContext';
 import { NightPalette, FONT, WORDMARK } from '@/constants/theme';
 import { Logo } from '@/components/Logo';
@@ -24,12 +27,32 @@ const HERO_STARS = [
 export default function HomeScreen() {
   const { intensity, setIntensity, accent, theme, setThemeId } = useTheme();
   const { isPremium, plan } = usePremium();
-  const { open, isLocked } = useFeatureGate();
+  const { open, isLocked, unlockBadge } = useFeatureGate();
+  const { maybeShowInterstitial } = useAds();
   const { lang, t, tc, isRTL } = useLocale();
   const router = useRouter();
+  usePreloadRewardedOnFocus();
   // Everyone except a paying subscriber (paid plans set the store entitlement,
   // never a local `plan`) — i.e. free users and free-Lifetime holders.
   const showSupport = !isPremium || plan === 'lifetime-free';
+
+  // The only place an interstitial may ever appear: back on Home right after
+  // the user ended a session — and only if ENABLE_INTERSTITIALS is on and all
+  // the quiet-hours / frequency / audio rules pass (see lib/ads/rules.ts).
+  // The short delay lets the screen settle; leaving Home cancels it.
+  useFocusEffect(
+    useCallback(() => {
+      if (isPremium) return;
+      const id = setTimeout(() => void maybeShowInterstitial('home_after_session'), 1200);
+      return () => clearTimeout(id);
+    }, [isPremium, maybeShowInterstitial]),
+  );
+
+  const lockProps = (route: string) => ({
+    locked: isLocked(route),
+    badge: unlockBadge(route),
+    onPress: () => open(route),
+  });
 
   const sounds = tracksForLang(lang);
 
@@ -140,28 +163,24 @@ export default function HomeScreen() {
           <View style={styles.padded}>
             <SoundscapeCard
               accent
-              locked={isLocked('/boring')}
+              {...lockProps('/boring')}
               title={t('toolBoringTitle')}
               subtitle={t('toolBoringSub')}
-              onPress={() => open('/boring')}
             />
             <SoundscapeCard
-              locked={isLocked('/breathe')}
+              {...lockProps('/breathe')}
               title={t('toolBreatheTitle')}
               subtitle={t('toolBreatheSub')}
-              onPress={() => open('/breathe')}
             />
             <SoundscapeCard
-              locked={isLocked('/worry')}
+              {...lockProps('/worry')}
               title={t('toolWorryTitle')}
               subtitle={t('toolWorrySub')}
-              onPress={() => open('/worry')}
             />
             <SoundscapeCard
-              locked={isLocked('/insights')}
+              {...lockProps('/insights')}
               title={t('toolInsightsTitle')}
               subtitle={t('toolInsightsSub')}
-              onPress={() => open('/insights')}
             />
           </View>
 

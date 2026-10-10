@@ -3,7 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate, usePreloadRewardedOnFocus } from '@/hooks/useFeatureGate';
 import { useTheme } from '@/contexts/ThemeContext';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { StarField } from '@/components/StarField';
@@ -35,6 +35,7 @@ function ShuffleGlyph({ color }: { color: string }) {
 export default function ListenScreen() {
   const { lang, t, tc, isRTL } = useLocale();
   const { open, isPremium } = useFeatureGate();
+  usePreloadRewardedOnFocus();
   const { accent } = useTheme();
   const { favoriteIds } = useFavorites();
 

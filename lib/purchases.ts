@@ -61,6 +61,20 @@ export const PRODUCT_IDS: Record<PaidPlan, string> = {
 /** Display order on the paywall — best value first. */
 const PLAN_ORDER: readonly PaidPlan[] = ['yearly', 'monthly', 'lifetime'];
 
+type StorePackage = { packageType?: string; product: { identifier: string } };
+
+/**
+ * Find the offering package for a plan — by product id, or, for Lifetime only,
+ * by RevenueCat's LIFETIME package type so the paywall still finds it if the
+ * store id differs. A subscription is never matched by package type alone.
+ */
+export function findPackage<P extends StorePackage>(packages: P[], plan: PaidPlan): P | undefined {
+  return (
+    packages.find((p) => p.product.identifier === PRODUCT_IDS[plan]) ??
+    (plan === 'lifetime' ? packages.find((p) => p.packageType === 'LIFETIME') : undefined)
+  );
+}
+
 /** The RevenueCat entitlement that means "premium unlocked". */
 export const ENTITLEMENT_ID = 'premium';
 
@@ -168,6 +182,30 @@ export async function hasActiveEntitlement(): Promise<boolean> {
 }
 
 /**
+ * Subscribe to entitlement changes pushed by RevenueCat (purchase, renewal,
+ * expiry, restore on another device). Returns an unsubscribe function. Lets
+ * premium — and therefore "no ads" — update live without a restart.
+ */
+export function onEntitlementChange(listener: (active: boolean) => void): () => void {
+  if (!ready || !Purchases) return () => undefined;
+  const sdk = Purchases;
+  const handler = (info: { entitlements: { active: Record<string, unknown> } }) =>
+    listener(info.entitlements.active[ENTITLEMENT_ID] != null);
+  try {
+    sdk.addCustomerInfoUpdateListener(handler);
+  } catch {
+    return () => undefined;
+  }
+  return () => {
+    try {
+      sdk.removeCustomerInfoUpdateListener(handler);
+    } catch {
+      // ignore
+    }
+  };
+}
+
+/**
  * The plans the user can buy right now, each with its real StoreKit price.
  * Returns [] when the store isn't ready — so the paywall hides paid buttons
  * rather than ever showing a price that can't be purchased.
@@ -179,7 +217,7 @@ export async function getPurchasablePlans(): Promise<PurchasablePlan[]> {
     const packages = offerings.current?.availablePackages ?? [];
     const out: PurchasablePlan[] = [];
     for (const plan of PLAN_ORDER) {
-      const pkg = packages.find((p) => p.product.identifier === PRODUCT_IDS[plan]);
+      const pkg = findPackage(packages, plan);
       if (pkg) {
         out.push({
           plan,
@@ -200,9 +238,7 @@ export async function buyPlan(plan: PaidPlan): Promise<PurchaseResult> {
   if (!ready || !Purchases) return { ok: false, reason: 'unavailable' };
   try {
     const offerings = await Purchases.getOfferings();
-    const pkg = offerings.current?.availablePackages.find(
-      (p) => p.product.identifier === PRODUCT_IDS[plan],
-    );
+    const pkg = findPackage(offerings.current?.availablePackages ?? [], plan);
     if (!pkg) return { ok: false, reason: 'unavailable' };
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     return customerInfo.entitlements.active[ENTITLEMENT_ID]

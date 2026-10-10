@@ -12,7 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { StarField } from '@/components/StarField';
 import { NightPalette, FONT } from '@/constants/theme';

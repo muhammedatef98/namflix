@@ -1,4 +1,5 @@
-import { Text, View, ScrollView, StyleSheet } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text, View, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -6,10 +7,11 @@ import { BackButton } from '@/components/BackButton';
 import { StarField } from '@/components/StarField';
 import { NightPalette, FONT } from '@/constants/theme';
 import type { Localized } from '@/lib/i18n';
+import { privacyOptionsRequired, showPrivacyOptions } from '@/lib/ads/sdk';
 
 // The full policy, shown in the user's app language. Content mirrors the
 // hosted page (functions/v1/privacy) that App Store Connect links to.
-const UPDATED: Localized = { en: 'Last updated: 9 August 2026', ar: 'آخر تحديث: ٩ أغسطس ٢٠٢٦' };
+const UPDATED: Localized = { en: 'Last updated: 10 October 2026', ar: 'آخر تحديث: ١٠ أكتوبر ٢٠٢٦' };
 const INTRO: Localized = {
   en: 'Namflix is a sleep-support app. We collect as little as possible.',
   ar: 'نامفلكس تطبيق للمساعدة على النوم، ونجمع أقلّ قدر ممكن من البيانات.',
@@ -26,15 +28,22 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'What we do NOT collect', ar: 'ما الذي لا نجمعه' },
     body: {
-      en: 'No ads, no ad identifiers, no analytics trackers, no location, no contacts, no health data, and no selling of data to third parties — ever.',
-      ar: 'لا إعلانات، ولا معرّفات إعلانية، ولا أدوات تتبّع، ولا موقع، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا.',
+      en: 'No analytics trackers, no precise location, no contacts, no health data, and no selling of data to third parties — ever. Premium members see no ads at all, and no ad requests are made for them.',
+      ar: 'لا أدوات تحليل أو تتبّع، ولا موقع دقيق، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا. ولا يرى مشتركو بريميوم أي إعلانات، ولا تُطلب لهم إعلانات أصلًا.',
+    },
+  },
+  {
+    title: { en: 'Ads in the free version', ar: 'الإعلانات في النسخة المجانية' },
+    body: {
+      en: 'The free version can show ads from Google AdMob — for example when you choose to watch a short ad to unlock a sound or method for 24 hours. To serve and measure ads, Google may process your device’s advertising identifier (on iOS only if you allow tracking), IP address and approximate location, device information and ad interactions. Where the law requires it (e.g. EEA/UK) we ask for your consent first; if you decline consent or tracking you still get non-personalised ads, and the app works the same. Google’s policy: policies.google.com/technologies/partner-sites',
+      ar: 'قد تعرض النسخة المجانية إعلانات من Google AdMob — مثلًا عندما تختار مشاهدة إعلان قصير لفتح صوت أو أسلوب لمدة ٢٤ ساعة. ولعرض الإعلانات وقياسها قد تعالج Google المعرّف الإعلاني لجهازك (على iOS فقط إن سمحتَ بالتتبّع)، وعنوان IP والموقع التقريبي، ومعلومات الجهاز، وتفاعلك مع الإعلانات. وحيث يشترط القانون ذلك (كالاتحاد الأوروبي والمملكة المتحدة) نطلب موافقتك أولًا؛ وإن رفضتَ الموافقة أو التتبّع تصلك إعلانات غير مخصّصة ويعمل التطبيق كما هو. سياسة Google: policies.google.com/technologies/partner-sites',
     },
   },
   {
     title: { en: 'Where data lives', ar: 'أين تُحفظ البيانات؟' },
     body: {
-      en: 'On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The one exception is the purchase record described below.',
-      ar: 'على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناء الوحيد هو سجلّ الشراء الموضّح أدناه.',
+      en: 'On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The exceptions are the purchase record and, in the free version only, the ads — both described in this policy.',
+      ar: 'على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناءان هما سجلّ الشراء، والإعلانات في النسخة المجانية فقط — وكلاهما موضّح في هذه السياسة.',
     },
   },
   {
@@ -47,8 +56,8 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
   {
     title: { en: 'Purchases', ar: 'المشتريات' },
     body: {
-      en: 'Subscriptions are processed by Apple or Google, never by us, and we never see your payment details. To unlock premium we use RevenueCat, which keeps a record of the purchase itself — which plan, and whether it is still active — against a random identifier created on your device. It never receives your name, your email or any way to contact you, because we never ask you for those. This purchase record is the only data of yours that exists off your device, and it is what makes "Restore purchases" work.',
-      ar: 'الاشتراكات تعالجها Apple أو Google لا نحن، ولا نرى بيانات الدفع إطلاقًا. ولفتح المزايا المدفوعة نستخدم RevenueCat، وهو يحتفظ بسجلّ عملية الشراء نفسها — أي باقة، وهل ما زالت فعّالة — مرتبطًا بمعرّف عشوائي يُنشأ على جهازك. ولا يصله اسمك ولا بريدك الإلكتروني ولا أي وسيلة للتواصل معك، لأننا لا نطلب منك شيئًا من ذلك أصلًا. وسجلّ الشراء هذا هو البيانات الوحيدة الخاصة بك خارج جهازك، وهو ما يجعل زرّ «استرجاع المشتريات» يعمل.',
+      en: 'Subscriptions are processed by Apple or Google, never by us, and we never see your payment details. To unlock premium we use RevenueCat, which keeps a record of the purchase itself — which plan, and whether it is still active — against a random identifier created on your device. It never receives your name, your email or any way to contact you, because we never ask you for those. Apart from ads in the free version, this purchase record is the only data of yours that exists off your device, and it is what makes "Restore purchases" work.',
+      ar: 'الاشتراكات تعالجها Apple أو Google لا نحن، ولا نرى بيانات الدفع إطلاقًا. ولفتح المزايا المدفوعة نستخدم RevenueCat، وهو يحتفظ بسجلّ عملية الشراء نفسها — أي باقة، وهل ما زالت فعّالة — مرتبطًا بمعرّف عشوائي يُنشأ على جهازك. ولا يصله اسمك ولا بريدك الإلكتروني ولا أي وسيلة للتواصل معك، لأننا لا نطلب منك شيئًا من ذلك أصلًا. وباستثناء الإعلانات في النسخة المجانية، فسجلّ الشراء هذا هو البيانات الوحيدة الخاصة بك خارج جهازك، وهو ما يجعل زرّ «استرجاع المشتريات» يعمل.',
     },
   },
   {
@@ -69,6 +78,11 @@ const SECTIONS: { title: Localized; body: Localized }[] = [
 
 export default function PrivacyScreen() {
   const { t, tc, isRTL } = useLocale();
+  // Google UMP requires a way to revisit ad consent where it applies (EEA/UK).
+  const [showAdChoices, setShowAdChoices] = useState(false);
+  useEffect(() => {
+    privacyOptionsRequired().then(setShowAdChoices).catch(() => undefined);
+  }, []);
 
   return (
     <LinearGradient colors={[NightPalette.deepEmber, NightPalette.voidBlack]} style={styles.fill}>
@@ -86,6 +100,12 @@ export default function PrivacyScreen() {
               <Text style={[styles.body, isRTL && styles.textRTL]}>{tc(s.body)}</Text>
             </View>
           ))}
+
+          {showAdChoices && (
+            <Pressable onPress={() => void showPrivacyOptions()} hitSlop={8} style={styles.adChoices}>
+              <Text style={[styles.adChoicesText, isRTL && styles.textRTL]}>{t('adPrivacyChoices')}</Text>
+            </Pressable>
+          )}
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -107,4 +127,6 @@ const styles = StyleSheet.create({
   },
   body: { fontSize: 14, lineHeight: 24, color: '#E0B896' },
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
+  adChoices: { marginTop: 26, paddingVertical: 6 },
+  adChoicesText: { fontSize: 14, color: NightPalette.amber, textDecorationLine: 'underline', lineHeight: 22 },
 });

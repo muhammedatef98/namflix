@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import Svg, { Path, Rect } from 'react-native-svg';
 import { useLocale } from '@/contexts/LocaleContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 import { NightPalette } from '@/constants/theme';
 import { ScienceNote } from '@/components/ScienceNote';
 import type { DullActivity } from '@/lib/dullContent';

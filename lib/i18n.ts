@@ -532,6 +532,24 @@ export const STRINGS = {
   claiming: { en: 'Activating…', ar: 'جارٍ التفعيل…' },
   claimed: { en: 'Activated ✓', ar: 'تم التفعيل ✓' },
 
+  premiumNoAds: { en: 'Remove all ads', ar: 'إزالة كل الإعلانات' },
+
+  // locked content — rewarded unlock (free users only)
+  lockTitle: { en: 'This one is for members', ar: 'هذا المحتوى للمشتركين' },
+  lockSub: {
+    en: 'Open it with Premium, or watch one short ad to open it for {hours}.',
+    ar: 'افتحه مع بريميوم، أو شاهد إعلانًا قصيرًا ليبقى مفتوحًا لك {hours}.',
+  },
+  unlockWithPremium: { en: 'Unlock with Premium', ar: 'افتحه مع بريميوم' },
+  // {hours} → hoursPhrase(), e.g. "24 hours" / "٢٤ ساعة"
+  watchAdUnlock: { en: 'Watch a short ad to unlock this for {hours}', ar: 'شاهد إعلانًا قصيرًا وافتح هذا لمدة {hours}' },
+  goPremiumNoAds: { en: 'Go Premium — everything unlocked, no ads', ar: 'اشترك في بريميوم واستمتع بكل المحتوى بلا إعلانات' },
+  adLoading: { en: 'Getting a short ad ready…', ar: 'نُجهّز إعلانًا قصيرًا…' },
+  adNoFill: { en: 'No ad available right now, please try again later', ar: 'لا يتوفّر إعلان الآن، جرّب مرة أخرى بعد قليل' },
+  adDailyCap: { en: 'Daily limit reached — unlock everything with Premium', ar: 'وصلتَ إلى الحدّ اليومي — افتح كل شيء مع بريميوم' },
+  adNotNow: { en: 'Not now', ar: 'ليس الآن' },
+  adPrivacyChoices: { en: 'Ad privacy choices', ar: 'خيارات خصوصية الإعلانات' },
+
   // descent rationale
   descentWhy: { en: 'Why this path', ar: 'لماذا هذا المسار' },
 
@@ -589,4 +607,31 @@ export type StringKey = keyof typeof STRINGS;
 
 export function translate(key: StringKey, lang: Lang): string {
   return STRINGS[key][lang];
+}
+
+const AR_DIGITS = '٠١٢٣٤٥٦٧٨٩';
+
+/** Western digits → Arabic-Indic, matching the app's Arabic copy (٢٤, ٣٣٪). */
+export function arabicDigits(n: number): string {
+  return String(n).replace(/[0-9]/g, (d) => AR_DIGITS[Number(d)]);
+}
+
+/** "24 hours" / "٢٤ ساعة" — Arabic follows number–noun agreement. */
+export function hoursPhrase(h: number, lang: Lang): string {
+  if (lang === 'en') return h === 1 ? '1 hour' : `${h} hours`;
+  if (h === 1) return 'ساعة واحدة';
+  if (h === 2) return 'ساعتين';
+  if (h <= 10) return `${arabicDigits(h)} ساعات`;
+  return `${arabicDigits(h)} ساعة`;
+}
+
+/**
+ * Small "time left" badge for a temporarily unlocked item: "18h left" /
+ * "متاح لمدة ١٨ ساعة". Rounds up, so it never claims less time than remains.
+ * Arabic follows the number–noun agreement rules (ساعة / ساعتين / ساعات).
+ */
+export function hoursLeftLabel(remainingMs: number, lang: Lang): string {
+  if (remainingMs < 60 * 60 * 1000) return lang === 'ar' ? 'متاح لأقل من ساعة' : '<1h left';
+  const h = Math.ceil(remainingMs / (60 * 60 * 1000));
+  return lang === 'en' ? `${h}h left` : `متاح لمدة ${hoursPhrase(h, lang)}`;
 }

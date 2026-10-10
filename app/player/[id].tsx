@@ -15,7 +15,7 @@ import Animated, {
 import { useLocale } from '@/contexts/LocaleContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import { usePlayback } from '@/contexts/PlaybackContext';
-import { useFeatureGate } from '@/contexts/PremiumContext';
+import { useFeatureGate } from '@/hooks/useFeatureGate';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BackButton } from '@/components/BackButton';
 import { NightPalette, FONT } from '@/constants/theme';

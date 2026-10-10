@@ -37,6 +37,12 @@ type PlaybackValue = {
   setVolume: (v: number) => void;
   /** Sleep timer; pass null (or the active value) to cancel. */
   setTimer: (min: number | null) => void;
+  /**
+   * Pause for an interruption (e.g. a rewarded ad) and return a function that
+   * resumes exactly where it was — unless the user or the sleep timer changed
+   * playback in between, in which case it leaves things alone.
+   */
+  suspend: () => () => void;
 };
 
 const PlaybackContext = createContext<PlaybackValue | null>(null);
@@ -51,6 +57,13 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const fadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const volumeRef = useRef(1);
+  const playingRef = useRef(false);
+  // Bumped on every real playback change so a stale suspend() can't resume.
+  const versionRef = useRef(0);
+
+  useEffect(() => {
+    playingRef.current = playing;
+  }, [playing]);
 
   useEffect(() => {
     setAudioModeAsync({ playsInSilentMode: true, shouldPlayInBackground: true }).catch(
@@ -81,6 +94,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const stop = useCallback(() => {
+    versionRef.current += 1;
     clearFade();
     clearTimer();
     playerRef.current?.release();
@@ -98,6 +112,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
       if (playerRef.current) playerRef.current.volume = v;
       if (v <= 0) {
         clearFade();
+        versionRef.current += 1;
         playerRef.current?.pause();
         if (playerRef.current) playerRef.current.volume = volumeRef.current;
         setPlaying(false);
@@ -111,6 +126,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     (trackId: string) => {
       const next = trackById(trackId);
       if (!next) return;
+      versionRef.current += 1;
       if (track?.id === trackId && playerRef.current) {
         if (!playing) {
           playerRef.current.play();
@@ -143,6 +159,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const toggle = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
+    versionRef.current += 1;
     clearFade();
     player.volume = volumeRef.current;
     if (playing) {
@@ -168,9 +185,21 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     [timerMin, startFadeOut],
   );
 
+  const suspend = useCallback(() => {
+    const player = playerRef.current;
+    if (!player || !playingRef.current) return () => undefined;
+    // Only pause — any fade or sleep timer keeps running, so a timer that ends
+    // during the interruption still ends the night's sound.
+    player.pause();
+    const version = versionRef.current;
+    return () => {
+      if (versionRef.current === version && playerRef.current === player) player.play();
+    };
+  }, []);
+
   const value = useMemo<PlaybackValue>(
-    () => ({ track, playing, volume, timerMin, play, toggle, stop, setVolume: applyVolume, setTimer }),
-    [track, playing, volume, timerMin, play, toggle, stop, applyVolume, setTimer],
+    () => ({ track, playing, volume, timerMin, play, toggle, stop, setVolume: applyVolume, setTimer, suspend }),
+    [track, playing, volume, timerMin, play, toggle, stop, applyVolume, setTimer, suspend],
   );
 
   return <PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>;

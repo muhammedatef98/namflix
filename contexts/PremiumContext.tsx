@@ -1,13 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
-import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isFreeRoute } from '@/lib/freeTier';
 import { isValidLifetimeCode } from '@/lib/redeemCodes';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
   configurePurchases,
   hasActiveEntitlement,
   getPurchasablePlans,
+  onEntitlementChange,
   buyPlan as iapBuyPlan,
   restorePurchases as iapRestore,
   type PaidPlan,
@@ -78,9 +77,14 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
   // reads. All calls no-op safely when IAP isn't configured (Expo Go).
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: () => void = () => undefined;
     (async () => {
       const ok = await configurePurchases(); // idempotent
       if (!ok || cancelled) return;
+      // Live updates: subscribing anywhere flips premium (and removes ads) at once.
+      unsubscribe = onEntitlementChange((active) => {
+        if (!cancelled) setStorePremium(active);
+      });
       const [active, plans] = await Promise.all([hasActiveEntitlement(), getPurchasablePlans()]);
       if (cancelled) return;
       setStorePremium(active);
@@ -88,6 +92,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
     })();
     return () => {
       cancelled = true;
+      unsubscribe();
     };
   }, []);
 
@@ -159,19 +164,3 @@ export function usePremium(): PremiumValue {
   return ctx;
 }
 
-/**
- * The single navigation gate. `open(route)` goes where the user asked when the
- * route is premium-unlocked or part of the permanently free tier, and to the
- * paywall otherwise; `isLocked(route)` answers the same question for padlock
- * badges, so what a card shows and what tapping it does can never disagree.
- */
-export function useFeatureGate() {
-  const { isPremium } = usePremium();
-  const router = useRouter();
-  const isLocked = (route: string) => !isPremium && !isFreeRoute(route);
-  return {
-    isPremium,
-    isLocked,
-    open: (route: string) => router.push((isLocked(route) ? '/premium' : route) as never),
-  };
-}
