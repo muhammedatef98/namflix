@@ -26,11 +26,22 @@ this.
 
 **Guideline 2.3.2 — Promotional image for the "Monthly" subscription**
 
-The image has been replaced with original artwork created for this purpose. It
-is not a screenshot of the app, and it carries no price and no plan name — only
-the app mark and what the tier grants. (App Store Connect offers no way to
-delete a subscription image once set, only to replace it, which is why it was
-replaced rather than removed.)
+**Build 14 (18 Aug 2026): duplicate promotional images.** "Monthly" and
+"Lifetime" carried the same image file. Because we do not promote any in-app
+purchase on the App Store, the "Monthly" image has been **deleted outright**
+rather than replaced.
+
+Exactly one promotional image now exists across all three products — a single
+image on "Lifetime", kept only so that offer-code redemptions have artwork.
+"Monthly" and "Yearly" have none. No duplicates remain.
+
+The earlier build-13 issue stands resolved too: the remaining Lifetime image is
+original artwork made for this purpose — not a screenshot, no price, no plan
+name.
+
+*(Correction to the previous reply: deleting a subscription image **is**
+possible. The Delete control is simply hidden while a submission is open — the
+file inputs are disabled until the submission is cancelled.)*
 
 Subscriptions are unaffected: they remain tied to the user's Apple ID and are
 recoverable via "Restore purchases" on the plans screen.

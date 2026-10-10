@@ -1,10 +1,77 @@
 # Namflix — session handoff
 
-**Last updated: 16 August 2026.** Everything done, everything left, and the exact
+**Last updated: 19 August 2026.** Everything done, everything left, and the exact
 commands. Written so another session (or another person) can pick it up cold.
 
-**Status right now:** iOS is **Waiting for Review** (verified in App Store Connect
-today). Android is the outstanding half.
+**Status right now:** iOS 1.0 (**build 15**) is **Waiting for Review** —
+resubmitted 19 Aug at 12:16 AM, 5 items. Android is the outstanding half.
+
+---
+
+## 18 August 2026 — build 14 rejected (2.3.2), and what it exposed
+
+**The rejection was one line:** Monthly and Lifetime carried the *same*
+promotional image file. Apple: "You submitted duplicate or identical promotional
+images for different promoted In-App Purchase products." Nothing else was cited;
+the other four items were all `Ready for Review`.
+
+**Fixed by deleting the Monthly image outright** (we promote no IAP on the App
+Store, so it had no purpose). Exactly one promotional image now exists across the
+three products — on Lifetime, kept only so offer-code redemptions have artwork.
+Yearly has none. Verified after reload.
+
+⚠️ **Correction to the note below: a subscription image CAN be deleted.** The
+Delete control is simply absent while a submission is open — the file inputs
+carry `disabled`. Cancel the submission and both the control and the inputs come
+back. The old claim ("ASC offers no way to delete") was written from that trap
+and has been removed from the reviewer notes and `REVIEW_REPLY.md`, because it
+was a false statement sitting in front of App Review.
+
+**Two live contradictions found while checking the screenshots** — neither was
+in the rejection, both would have been visible to the next reviewer:
+
+| Where | Said | Now |
+|---|---|---|
+| `lib/i18n.ts` `premiumFeat4` — **on the paywall** | "on every device you sign in with" | "restore it on any of your devices" |
+| `lib/i18n.ts` `supportWhyBody` — Support screen | "the accounts backend" | (removed) |
+
+Both claimed infrastructure that was deleted on 9 Aug. The paywall one is the
+dangerous one: it is on the exact screen the reviewer opens to test the IAP,
+while the reviewer notes say "There is no account and no sign-in screen."
+The dead `exit` key (`خروج`) went too.
+
+**⚠️ The IAP REVIEW screenshots are the real landmine — all three are stale.**
+`Monthly`, `Yearly` and `Lifetime` each carry a *pixel-identical* copy of the old
+paywall capture (`store/ios/iap-review/paywall.png`). It shows:
+
+- a **"Free offer ends in 28 days … Claim it free"** card — the launch giveaway
+  that was cancelled (`lifetime_mode = 'paid'`)
+- **Monthly $4.99** — the real price is **$7.99**
+- **Yearly "Save 33% vs monthly"** — it is now 58%
+- **no Lifetime plan at all** — while the Lifetime IAP's own review notes say
+  "The attached screenshot shows that paywall"
+
+A wrong price plus a giveaway that does not exist, sitting in the review
+material, is the same 2.3.2 family the app was already rejected under twice.
+
+**RESOLVED 19 Aug.** Replaced with `paywall-subscriptions.png` (Monthly, Yearly)
+and `paywall-lifetime.png` (Lifetime), both captured from build 15.
+
+⚠️ **Correction: the simulator CAN render StoreKit prices.** Add a StoreKit
+configuration file (`ios/Namflix.storekit`, in the repo) and reference it from the
+scheme's LaunchAction; RevenueCat then resolves all three products normally. That
+is how these captures were made — no device needed. Full recipe in
+`store/ios/iap-review/README.md`.
+
+One trap: a leftover test purchase makes the paywall render *"You're on Lifetime
+— everything is unlocked"* instead of the plan cards. Uninstall and reinstall the
+app on the simulator first.
+
+**The 8 App Store screenshots were checked one by one (EN + AR): clean.** Home,
+Methods, Listen, Sound Mixer — no sign-out, no account UI, no prices.
+
+**⚠️ These are JS changes, so build 14 does not contain them.** Shipping the copy
+fix needs build 15.
 
 ---
 

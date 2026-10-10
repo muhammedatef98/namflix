@@ -28,7 +28,6 @@ export const STRINGS = {
 
   // home
   tagline: { en: 'the sky is dimming', ar: 'السماء تخفت' },
-  exit: { en: 'exit', ar: 'خروج' },
   goodNight: { en: 'Good night', ar: 'طابت ليلتك' },
   homeIntro: {
     en: 'Everything here is built to lower arousal and ease you toward sleep — the science-backed way.',
@@ -437,15 +436,19 @@ export const STRINGS = {
     ar: 'برنامج الـ١٤ ليلة للعلاج المعرفي السلوكي، ونافذة النوم، وتحليلك الشخصي',
   },
   premiumFeat4: {
-    en: 'No ads and no tracking — on every device you sign in with',
-    ar: 'بلا إعلانات ولا تتبّع — على كل جهاز تسجّل الدخول منه',
+    en: 'No ads and no tracking — restore it on any of your devices',
+    ar: 'بلا إعلانات ولا تتبّع — استعِدْه على أي جهاز من أجهزتك',
   },
   planMonthly: { en: 'Monthly', ar: 'شهري' },
   planYearly: { en: 'Yearly', ar: 'سنوي' },
   planLifetime: { en: 'Lifetime', ar: 'مدى الحياة' },
   perMonth: { en: '/mo', ar: '/شهر' },
   perYear: { en: '/yr', ar: '/سنة' },
-  planYearlyNote: { en: 'Save 58% vs monthly', ar: 'وفّر ٥٨٪ عن الشهري' },
+  // Savings copy is assembled around a number DERIVED from two live StoreKit
+  // prices (see `yearlySavingsPct` in app/premium.tsx). The percentage is never
+  // written by hand, so it cannot drift out of date when prices change.
+  savePrefix: { en: 'Save', ar: 'وفّر' },
+  vsMonthly: { en: 'vs paying monthly', ar: 'عن الدفع الشهري' },
   planLifetimePaidNote: {
     en: 'One payment. Yours for good — no renewal.',
     ar: 'دفعة واحدة. لك إلى الأبد — بلا تجديد.',
@@ -459,7 +462,7 @@ export const STRINGS = {
     ar: 'الباقات المدفوعة ستتوفّر مع إصدار المتجر. حاليًا Lifetime مجاني — استمتع بكل شيء.',
   },
   premiumActive: { en: 'You’re on Lifetime — everything is unlocked. Rest easy.', ar: 'أنت على باقة مدى الحياة — كل شيء مفتوح. نَم مطمئنًّا.' },
-  premiumEntry: { en: 'Unlock everything — free for launch', ar: 'افتح كل المزايا — مجانًا مع الإطلاق' },
+  premiumEntry: { en: 'Unlock every method and sound', ar: 'افتح كل الأساليب والأصوات' },
   premiumBadge: { en: 'PREMIUM', ar: 'بريميوم' },
   bestValue: { en: 'BEST VALUE', ar: 'الأفضل قيمة' },
   restorePurchases: { en: 'Restore purchases', ar: 'استرجاع المشتريات' },
@@ -475,6 +478,20 @@ export const STRINGS = {
   redeemAndroid: {
     en: 'Open the Play Store, tap your profile, then Payments and subscriptions → Redeem code.',
     ar: 'افتح متجر Play، واضغط صورتك، ثم المدفوعات والاشتراكات ← استخدام رمز.',
+  },
+  // Lifetime-code copy. The field takes both kinds of code: a Namflix lifetime
+  // code, checked on device, and an App Store offer code, handed to Apple's
+  // sheet. The placeholder stays neutral so neither looks like the "real" one.
+  redeemPlaceholder: { en: 'Enter your code', ar: 'أدخل الرمز' },
+  redeemSubmit: { en: 'Redeem', ar: 'تفعيل' },
+  redeemAppStore: { en: 'I have an App Store code', ar: 'لديّ رمز من App Store' },
+  redeemLifetimeDone: {
+    en: 'Code accepted — Namflix is yours for life. Everything is unlocked.',
+    ar: 'تم قبول الرمز — نامفليكس لك مدى الحياة. كل شيء مفتوح الآن.',
+  },
+  redeemInvalid: {
+    en: 'That code isn’t valid. Check for typos and try again.',
+    ar: 'هذا الرمز غير صالح. تأكّد من كتابته وحاول مرة أخرى.',
   },
   restorePrompt: {
     en: 'Reinstalled, or on a new phone? Your subscription is tied to your store account.',
@@ -535,8 +552,8 @@ export const STRINGS = {
     ar: 'ما الذي يذهب إليه دعمك',
   },
   supportWhyBody: {
-    en: 'Audio hosting and streaming, the accounts backend, developer fees, and the hours behind each new evidence-based tool.',
-    ar: 'استضافة الأصوات وبثّها، وخوادم الحسابات، ورسوم النشر، والساعات وراء كل أداة جديدة قائمة على الأدلة.',
+    en: 'Audio hosting and streaming, developer fees, and the hours behind each new evidence-based tool.',
+    ar: 'استضافة الأصوات وبثّها، ورسوم النشر، والساعات وراء كل أداة جديدة قائمة على الأدلة.',
   },
   supportCta: { en: 'Buy me a coffee', ar: 'ادعمني بفنجان قهوة' },
   supportOpensBrowser: {

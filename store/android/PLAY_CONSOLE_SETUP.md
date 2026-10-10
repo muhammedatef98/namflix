@@ -303,3 +303,127 @@ Namflix offers educational relaxation content; it is not a medical device or med
 
 The free version is enough to start. Premium unlocks every sound, program and mixer.
 ```
+
+
+---
+
+## 19 August 2026 — Play Console pass
+
+### Done
+
+**Foreground service declaration (was OVERDUE since 31 Jan 2024 and blocking every release).**
+`expo-audio` ships `FOREGROUND_SERVICE_MEDIA_PLAYBACK` plus an `AudioControlsService`
+(`mediaPlayback`). That is a legitimate use — sleep sounds and stories play with the
+screen off. Declared as **Media playback**.
+⚠️ **Not submitted yet: Google requires a VIDEO LINK** demonstrating the feature.
+
+Note: `expo-audio` also declares an `AudioRecordingService` (`microphone`), but
+`RECORD_AUDIO` is in `blockedPermissions` and no `FOREGROUND_SERVICE_MICROPHONE`
+permission is merged, so that service can never start. Only media playback was
+declared, which is accurate.
+
+**Data safety questionnaire — rewritten and saved.**
+It previously declared *Email address* and *account creation*, neither of which has
+existed since 9 Aug. It also **over-declared** *Crash logs* + *Diagnostics*:
+`EXPO_PUBLIC_SENTRY_DSN` exists as an EAS env var but **Sentry is not installed** —
+`package.json` has no crash or analytics SDK at all (only `expo-updates`).
+
+Final declaration: **Purchase history only, collected, not shared, App functionality,
+optional.** This matches the Apple App Privacy declaration exactly. Keep them in sync.
+
+⚠️ **The Save button is hidden inside the bottom bar's ⋮ menu.** The first save was
+lost silently — the visible bar only shows "Discard". Always reopen the form and
+verify the answers persisted.
+
+**`namflix.premium.lifetime` created and activated** as a one-time product.
+- Purchase option id `lifetime`, type **Buy**, **Digital content**
+- ⚠️ **"Allow users to purchase more than one" is OFF and must stay off.** A
+  consumable one-time product cannot be restored after reinstall on Billing
+  Library 8 — every Lifetime buyer would silently lose their purchase.
+
+**Regional pricing** (base USD 99.99, auto-converted, then overridden):
+
+| Tier | Regions | Price |
+|---|---|---|
+| B | Jordan, Lebanon, Iraq, Morocco, Tunisia, Algeria, Libya | ~USD 49.99 |
+| C | Yemen | USD 37.99 |
+| Egypt | | EGP 1,499.99 |
+| Gulf | Saudi / UAE / Qatar | SAR 429.99 / AED 384.99 / QAR 365 |
+
+Mauritania is not a Play billing region. Tunisia and Libya silently failed the first
+bulk edit — **always re-read the table after a bulk price change.**
+
+### Blocked
+
+1. **Upload `vc11` .aab by hand.** `eas submit --platform android` fails:
+   "Google Service Account Keys cannot be set up in --non-interactive mode".
+   The fix is a Google service account key (see below) — until then, drag the
+   `.aab` into the Closed testing track manually.
+2. **Foreground service video link** — needs a publicly reachable URL (unlisted
+   YouTube or Drive), so it needs the owner's account.
+3. **12 testers x 14 continuous days** before production unlocks. Currently **2**.
+   This is the longest pole in the whole Android release and it is not technical —
+   start it early.
+
+### Worth doing once: the service account key
+
+It permanently removes the manual `.aab` upload:
+Google Cloud Console -> create a service account -> enable the **Google Play
+Android Developer API** -> create a JSON key -> Play Console **Users and
+permissions** -> invite that service account with release permissions ->
+`eas credentials` -> Android -> upload the JSON.
+
+Treat the JSON as a secret: it can publish releases. Never commit it.
+
+
+---
+
+## 19 August 2026 (evening) — the wrong-track trap
+
+**vc12 was uploaded to `Internal testing`, not `Closed testing`.** The tracks look
+almost identical in the console, and the upload succeeded, so nothing looked wrong:
+
+| Track | Version | Date |
+|---|---|---|
+| Internal testing | **12** | 19 Aug |
+| Closed testing - Alpha | **8** | 1 Aug |
+
+⚠️ **Only Closed testing counts toward the "12 testers x 14 continuous days"
+production requirement.** Time spent on Internal testing counts for nothing. Always
+confirm the track name after an upload.
+
+Fixed: created a Closed testing - Alpha release from vc12 (Add from library ->
+version code 12) and sent it for review together with the pending Data safety
+change.
+
+### vc12 is verified clean
+
+The `premiumEntry` banner used to read *"Unlock everything - free for launch"*
+while the giveaway was cancelled and everything was paid — a false claim on the
+home screen of both platforms. Verified byte-level that vc12 carries the fix:
+
+```bash
+unzip -q vc12.aab -d vc12x
+python3 -c "
+d=open('vc12x/base/assets/index.android.bundle','rb').read()
+print('new:', d.count(b'Unlock every method and sound'))          # 1
+print('old:', d.count(b'free for launch'))                        # 0
+print('ar new:', d.count('افتح كل الأساليب والأصوات'.encode('utf-16-le')))  # 1
+"
+```
+
+⚠️ Hermes stores non-ASCII as **UTF-16LE**, so a plain `grep -a` for Arabic returns
+nothing even when the string is present. Search `utf-16-le` bytes, not UTF-8.
+
+### Still blocking production
+
+**Testers: 14 invited, 1 opted in.** The requirement counts *opted-in* testers, not
+invitations. The 14-day clock does not start until 12 people have actually accepted
+and installed from the closed-testing link. This is the single longest pole in the
+Android release and it is not a technical task.
+
+### Release warning (benign)
+
+"No deobfuscation file associated with this App Bundle" — normal for Expo builds
+without an uploaded R8 mapping. It does not block the release; it only makes crash
+stack traces harder to read.

@@ -80,6 +80,12 @@ export type FreeTrial = {
 export type PurchasablePlan = {
   plan: PaidPlan;
   priceString: string; // ALWAYS from StoreKit, never hardcoded
+  /**
+   * The same amount as a number, in the store's local currency. Carried only so
+   * the paywall can DERIVE a saving ("save 58%") by comparing two real store
+   * prices. Never rendered directly — `priceString` is the formatted one.
+   */
+  price: number;
   /** Present only when the store offers a zero-price introductory period. */
   trial?: FreeTrial;
 };
@@ -178,6 +184,7 @@ export async function getPurchasablePlans(): Promise<PurchasablePlan[]> {
         out.push({
           plan,
           priceString: pkg.product.priceString,
+          price: pkg.product.price,
           trial: readFreeTrial(pkg.product),
         });
       }

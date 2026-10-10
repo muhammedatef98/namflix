@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, useCallback, t
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isFreeRoute } from '@/lib/freeTier';
+import { isValidLifetimeCode } from '@/lib/redeemCodes';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
   configurePurchases,
@@ -34,6 +35,12 @@ type PremiumValue = {
   purchasablePlans: PurchasablePlan[];
   /** Grant the free lifetime plan (the launch offer). */
   unlockLifetimeFree: () => Promise<void>;
+  /**
+   * Redeem a lifetime code typed into the paywall. Returns whether the code was
+   * valid; the caller owns the message, since a wrong code is a normal typo and
+   * not an error worth throwing.
+   */
+  redeemLifetimeCode: (code: string) => Promise<boolean>;
   /** Buy a paid App Store plan; refreshes entitlement on success. */
   purchase: (plan: PaidPlan) => Promise<PurchaseResult>;
   /** Restore a previous App Store purchase. */
@@ -84,6 +91,24 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Local grant, on device. Without an app account there is no identity to hang
+  // a server-side entitlement on, so the claim lives in storage and does not
+  // survive a reinstall — acceptable for a giveaway, and the same trade the
+  // launch offer already makes.
+  const grantLifetimeFree = useCallback(async () => {
+    setPlan('lifetime-free');
+    await AsyncStorage.setItem(PLAN_KEY, 'lifetime-free').catch(() => undefined);
+  }, []);
+
+  const redeemLifetimeCode = useCallback(
+    async (code: string): Promise<boolean> => {
+      if (!isValidLifetimeCode(code)) return false;
+      await grantLifetimeFree();
+      return true;
+    },
+    [grantLifetimeFree],
+  );
+
   const purchase = useCallback(async (paid: PaidPlan): Promise<PurchaseResult> => {
     const res = await iapBuyPlan(paid);
     if (res.ok) setStorePremium(true);
@@ -103,13 +128,8 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       loading,
       config,
       purchasablePlans,
-      unlockLifetimeFree: async () => {
-        // Local grant, on device. Without an app account there is no identity to
-        // hang a server-side entitlement on, so the claim lives in storage and
-        // does not survive a reinstall — acceptable for a time-boxed giveaway.
-        setPlan('lifetime-free');
-        await AsyncStorage.setItem(PLAN_KEY, 'lifetime-free').catch(() => undefined);
-      },
+      unlockLifetimeFree: grantLifetimeFree,
+      redeemLifetimeCode,
       purchase,
       restore,
       clearPlan: async () => {
@@ -117,7 +137,17 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
         await AsyncStorage.removeItem(PLAN_KEY).catch(() => undefined);
       },
     }),
-    [plan, storePremium, loading, config, purchasablePlans, purchase, restore],
+    [
+      plan,
+      storePremium,
+      loading,
+      config,
+      purchasablePlans,
+      grantLifetimeFree,
+      redeemLifetimeCode,
+      purchase,
+      restore,
+    ],
   );
 
   return <PremiumContext.Provider value={value}>{children}</PremiumContext.Provider>;

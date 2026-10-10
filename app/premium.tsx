@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking, ActivityIndicator, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -50,8 +50,16 @@ export default function PremiumScreen() {
   const router = useRouter();
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
-  const { plan, isPremium, config, purchasablePlans, unlockLifetimeFree, purchase, restore } =
-    usePremium();
+  const {
+    plan,
+    isPremium,
+    config,
+    purchasablePlans,
+    unlockLifetimeFree,
+    redeemLifetimeCode,
+    purchase,
+    restore,
+  } = usePremium();
 
   const lifetimeMode = config.lifetimeMode;
   const deadline = config.freeUntil ? new Date(config.freeUntil) : null;
@@ -63,6 +71,9 @@ export default function PremiumScreen() {
   const showCountdown = offerActive && deadline !== null;
 
   const [claim, setClaim] = useState<ClaimState>('idle');
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [codeBusy, setCodeBusy] = useState(false);
 
   // Paid cards are driven entirely by what the store actually offers, so a
   // price is never shown without a working purchase behind it. The paid
@@ -78,6 +89,20 @@ export default function PremiumScreen() {
   const nameLabel = (p: PaidPlan) =>
     p === 'lifetime' ? t('planLifetime') : p === 'yearly' ? t('planYearly') : t('planMonthly');
   const hasTrial = purchasablePlans.some((p) => p.trial != null);
+
+  // The saving is DERIVED from two real StoreKit prices, never written by hand,
+  // so it stays true the moment prices change in App Store Connect — no build,
+  // no OTA, and no way to advertise a discount the store would not honour
+  // (Guideline 2.3.1). Null whenever the maths can't be trusted (a missing
+  // plan, or a yearly price that isn't actually cheaper), and the badge is
+  // simply not rendered.
+  const monthlyPrice = purchasablePlans.find((p) => p.plan === 'monthly')?.price;
+  const yearlyPrice = purchasablePlans.find((p) => p.plan === 'yearly')?.price;
+  const yearlySavingsPct =
+    monthlyPrice != null && yearlyPrice != null && monthlyPrice > 0 && yearlyPrice < monthlyPrice * 12
+      ? Math.round((1 - yearlyPrice / (monthlyPrice * 12)) * 100)
+      : null;
+  const showYearlySaving = yearlySavingsPct !== null && yearlySavingsPct > 0;
 
   // "7 days free, then $39.99/yr" — built from what the store reported, so the
   // trial length and the price after it are always the real ones.
@@ -110,6 +135,27 @@ export default function PremiumScreen() {
     }
     if (res.reason === 'cancelled') return; // user backed out — stay quiet
     Alert.alert(t('premiumTitle'), t('purchaseFailed'));
+  };
+
+  // A Namflix lifetime code, checked against the digests in `lib/redeemCodes`
+  // with no network call — the app has no accounts and no server-side user
+  // data, and validating a code remotely would quietly break that promise.
+  const submitCode = async () => {
+    const entered = code.trim();
+    if (codeBusy || entered.length === 0) return;
+    setCodeBusy(true);
+    const ok = await redeemLifetimeCode(entered);
+    setCodeBusy(false);
+    if (!ok) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => undefined);
+      Alert.alert(t('redeemCode'), t('redeemInvalid'));
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    setCode('');
+    setCodeOpen(false);
+    Alert.alert(t('redeemCode'), t('redeemLifetimeDone'));
+    router.back();
   };
 
   // Offer codes are Apple's own: we never see the code, and it is revoked from
@@ -223,7 +269,14 @@ export default function PremiumScreen() {
               style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}
             >
               <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-                <Text style={[styles.planName, isRTL && styles.rtl]}>{nameLabel(paid)}</Text>
+                <View style={[styles.nameWrap, isRTL && styles.rowRTL]}>
+                  <Text style={[styles.planName, isRTL && styles.rtl]}>{nameLabel(paid)}</Text>
+                  {paid === 'yearly' && showYearlySaving && (
+                    <View style={[styles.ribbon, { backgroundColor: accent }]}>
+                      <Text style={styles.ribbonText}>{`${t('savePrefix')} ${yearlySavingsPct}%`}</Text>
+                    </View>
+                  )}
+                </View>
                 <Text style={[styles.priceRow, isRTL && styles.rtl]}>
                   <Text style={styles.price}>{priceString}</Text>
                   <Text style={styles.per}> {perLabel(paid)}</Text>
@@ -236,8 +289,10 @@ export default function PremiumScreen() {
                   {trialLabel(trial, priceString, paid)}
                 </Text>
               )}
-              {paid === 'yearly' && (
-                <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planYearlyNote')}</Text>
+              {paid === 'yearly' && showYearlySaving && (
+                <Text style={[styles.planNote, isRTL && styles.rtl]}>
+                  {`${t('savePrefix')} ${yearlySavingsPct}% ${t('vsMonthly')}`}
+                </Text>
               )}
               {paid === 'lifetime' && (
                 <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planLifetimePaidNote')}</Text>
@@ -278,11 +333,50 @@ export default function PremiumScreen() {
           <Pressable onPress={onRestore} hitSlop={8} style={styles.restoreBtn}>
             <Text style={[styles.restoreText, { color: accent }]}>{t('restorePurchases')}</Text>
           </Pressable>
-          {/* Hidden once premium is active — nothing left to redeem. */}
-          {!isPremium && (
-            <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
+          {/* Hidden once premium is active — nothing left to redeem. Tapping
+              opens a field rather than Apple's sheet, because a Namflix
+              lifetime code is checked on device; the link underneath still
+              hands App Store offer codes to Apple, which owns that flow. */}
+          {!isPremium && !codeOpen && (
+            <Pressable onPress={() => setCodeOpen(true)} hitSlop={8} style={styles.redeemBtn}>
               <Text style={styles.redeemText}>{t('redeemCode')}</Text>
             </Pressable>
+          )}
+          {!isPremium && codeOpen && (
+            <View style={styles.codeBlock}>
+              <View style={[styles.codeRow, isRTL && styles.codeRowRTL]}>
+                <TextInput
+                  value={code}
+                  onChangeText={setCode}
+                  onSubmitEditing={submitCode}
+                  placeholder={t('redeemPlaceholder')}
+                  placeholderTextColor={NightPalette.dimText}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  autoFocus
+                  returnKeyType="done"
+                  editable={!codeBusy}
+                  style={[styles.codeInput, { borderColor: accent }, isRTL && styles.rtl]}
+                />
+                <Pressable
+                  onPress={submitCode}
+                  disabled={codeBusy || code.trim().length === 0}
+                  style={({ pressed }) => [
+                    styles.codeSubmit,
+                    { backgroundColor: accent, opacity: codeBusy || code.trim().length === 0 ? 0.45 : pressed ? 0.8 : 1 },
+                  ]}
+                >
+                  {codeBusy ? (
+                    <ActivityIndicator color={NightPalette.voidBlack} />
+                  ) : (
+                    <Text style={styles.codeSubmitText}>{t('redeemSubmit')}</Text>
+                  )}
+                </Pressable>
+              </View>
+              <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
+                <Text style={styles.redeemText}>{t('redeemAppStore')}</Text>
+              </Pressable>
+            </View>
           )}
           <View style={styles.legalRow}>
             <Pressable onPress={() => Linking.openURL(EULA_URL)} hitSlop={8}>
@@ -349,6 +443,7 @@ const styles = StyleSheet.create({
   price: { color: '#F2C9A6', fontSize: 22, fontFamily: FONT.bold },
   per: { color: NightPalette.dimText, fontSize: 13 },
   planNote: { color: NightPalette.dimText, fontSize: 12, lineHeight: 18, marginTop: 6 },
+  nameWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
   trialNote: { fontSize: 13, fontFamily: FONT.medium, lineHeight: 20, marginTop: 8 },
   cta: { borderRadius: 999, paddingVertical: 15, alignItems: 'center', marginTop: 18 },
   ctaText: { color: NightPalette.voidBlack, fontSize: 15, fontFamily: FONT.bold, lineHeight: 22 },
@@ -399,6 +494,34 @@ const styles = StyleSheet.create({
   },
   restoreBtn: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
   redeemBtn: { alignItems: 'center', paddingVertical: 8 },
+  codeBlock: { marginTop: 6 },
+  codeRow: { flexDirection: 'row', alignItems: 'stretch', gap: 8 },
+  codeRowRTL: { flexDirection: 'row-reverse' },
+  codeInput: {
+    flex: 1,
+    height: 46,
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    fontFamily: FONT.medium,
+    letterSpacing: 1,
+    color: NightPalette.textPrimary,
+    backgroundColor: NightPalette.deepEmber,
+  },
+  codeSubmit: {
+    minWidth: 92,
+    height: 46,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  codeSubmitText: {
+    fontSize: 15,
+    fontFamily: FONT.bold,
+    color: NightPalette.voidBlack,
+  },
   redeemText: { fontSize: 13, lineHeight: 20, color: NightPalette.dimText },
   restoreText: { fontSize: 14, fontFamily: FONT.medium, lineHeight: 20 },
   legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 2 },

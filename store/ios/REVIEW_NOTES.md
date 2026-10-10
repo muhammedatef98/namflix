@@ -38,12 +38,11 @@ own code-redemption sheet (presentCodeRedemptionSheet). We never see or
 validate a code ourselves — Apple does. It is there so a free-Lifetime offer
 code can be redeemed without leaving the app.
 
-LIMITED-TIME LAUNCH OFFER
-Until 28 August 2026 the app also offers a free "Lifetime" unlock (no charge,
-no purchase) as a launch promotion. It is granted directly by us, not through
-StoreKit, so it is not an alternative payment method — nothing is sold outside
-Apple's IAP. After that date the card disappears and the subscriptions are the
-only way to unlock.
+PROMOTIONAL IMAGES
+Only one in-app purchase carries a promotional image: "Lifetime", and it is
+there solely so offer-code redemptions have artwork. "Monthly" and "Yearly"
+have none. No in-app purchase is promoted on the App Store, and no two products
+share an image.
 
 DONATION LINK
 Home → Support → "Buy me a coffee" opens ko-fi.com in Safari (outside the app)
