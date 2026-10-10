@@ -20,33 +20,22 @@ export default function PremiumScreen() {
   const router = useRouter();
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
-  const { plan, config, purchasablePlans, unlockLifetimeFree, purchase, restore } = usePremium();
+  const { plan, config, purchasablePlans, purchase, restore } = usePremium();
   // Where the paywall was opened from — lets purchases be attributed to the
   // lock sheet / daily-cap message vs. the regular paywall.
   const params = useLocalSearchParams<{ source?: string }>();
   const source: PurchaseSource =
     params.source === 'lock_screen' || params.source === 'cap_message' ? params.source : 'paywall';
 
-  const lifetimeMode = config.lifetimeMode;
-  // Paid cards are driven entirely by what the store actually offers, so a
-  // price is never shown without a working purchase behind it.
-  const hasPaid = purchasablePlans.length > 0;
-  const perLabel = (p: PaidPlan) => (p === 'yearly' ? t('perYear') : t('perMonth'));
-  const nameLabel = (p: PaidPlan) => (p === 'yearly' ? t('planYearly') : t('planMonthly'));
-
-  const chooseFree = async () => {
-    await unlockLifetimeFree();
-    track('purchase_completed', { plan: 'lifetime-free', source });
-    router.back();
-  };
-
-  const chooseLifetime = async () => {
-    if (lifetimeMode === 'free') {
-      await chooseFree();
-      return;
-    }
-    Alert.alert(t('premiumTitle'), t('planPaidSoon'));
-  };
+  // Cards are driven entirely by what the store actually offers (with its
+  // localized price), so a price is never shown without a working purchase
+  // behind it. Admin can still hide Lifetime remotely (lifetime_mode = 'off').
+  const plans = purchasablePlans.filter((p) => p.plan !== 'lifetime' || config.lifetimeMode !== 'off');
+  const hasSubscription = plans.some((p) => p.plan !== 'lifetime');
+  const perLabel = (p: PaidPlan) =>
+    p === 'lifetime' ? t('perOnce') : p === 'yearly' ? t('perYear') : t('perMonth');
+  const nameLabel = (p: PaidPlan) =>
+    p === 'lifetime' ? t('planLifetime') : p === 'yearly' ? t('planYearly') : t('planMonthly');
 
   const choosePaid = async (paid: PaidPlan) => {
     const res = await purchase(paid);
@@ -84,62 +73,60 @@ export default function PremiumScreen() {
             </View>
           </View>
 
+          {/* Users who claimed the old free launch Lifetime keep it forever. */}
           {plan === 'lifetime-free' && (
             <View style={[styles.activeBanner, { borderColor: accent }]}>
               <Text style={[styles.activeText, isRTL && styles.rtl]}>{t('premiumActive')}</Text>
             </View>
           )}
 
-          {/* Lifetime — hero card. Free at launch; hidden when admin sets 'off'. */}
-          {lifetimeMode !== 'off' && (
-            <Pressable
-              onPress={chooseLifetime}
-              style={({ pressed }) => [styles.planCard, styles.heroCard, { borderColor: accent }, pressed && styles.pressed]}
-            >
-              <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-                <Text style={[styles.planName, isRTL && styles.rtl]}>{t('planLifetime')}</Text>
-                <View style={[styles.ribbon, { backgroundColor: accent }]}>
-                  <Text style={styles.ribbonText}>{t('bestValue')}</Text>
+          {plans.map(({ plan: paid, priceString }) => {
+            const hero = paid === 'lifetime';
+            return (
+              <Pressable
+                key={paid}
+                onPress={() => choosePaid(paid)}
+                style={({ pressed }) => [
+                  styles.planCard,
+                  hero && styles.heroCard,
+                  hero && { borderColor: accent },
+                  pressed && styles.pressed,
+                ]}
+              >
+                <View style={[styles.planTop, isRTL && styles.rowRTL]}>
+                  <Text style={[styles.planName, isRTL && styles.rtl]}>{nameLabel(paid)}</Text>
+                  {hero ? (
+                    <View style={[styles.ribbon, { backgroundColor: accent }]}>
+                      <Text style={styles.ribbonText}>{t('bestValue')}</Text>
+                    </View>
+                  ) : (
+                    <Text style={[styles.priceRow, isRTL && styles.rtl]}>
+                      <Text style={styles.price}>{priceString}</Text>
+                      <Text style={styles.per}> {perLabel(paid)}</Text>
+                    </Text>
+                  )}
                 </View>
-              </View>
-              {lifetimeMode === 'free' && (
-                <Text style={[styles.freePrice, { color: accent }, isRTL && styles.rtl]}>{t('planLifetimeFree')}</Text>
-              )}
-              <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planLifetimeNote')}</Text>
-              <View style={[styles.cta, { backgroundColor: accent }]}>
-                <Text style={styles.ctaText}>
-                  {lifetimeMode === 'free' ? t('planLifetimeCta') : t('planPaidCta')}
-                </Text>
-              </View>
-            </Pressable>
-          )}
-
-          {/* Paid App Store tiers — only rendered for plans the store actually
-              sells, always with the real StoreKit price. */}
-          {purchasablePlans.map(({ plan: paid, priceString }) => (
-            <Pressable
-              key={paid}
-              onPress={() => choosePaid(paid)}
-              style={({ pressed }) => [styles.planCard, pressed && styles.pressed]}
-            >
-              <View style={[styles.planTop, isRTL && styles.rowRTL]}>
-                <Text style={[styles.planName, isRTL && styles.rtl]}>{nameLabel(paid)}</Text>
-                <Text style={[styles.priceRow, isRTL && styles.rtl]}>
-                  <Text style={styles.price}>{priceString}</Text>
-                  <Text style={styles.per}> {perLabel(paid)}</Text>
-                </Text>
-              </View>
-              {paid === 'yearly' && (
-                <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planYearlyNote')}</Text>
-              )}
-              <View style={styles.ctaGhost}>
-                <Text style={[styles.ctaGhostText, { color: accent }]}>{t('planPaidCta')}</Text>
-              </View>
-            </Pressable>
-          ))}
+                {hero && (
+                  <Text style={[styles.priceRow, styles.heroPrice, isRTL && styles.rtl]}>
+                    <Text style={styles.price}>{priceString}</Text>
+                    <Text style={styles.per}> {perLabel(paid)}</Text>
+                  </Text>
+                )}
+                {paid === 'yearly' && (
+                  <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planYearlyNote')}</Text>
+                )}
+                {hero && <Text style={[styles.planNote, isRTL && styles.rtl]}>{t('planLifetimeNote')}</Text>}
+                <View style={hero ? [styles.cta, { backgroundColor: accent }] : styles.ctaGhost}>
+                  <Text style={hero ? styles.ctaText : [styles.ctaGhostText, { color: accent }]}>
+                    {t('planPaidCta')}
+                  </Text>
+                </View>
+              </Pressable>
+            );
+          })}
 
           {/* Auto-renew disclosure — required next to subscription purchases. */}
-          {hasPaid && (
+          {hasSubscription && (
             <Text style={[styles.disclosure, isRTL && styles.rtl]}>{t('subDisclosure')}</Text>
           )}
 
@@ -197,7 +184,7 @@ const styles = StyleSheet.create({
   planName: { color: NightPalette.textPrimary, fontSize: 18, fontFamily: FONT.medium, lineHeight: 26 },
   ribbon: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 5 },
   ribbonText: { color: NightPalette.voidBlack, fontSize: 10, fontFamily: FONT.bold, lineHeight: 14 },
-  freePrice: { fontSize: 40, fontFamily: FONT.black, lineHeight: 52, marginTop: 8 },
+  heroPrice: { marginTop: 8 },
   priceRow: { color: NightPalette.textPrimary },
   price: { color: '#F2C9A6', fontSize: 22, fontFamily: FONT.bold },
   per: { color: NightPalette.dimText, fontSize: 13 },

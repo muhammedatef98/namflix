@@ -7,8 +7,8 @@
  *
  * SAFE-BY-DEFAULT: every call is guarded. If the native module isn't in the
  * running binary (e.g. an OTA update landed on an older build) or the API key
- * is missing, `configure()` reports not-ready and the paywall simply shows the
- * free Lifetime offer with NO paid buttons — so Apple never sees a price with
+ * is missing, `configure()` reports not-ready and the paywall simply shows
+ * NO paid buttons — so Apple never sees a price with
  * no working purchase behind it (Guideline 2.1 / 3.1.2).
  *
  * ── ACTIVATION — iOS (once, to start charging) ───────────────────────────────
@@ -37,12 +37,31 @@
 
 import { Platform } from 'react-native';
 
-export type PaidPlan = 'monthly' | 'yearly';
+export type PaidPlan = 'monthly' | 'yearly' | 'lifetime';
 
+/**
+ * Store product ids. `lifetime` is a one-time (non-consumable / in-app)
+ * purchase, not a subscription. It is also matched by RevenueCat's LIFETIME
+ * package type, so the paywall finds it even if the store id differs.
+ */
 export const PRODUCT_IDS: Record<PaidPlan, string> = {
   monthly: 'namflix.premium.monthly',
   yearly: 'namflix.premium.yearly',
+  lifetime: 'namflix.premium.lifetime',
 };
+
+/** Paywall order: Lifetime first (best value), then yearly, then monthly. */
+const PLAN_ORDER: PaidPlan[] = ['lifetime', 'yearly', 'monthly'];
+
+type StorePackage = { packageType?: string; product: { identifier: string; priceString: string } };
+
+/** Find the offering package for a plan — by product id, or by package type for Lifetime. */
+export function findPackage<P extends StorePackage>(packages: P[], plan: PaidPlan): P | undefined {
+  return (
+    packages.find((p) => p.product.identifier === PRODUCT_IDS[plan]) ??
+    (plan === 'lifetime' ? packages.find((p) => p.packageType === 'LIFETIME') : undefined)
+  );
+}
 
 /** The RevenueCat entitlement that means "premium unlocked". */
 export const ENTITLEMENT_ID = 'premium';
@@ -151,8 +170,8 @@ export async function getPurchasablePlans(): Promise<PurchasablePlan[]> {
     const offerings = await Purchases.getOfferings();
     const packages = offerings.current?.availablePackages ?? [];
     const out: PurchasablePlan[] = [];
-    for (const plan of ['yearly', 'monthly'] as PaidPlan[]) {
-      const pkg = packages.find((p) => p.product.identifier === PRODUCT_IDS[plan]);
+    for (const plan of PLAN_ORDER) {
+      const pkg = findPackage(packages, plan);
       if (pkg) out.push({ plan, priceString: pkg.product.priceString });
     }
     return out;
@@ -166,9 +185,7 @@ export async function buyPlan(plan: PaidPlan): Promise<PurchaseResult> {
   if (!ready || !Purchases) return { ok: false, reason: 'unavailable' };
   try {
     const offerings = await Purchases.getOfferings();
-    const pkg = offerings.current?.availablePackages.find(
-      (p) => p.product.identifier === PRODUCT_IDS[plan],
-    );
+    const pkg = findPackage(offerings.current?.availablePackages ?? [], plan);
     if (!pkg) return { ok: false, reason: 'unavailable' };
     const { customerInfo } = await Purchases.purchasePackage(pkg);
     return customerInfo.entitlements.active[ENTITLEMENT_ID]

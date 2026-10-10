@@ -16,10 +16,12 @@ import {
 const PLAN_KEY = 'namflix.plan';
 
 /**
- * Entitlement plans. `lifetime-free` is the launch offer (granted locally).
- * `monthly`/`yearly` are the paid App Store subscriptions — premium for those
- * comes from RevenueCat's entitlement (`storePremium`), the source of truth, so
- * it survives reinstalls and works across the user's devices.
+ * Locally stored plans. `lifetime-free` is the old launch offer, granted on the
+ * device: it can no longer be claimed, but anyone who claimed it keeps premium
+ * forever (we still read the stored value — nothing is revoked).
+ * Paid plans (monthly / yearly / lifetime) come from RevenueCat's entitlement
+ * (`storePremium`), the source of truth, so they survive reinstalls and work
+ * across the user's devices.
  */
 export type Plan = 'monthly' | 'yearly' | 'lifetime-free';
 
@@ -27,12 +29,10 @@ type PremiumValue = {
   plan: Plan | null;
   isPremium: boolean;
   loading: boolean;
-  /** Admin-controlled remote config (lifetime mode + display prices). */
+  /** Admin-controlled remote config (lifetime on/off, display prices, ads). */
   config: AppConfig;
   /** Paid plans that can actually be bought now, with real StoreKit prices. */
   purchasablePlans: PurchasablePlan[];
-  /** Grant the free lifetime plan (the launch offer). */
-  unlockLifetimeFree: () => Promise<void>;
   /** Buy a paid App Store plan; refreshes entitlement on success. */
   purchase: (plan: PaidPlan) => Promise<PurchaseResult>;
   /** Restore a previous App Store purchase. */
@@ -105,10 +105,6 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       loading,
       config,
       purchasablePlans,
-      unlockLifetimeFree: async () => {
-        setPlan('lifetime-free');
-        await AsyncStorage.setItem(PLAN_KEY, 'lifetime-free').catch(() => undefined);
-      },
       purchase,
       restore,
       clearPlan: async () => {

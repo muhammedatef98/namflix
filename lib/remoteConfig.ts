@@ -1,19 +1,21 @@
 /**
  * Admin-controlled remote config, edited from the Supabase dashboard
  * (public.app_config, a single row). The app reads it once at launch to decide
- * how the Lifetime offer behaves and which display prices the paywall shows.
+ * whether the Lifetime purchase is offered and which display prices the paywall shows.
  *
  * There are no client write policies on the table, so only the dashboard
  * (service role) can change these values — that's the admin control. Flipping
  * `lifetime_mode` from 'free' to 'paid' or 'off' takes effect on the next
  * launch, no app build or OTA update required.
  *
- *   free  → Lifetime is granted for free (launch offer)
- *   paid  → Lifetime routes to App Store purchase (needs the IAP build)
- *   off   → the Lifetime card is hidden entirely
+ *   paid  → Lifetime is a one-time store purchase (the default)
+ *   off   → the Lifetime option is hidden entirely
+ *   free  → legacy launch-offer value; no longer grants anything — treated as 'paid'.
+ *           Users who claimed the free launch Lifetime keep it (stored on-device,
+ *           see PremiumContext).
  *
  * Every fetch falls back to DEFAULT_CONFIG, so a network failure or DEMO_MODE
- * always leaves the free Lifetime offer working.
+ * never makes anything free: the fallback is always 'paid'.
  *
  * The same row carries optional `ads_*` columns (supabase/app_config_ads.sql)
  * that tune the ad policy — rewarded cap, interstitial flag, quiet hours, etc.
@@ -24,7 +26,7 @@ import { supabase } from './supabase';
 import { DEMO_MODE } from './config';
 import { DEFAULT_AD_POLICY, parseAdPolicy, type AdPolicy } from './ads/policy';
 
-export type LifetimeMode = 'free' | 'paid' | 'off';
+export type LifetimeMode = 'paid' | 'off';
 
 export type AppConfig = {
   lifetimeMode: LifetimeMode;
@@ -34,14 +36,15 @@ export type AppConfig = {
 };
 
 export const DEFAULT_CONFIG: AppConfig = {
-  lifetimeMode: 'free',
+  lifetimeMode: 'paid',
   monthlyPrice: '$4.99',
   yearlyPrice: '$39.99',
   ads: DEFAULT_AD_POLICY,
 };
 
-function normaliseMode(value: unknown): LifetimeMode {
-  return value === 'paid' || value === 'off' ? value : 'free';
+/** Only an explicit 'off' hides Lifetime; anything else (incl. legacy 'free') is paid. */
+export function normaliseMode(value: unknown): LifetimeMode {
+  return value === 'off' ? 'off' : 'paid';
 }
 
 export async function fetchAppConfig(): Promise<AppConfig> {
