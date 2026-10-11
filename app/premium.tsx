@@ -77,7 +77,6 @@ export default function PremiumScreen() {
   const showCountdown = offerActive && deadline !== null;
 
   const [claim, setClaim] = useState<ClaimState>('idle');
-  const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState('');
   const [codeBusy, setCodeBusy] = useState(false);
 
@@ -161,7 +160,6 @@ export default function PremiumScreen() {
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
     setCode('');
-    setCodeOpen(false);
     Alert.alert(t('redeemCode'), t('redeemLifetimeDone'));
     router.back();
   };
@@ -325,6 +323,49 @@ export default function PremiumScreen() {
             <Text style={[styles.disclosure, isRTL && styles.rtl]}>{t('subDisclosure')}</Text>
           )}
 
+          {/* Namflix lifetime code — always visible and checked on device, so
+              it never sends anyone to a store. Hidden once premium is active.
+              The App Store offer-code link only shows where Apple's in-app
+              sheet exists (iOS); Android has no in-app equivalent. */}
+          {!isPremium && (
+            <View style={styles.codeBlock}>
+              <Text style={[styles.codeTitle, isRTL && styles.rtl]}>{t('redeemCode')}</Text>
+              <View style={[styles.codeRow, isRTL && styles.codeRowRTL]}>
+                <TextInput
+                  value={code}
+                  onChangeText={setCode}
+                  onSubmitEditing={submitCode}
+                  placeholder={t('redeemPlaceholder')}
+                  placeholderTextColor={NightPalette.dimText}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  returnKeyType="done"
+                  editable={!codeBusy}
+                  style={[styles.codeInput, { borderColor: accent }, isRTL && styles.rtl]}
+                />
+                <Pressable
+                  onPress={submitCode}
+                  disabled={codeBusy || code.trim().length === 0}
+                  style={({ pressed }) => [
+                    styles.codeSubmit,
+                    { backgroundColor: accent, opacity: codeBusy || code.trim().length === 0 ? 0.45 : pressed ? 0.8 : 1 },
+                  ]}
+                >
+                  {codeBusy ? (
+                    <ActivityIndicator color={NightPalette.voidBlack} />
+                  ) : (
+                    <Text style={styles.codeSubmitText}>{t('redeemSubmit')}</Text>
+                  )}
+                </Pressable>
+              </View>
+              {canRedeemInApp() && (
+                <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
+                  <Text style={styles.redeemText}>{t('redeemAppStore')}</Text>
+                </Pressable>
+              )}
+            </View>
+          )}
+
           {/* Always an explicit way out: the paywall can appear on entry, and
               nothing here is mandatory — the app is browsable without it. */}
           {router.canGoBack() && claim === 'idle' && (
@@ -345,51 +386,6 @@ export default function PremiumScreen() {
           <Pressable onPress={onRestore} hitSlop={8} style={styles.restoreBtn}>
             <Text style={[styles.restoreText, { color: accent }]}>{t('restorePurchases')}</Text>
           </Pressable>
-          {/* Hidden once premium is active — nothing left to redeem. Tapping
-              opens a field rather than Apple's sheet, because a Namflix
-              lifetime code is checked on device; the link underneath still
-              hands App Store offer codes to Apple, which owns that flow. */}
-          {!isPremium && !codeOpen && (
-            <Pressable onPress={() => setCodeOpen(true)} hitSlop={8} style={styles.redeemBtn}>
-              <Text style={styles.redeemText}>{t('redeemCode')}</Text>
-            </Pressable>
-          )}
-          {!isPremium && codeOpen && (
-            <View style={styles.codeBlock}>
-              <View style={[styles.codeRow, isRTL && styles.codeRowRTL]}>
-                <TextInput
-                  value={code}
-                  onChangeText={setCode}
-                  onSubmitEditing={submitCode}
-                  placeholder={t('redeemPlaceholder')}
-                  placeholderTextColor={NightPalette.dimText}
-                  autoCapitalize="characters"
-                  autoCorrect={false}
-                  autoFocus
-                  returnKeyType="done"
-                  editable={!codeBusy}
-                  style={[styles.codeInput, { borderColor: accent }, isRTL && styles.rtl]}
-                />
-                <Pressable
-                  onPress={submitCode}
-                  disabled={codeBusy || code.trim().length === 0}
-                  style={({ pressed }) => [
-                    styles.codeSubmit,
-                    { backgroundColor: accent, opacity: codeBusy || code.trim().length === 0 ? 0.45 : pressed ? 0.8 : 1 },
-                  ]}
-                >
-                  {codeBusy ? (
-                    <ActivityIndicator color={NightPalette.voidBlack} />
-                  ) : (
-                    <Text style={styles.codeSubmitText}>{t('redeemSubmit')}</Text>
-                  )}
-                </Pressable>
-              </View>
-              <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
-                <Text style={styles.redeemText}>{t('redeemAppStore')}</Text>
-              </Pressable>
-            </View>
-          )}
           <View style={styles.legalRow}>
             <Pressable onPress={() => Linking.openURL(EULA_URL)} hitSlop={8}>
               <Text style={styles.legalLink}>{t('termsOfUse')}</Text>
@@ -509,7 +505,8 @@ const styles = StyleSheet.create({
   },
   restoreBtn: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
   redeemBtn: { alignItems: 'center', paddingVertical: 8 },
-  codeBlock: { marginTop: 6 },
+  codeBlock: { marginTop: 8, marginBottom: 12 },
+  codeTitle: { color: NightPalette.textPrimary, fontSize: 14, fontFamily: FONT.medium, lineHeight: 20, marginBottom: 8 },
   codeRow: { flexDirection: 'row', alignItems: 'stretch', gap: 8 },
   codeRowRTL: { flexDirection: 'row-reverse' },
   codeInput: {
