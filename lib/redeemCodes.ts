@@ -66,6 +66,11 @@ const REDEEM_CODES: readonly string[] = [
   '848a7c6a4a264ad9',
   'f9197409f4e8d38a',
   '0765f461a0d62a4a',
+  '2d288d922151f045',
+  '52aa0b6e1ceec159',
+  '925a08849602ef53',
+  'ff572925572e9c0a',
+  '7f04341b96c52710',
 ];
 
 /** Shortest real code, used to reject obvious noise before hashing. */
