@@ -26,17 +26,20 @@ const HTML = `<!doctype html>
 </head>
 <body><main>
 <h1>Namflix — Privacy Policy</h1>
-<p class="muted">Last updated: 10 October 2026</p>
+<p class="muted">Last updated: 19 October 2026</p>
 <p>Namflix is a sleep-support app. We collect as little as possible.</p>
 
 <h2>What we collect</h2>
 <p>Nothing that identifies you. Namflix has no accounts, no sign-in, and no email address to give us. Everything you do here — preferences, favourite sounds, your nightly check-ins and their history — is stored only on your device.</p>
 
 <h2>What we do NOT collect</h2>
-<p>No analytics trackers, no precise location, no contacts, no health data, and no selling of data to third parties — ever. Premium members see no ads at all, and no ad requests are made for them.</p>
+<p>No analytics trackers (the app keeps its own usage notes on your device and sends them to no server), no precise location, no contacts, no health data, and no selling of data to third parties — ever. Premium members see no ads at all, and no ad requests are made for them.</p>
 
 <h2>Ads in the free version</h2>
 <p>The free version can show ads from Google AdMob — for example when you choose to watch a short ad to unlock a sound or method for 24 hours. To serve and measure ads, Google may process your device’s advertising identifier (on iOS only if you allow tracking), IP address and approximate location, device information and ad interactions. Where the law requires it (e.g. EEA/UK) we ask for your consent first; if you decline consent or tracking you still get non-personalised ads, and the app works the same. Google’s policy: <a href="https://policies.google.com/technologies/partner-sites">policies.google.com/technologies/partner-sites</a></p>
+
+<h2>Your ad choices</h2>
+<p>You can change your ad consent at any time: open the app → Privacy policy → <strong>Ad privacy choices</strong> (shown where the law requires a consent choice, e.g. EEA/UK). On iPhone you can also turn tracking off in Settings → Privacy &amp; Security → Tracking; on Android you can reset or delete your advertising ID in Settings → Google → Ads. Going Premium removes ads entirely.</p>
 
 <h2>Where data lives</h2>
 <p>On your phone. We hold no account and no personal data on any server. The sound library is streamed from our provider Supabase (EU region, London), which serves audio files — it receives no personal data from you. The exceptions are the purchase record (see Purchases) and, in the free version only, the ads described above.</p>
@@ -56,17 +59,20 @@ const HTML = `<!doctype html>
 
 <div class="ar">
 <h1>نامفلكس — سياسة الخصوصية</h1>
-<p class="muted">آخر تحديث: ١٠ أكتوبر ٢٠٢٦</p>
+<p class="muted">آخر تحديث: ١٩ أكتوبر ٢٠٢٦</p>
 <p>نامفلكس تطبيق للمساعدة على النوم، ونجمع أقلّ قدر ممكن من البيانات.</p>
 
 <h2>ما الذي نجمعه؟</h2>
 <p>لا شيء يعرّف بك. نامفلكس بلا حسابات ولا تسجيل دخول ولا بريد إلكتروني تعطينا إياه. كل ما تفعله هنا — التفضيلات، والأصوات المفضّلة، وتسجيلاتك الصباحية وسجلّها — محفوظ على جهازك وحده.</p>
 
 <h2>ما الذي لا نجمعه</h2>
-<p>لا أدوات تحليل أو تتبّع، ولا موقع دقيق، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا. ولا يرى مشتركو بريميوم أي إعلانات، ولا تُطلب لهم إعلانات أصلًا.</p>
+<p>لا أدوات تحليل أو تتبّع (ملاحظات الاستخدام يحفظها التطبيق على جهازك ولا يرسلها لأي خادم)، ولا موقع دقيق، ولا جهات اتصال، ولا بيانات صحية، ولا بيع للبيانات لأطراف ثالثة — أبدًا. ولا يرى مشتركو بريميوم أي إعلانات، ولا تُطلب لهم إعلانات أصلًا.</p>
 
 <h2>الإعلانات في النسخة المجانية</h2>
 <p>قد تعرض النسخة المجانية إعلانات من Google AdMob — مثلًا عندما تختار مشاهدة إعلان قصير لفتح صوت أو أسلوب لمدة ٢٤ ساعة. ولعرض الإعلانات وقياسها قد تعالج Google المعرّف الإعلاني لجهازك (على iOS فقط إن سمحتَ بالتتبّع)، وعنوان IP والموقع التقريبي، ومعلومات الجهاز، وتفاعلك مع الإعلانات. وحيث يشترط القانون ذلك (كالاتحاد الأوروبي والمملكة المتحدة) نطلب موافقتك أولًا؛ وإن رفضتَ الموافقة أو التتبّع تصلك إعلانات غير مخصّصة ويعمل التطبيق كما هو. سياسة Google: <a href="https://policies.google.com/technologies/partner-sites">policies.google.com/technologies/partner-sites</a></p>
+
+<h2>خياراتك في الإعلانات</h2>
+<p>يمكنك تغيير موافقتك على الإعلانات في أي وقت: افتح التطبيق ← سياسة الخصوصية ← <strong>خيارات خصوصية الإعلانات</strong> (تظهر حيث يشترط القانون خيار الموافقة، كالاتحاد الأوروبي والمملكة المتحدة). وعلى iPhone يمكنك أيضًا إيقاف التتبّع من الإعدادات ← الخصوصية والأمن ← التتبّع، وعلى Android يمكنك إعادة تعيين المعرّف الإعلاني أو حذفه من الإعدادات ← Google ← الإعلانات. والاشتراك في بريميوم يزيل الإعلانات تمامًا.</p>
 
 <h2>أين تُحفظ البيانات؟</h2>
 <p>على هاتفك. لا نحتفظ بحساب لك ولا ببيانات شخصية على أي خادم. مكتبة الأصوات تُبثّ من مزوّدنا Supabase (منطقة الاتحاد الأوروبي — لندن)، وهو يقدّم ملفات صوتية فقط ولا يستقبل منك أي بيانات شخصية. والاستثناءان هما سجلّ الشراء (انظر «المشتريات»)، والإعلانات في النسخة المجانية فقط كما وُضّح أعلاه.</p>
