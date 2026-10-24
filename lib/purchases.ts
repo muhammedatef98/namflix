@@ -35,7 +35,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { Platform } from 'react-native';
+import { Platform, Linking } from 'react-native';
 
 export type PaidPlan = 'monthly' | 'yearly';
 
@@ -167,5 +167,64 @@ export async function restorePurchases(): Promise<PurchaseResult> {
       : { ok: false, reason: 'error' };
   } catch (e: unknown) {
     return { ok: false, reason: 'error', message: (e as { message?: string })?.message };
+  }
+}
+
+/**
+ * Open the store's own "redeem a code" flow (gift / offer / promo codes).
+ *  - iOS: Apple's native offer-code redemption sheet (StoreKit).
+ *  - Android: Google Play's redeem page. Play promo codes are redeemed in the
+ *    Play Store itself; the entitlement syncs back when the app returns.
+ * Returns false only when no redemption UI could be shown.
+ */
+export async function presentRedeemCode(): Promise<boolean> {
+  if (Platform.OS === 'ios') {
+    if (!ready || !Purchases) return false;
+    try {
+      await Purchases.presentCodeRedemptionSheet();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  try {
+    await Linking.openURL('https://play.google.com/redeem');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Re-check the entitlement after a code was redeemed outside the app.
+ * On Android we sync first so a Play-side redemption reaches RevenueCat.
+ */
+export async function refreshEntitlement(): Promise<boolean> {
+  if (!ready || !Purchases) return false;
+  try {
+    if (Platform.OS === 'android') await Purchases.syncPurchases();
+  } catch {
+    /* ignore — fall through to a plain check */
+  }
+  return hasActiveEntitlement();
+}
+
+/** Subscribe to entitlement changes (e.g. an offer code redeemed in the sheet). */
+export function onEntitlementChange(cb: (active: boolean) => void): () => void {
+  if (!ready || !Purchases) return () => undefined;
+  const sdk = Purchases;
+  const listener = (info: { entitlements: { active: Record<string, unknown> } }) =>
+    cb(info.entitlements.active[ENTITLEMENT_ID] != null);
+  try {
+    sdk.addCustomerInfoUpdateListener(listener as never);
+    return () => {
+      try {
+        sdk.removeCustomerInfoUpdateListener(listener as never);
+      } catch {
+        /* ignore */
+      }
+    };
+  } catch {
+    return () => undefined;
   }
 }

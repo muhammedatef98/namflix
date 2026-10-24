@@ -19,7 +19,7 @@ export default function PremiumScreen() {
   const router = useRouter();
   const { t, isRTL } = useLocale();
   const { accent } = useTheme();
-  const { plan, config, purchasablePlans, unlockLifetimeFree, purchase, restore } = usePremium();
+  const { plan, config, purchasablePlans, unlockLifetimeFree, purchase, restore, redeemCode } = usePremium();
 
   const lifetimeMode = config.lifetimeMode;
   // Paid cards are driven entirely by what the store actually offers, so a
@@ -58,6 +58,11 @@ export default function PremiumScreen() {
       return;
     }
     Alert.alert(t('premiumTitle'), t('restoreNone'));
+  };
+
+  const onRedeem = async () => {
+    const shown = await redeemCode();
+    if (!shown) Alert.alert(t('premiumTitle'), t('redeemUnavailable'));
   };
 
   return (
@@ -135,6 +140,9 @@ export default function PremiumScreen() {
           <Pressable onPress={onRestore} hitSlop={8} style={styles.restoreBtn}>
             <Text style={[styles.restoreText, { color: accent }]}>{t('restorePurchases')}</Text>
           </Pressable>
+          <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
+            <Text style={[styles.redeemText, { color: accent }]}>{t('redeemCode')}</Text>
+          </Pressable>
           <View style={styles.legalRow}>
             <Pressable onPress={() => Linking.openURL(EULA_URL)} hitSlop={8}>
               <Text style={styles.legalLink}>{t('termsOfUse')}</Text>
@@ -208,6 +216,8 @@ const styles = StyleSheet.create({
   },
   restoreBtn: { alignItems: 'center', paddingVertical: 14, marginTop: 4 },
   restoreText: { fontSize: 14, fontFamily: FONT.medium, lineHeight: 20 },
+  redeemBtn: { alignItems: 'center', paddingVertical: 10, marginBottom: 6 },
+  redeemText: { fontSize: 13, fontFamily: FONT.medium, lineHeight: 20, textDecorationLine: 'underline' },
   legalRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8, marginTop: 2 },
   legalLink: { color: NightPalette.dimText, fontSize: 12, lineHeight: 18, textDecorationLine: 'underline' },
   legalDot: { color: NightPalette.dimText, fontSize: 12 },
