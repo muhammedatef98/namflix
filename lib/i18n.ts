@@ -476,6 +476,11 @@ export const STRINGS = {
     en: 'Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Manage or cancel anytime in your App Store account settings.',
     ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا ما لم يُلغَ قبل ٢٤ ساعة على الأقل من نهاية المدة. يمكنك الإدارة أو الإلغاء في أي وقت من إعدادات حساب App Store.',
   },
+  redeemCode: { en: 'Have a code? Redeem it', ar: 'معاك كود؟ استخدمه' },
+  redeemUnavailable: {
+    en: 'Code redemption isn’t available right now. You can redeem it from the App Store or Google Play app.',
+    ar: 'استخدام الكود غير متاح حاليًا. يمكنك استخدامه من تطبيق App Store أو Google Play.',
+  },
   restoreNone: { en: 'No previous purchase found.', ar: 'لم نجد أي عملية شراء سابقة.' },
   purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'تعذّر إتمام الشراء. من فضلك حاول مرة أخرى.' },
 
