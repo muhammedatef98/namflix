@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState } from 'react-native';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
   configurePurchases,
@@ -8,6 +9,9 @@ import {
   getPurchasablePlans,
   buyPlan as iapBuyPlan,
   restorePurchases as iapRestore,
+  presentRedeemCode,
+  refreshEntitlement,
+  onEntitlementChange,
   type PaidPlan,
   type PurchasablePlan,
   type PurchaseResult,
@@ -37,6 +41,8 @@ type PremiumValue = {
   purchase: (plan: PaidPlan) => Promise<PurchaseResult>;
   /** Restore a previous App Store purchase. */
   restore: () => Promise<PurchaseResult>;
+  /** Open the store's redeem-code flow (gift / offer / promo codes). */
+  redeemCode: () => Promise<boolean>;
   /** Clear the local entitlement (used on sign-out / testing). */
   clearPlan: () => Promise<void>;
 };
@@ -68,15 +74,30 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
   // no-op safely when IAP isn't configured, leaving the free offer intact.
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe: () => void = () => undefined;
     configurePurchases().then(async (ok) => {
       if (!ok || cancelled) return;
       const [active, plans] = await Promise.all([hasActiveEntitlement(), getPurchasablePlans()]);
       if (cancelled) return;
       setStorePremium(active);
       setPurchasablePlans(plans);
+      // A code redeemed in Apple's sheet updates CustomerInfo live.
+      unsubscribe = onEntitlementChange((on) => {
+        if (on) setStorePremium(true);
+      });
+    });
+    // Coming back from the Play Store redeem page (or any store screen):
+    // re-sync so a freshly redeemed code unlocks premium right away.
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      refreshEntitlement().then((on) => {
+        if (on) setStorePremium(true);
+      });
     });
     return () => {
       cancelled = true;
+      unsubscribe();
+      sub.remove();
     };
   }, []);
 
@@ -105,6 +126,7 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       },
       purchase,
       restore,
+      redeemCode: presentRedeemCode,
       clearPlan: async () => {
         setPlan(null);
         await AsyncStorage.removeItem(PLAN_KEY).catch(() => undefined);
