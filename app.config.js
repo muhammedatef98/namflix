@@ -39,6 +39,8 @@ module.exports = ({ config }) => ({
   ...config,
   plugins: [
     ...(config.plugins ?? []),
+    // Local notifications only — drop the push entitlement (see the plugin).
+    './plugins/withoutPushEntitlement',
     [
       'react-native-google-mobile-ads',
       {
