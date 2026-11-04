@@ -1,8 +1,7 @@
-import { useCallback, useState } from 'react';
-import { Text, View, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { Text, View, Pressable, ScrollView, StyleSheet, Switch, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from 'expo-router';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,6 +9,22 @@ import { BackButton } from '@/components/BackButton';
 import { StarField } from '@/components/StarField';
 import { NightPalette, FONT } from '@/constants/theme';
 import { useRecordTool } from '@/hooks/useRecordTool';
+import {
+  MIN_WINDOW_H,
+  WINDOW_DEFAULTS as DEFAULTS,
+  bedMinutes,
+  loadWindowSettings,
+  saveWindowSettings,
+  wakeMinutes,
+  type WindowSettings,
+} from '@/lib/sleepWindow';
+import {
+  disableReminder,
+  enableReminder,
+  isReminderAvailable,
+  isReminderEnabled,
+  rescheduleReminderIfEnabled,
+} from '@/lib/bedtimeReminder';
 
 /**
  * Sleep-window calculator — an interactive taste of Sleep Restriction Therapy
@@ -19,22 +34,12 @@ import { useRecordTool } from '@/hooks/useRecordTool';
  * never allowed below the clinical floor of 5.5 hours.
  */
 
-const STORE_KEY = 'namflix.window';
-const MIN_WINDOW_H = 5.5;
 const SLEEP_CHOICES = [5.5, 6, 6.5, 7, 7.5, 8, 8.5];
 const WAKE_HOURS = [4, 5, 6, 7, 8, 9, 10, 11];
 const WAKE_MINUTES = [0, 15, 30, 45];
 
 const AR_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 const arNum = (s: string) => s.replace(/[0-9]/g, (d) => AR_DIGITS[Number(d)]);
-
-interface WindowSettings {
-  sleepHours: number;
-  wakeHour: number;
-  wakeMinute: number;
-}
-
-const DEFAULTS: WindowSettings = { sleepHours: 7, wakeHour: 7, wakeMinute: 0 };
 
 function formatClock(totalMinutes: number, ar: boolean): string {
   const mins = ((totalMinutes % 1440) + 1440) % 1440;
@@ -51,16 +56,21 @@ export default function WindowScreen() {
   const { t, isRTL, lang } = useLocale();
   const { accent } = useTheme();
   const [settings, setSettings] = useState<WindowSettings>(DEFAULTS);
+  const [reminderOn, setReminderOn] = useState(false);
+  const reminderAvailable = isReminderAvailable();
   const ar = lang === 'ar';
 
   useFocusEffect(
     useCallback(() => {
       let alive = true;
-      AsyncStorage.getItem(STORE_KEY)
-        .then((raw) => {
-          if (!raw || !alive) return;
-          const parsed = JSON.parse(raw) as WindowSettings;
-          if (typeof parsed?.sleepHours === 'number') setSettings(parsed);
+      loadWindowSettings()
+        .then((saved) => {
+          if (saved && alive) setSettings(saved);
+        })
+        .catch(() => undefined);
+      isReminderEnabled()
+        .then((on) => {
+          if (alive) setReminderOn(on);
         })
         .catch(() => undefined);
       return () => {
@@ -71,12 +81,31 @@ export default function WindowScreen() {
 
   const update = (next: WindowSettings) => {
     setSettings(next);
-    AsyncStorage.setItem(STORE_KEY, JSON.stringify(next)).catch(() => undefined);
+    // Save first, then move the reminder to the new bedtime.
+    saveWindowSettings(next)
+      .then(() => rescheduleReminderIfEnabled(lang))
+      .catch(() => undefined);
+  };
+
+  // A language switch changes the reminder text, so re-schedule it too.
+  useEffect(() => {
+    void rescheduleReminderIfEnabled(lang);
+  }, [lang]);
+
+  const toggleReminder = async (next: boolean) => {
+    if (!next) {
+      setReminderOn(false);
+      await disableReminder();
+      return;
+    }
+    const ok = await enableReminder(lang);
+    setReminderOn(ok);
+    if (!ok) Alert.alert(t('reminderTitle'), t('reminderDenied'));
   };
 
   const windowH = Math.max(MIN_WINDOW_H, settings.sleepHours);
-  const wakeMins = settings.wakeHour * 60 + settings.wakeMinute;
-  const bedMins = wakeMins - windowH * 60;
+  const wakeMins = wakeMinutes(settings);
+  const bedMins = bedMinutes(settings);
 
   const hourLabel = (h: number) => {
     const raw = h === Math.floor(h) ? String(h) : String(h);
@@ -160,6 +189,24 @@ export default function WindowScreen() {
             <Text style={[styles.resultNote, isRTL && styles.textRTL]}>{t('windowNotEarlier')}</Text>
           </View>
 
+          {/* Gentle reminder before the window opens — off by default */}
+          {reminderAvailable && (
+            <View style={[styles.reminderRow, isRTL && styles.rowRTL]}>
+              <View style={styles.reminderText}>
+                <Text style={[styles.reminderTitle, isRTL && styles.textRTL]}>{t('reminderTitle')}</Text>
+                <Text style={[styles.reminderSub, isRTL && styles.textRTL]}>
+                  {t('reminderSub').replace('{time}', formatClock(bedMins - 30, ar))}
+                </Text>
+              </View>
+              <Switch
+                value={reminderOn}
+                onValueChange={(v) => void toggleReminder(v)}
+                trackColor={{ false: 'rgba(140,42,18,0.3)', true: accent }}
+                thumbColor="#F2C9A6"
+              />
+            </View>
+          )}
+
           {/* Weekly adjustment rules */}
           <Text style={[styles.rulesTitle, isRTL && styles.textRTL]}>{t('windowRulesTitle')}</Text>
           <Text style={[styles.rule, isRTL && styles.textRTL]}>{t('windowRule1')}</Text>
@@ -178,6 +225,20 @@ const styles = StyleSheet.create({
   fill: { flex: 1 },
   content: { paddingHorizontal: 26, paddingTop: 12, paddingBottom: 36 },
   rowRTL: { flexDirection: 'row-reverse' },
+  reminderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 18,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(140,42,18,0.3)',
+    backgroundColor: 'rgba(36,17,9,0.55)',
+  },
+  reminderText: { flex: 1 },
+  reminderTitle: { color: NightPalette.textPrimary, fontSize: 14, fontFamily: FONT.medium, lineHeight: 21 },
+  reminderSub: { color: NightPalette.dimText, fontSize: 12, lineHeight: 18, marginTop: 2 },
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
   title: { fontSize: 26, fontFamily: FONT.bold, lineHeight: 38, color: NightPalette.textPrimary },
   sub: { fontSize: 13, lineHeight: 21, color: NightPalette.dimText, marginTop: 4 },

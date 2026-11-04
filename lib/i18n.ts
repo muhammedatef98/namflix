@@ -384,6 +384,15 @@ export const STRINGS = {
     en: 'Not for people with epilepsy, bipolar disorder, or jobs where daytime sleepiness is dangerous (driving, heavy machinery) — consult a clinician first.',
     ar: 'لا يناسب المصابين بالصرع أو الاضطراب ثنائي القطب، ولا أصحاب الأعمال التي يخطر فيها نعاس النهار (قيادة، آلات ثقيلة) — استشر مختصًّا أولًا.',
   },
+  reminderTitle: { en: 'Remind me before bedtime', ar: 'ذكّرني قبل موعد النوم' },
+  reminderSub: {
+    en: 'One quiet notification a day, at {time}. No sound, no vibration.',
+    ar: 'إشعار هادئ واحد يوميًا عند {time}. بلا صوت ولا اهتزاز.',
+  },
+  reminderDenied: {
+    en: 'Notifications are turned off for Namflix. You can allow them in your phone settings.',
+    ar: 'الإشعارات متوقفة لنامفلكس. يمكنك السماح بها من إعدادات هاتفك.',
+  },
   toolWindowTitle: { en: 'Your Sleep Window', ar: 'نافذة نومك' },
   toolWindowSub: { en: 'sleep-restriction calculator', ar: 'حاسبة نافذة النوم' },
 
