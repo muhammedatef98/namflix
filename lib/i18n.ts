@@ -80,8 +80,8 @@ export const STRINGS = {
     ar: 'سترى شيئًا عاديًّا عشوائيًّا واحدًا في كل مرة. تخيّله ببساطة للحظة، ثم دَعه يتلاشى قبل أن يظهر التالي.',
   },
   shuffleRule1: { en: "Don't link them into a story.", ar: 'لا تربطها بقصة.' },
-  shuffleRule2: { en: 'No image is important. Some are dull. Good.', ar: 'ما فيش صورة أهم من التانية. بعضها ممل، وده كويس.' },
-  shuffleRule3: { en: "If your mind drifts off — that's the point.", ar: 'لو شرد ذهنك فهذا بالضبط المطلوب.' },
+  shuffleRule2: { en: 'No image is important. Some are dull. Good.', ar: 'لا توجد صورة أهم من غيرها. بعضها ممل، وهذا جيد.' },
+  shuffleRule3: { en: "If your mind drifts off — that's the point.", ar: 'إن شرد ذهنك، فهذا هو المطلوب تمامًا.' },
   shuffleStart: { en: 'Begin drifting', ar: 'ابدأ الخلخلة' },
   shuffleHint: { en: 'picture it · let it go · tap to stop', ar: 'تخيّله · دَعه · المس لتوقف' },
   shuffleScience: {
@@ -128,9 +128,9 @@ export const STRINGS = {
   },
 
   // paradox
-  paradoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى صاحيًا' },
+  paradoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى مستيقظًا' },
   paradoxCue1: { en: 'Lie still. Let your eyes close, or rest them half-open.', ar: 'استلقِ بهدوء. اترك عينيك تُغلَقان، أو اتركهما نصف مفتوحتين.' },
-  paradoxCue2: { en: 'Gently try to stay awake — without moving, without effort.', ar: 'جرّب بهدوء أن تبقى صاحيًا — بلا حركة ولا مجهود.' },
+  paradoxCue2: { en: 'Gently try to stay awake — without moving, without effort.', ar: 'جرّب بهدوء أن تبقى مستيقظًا، بلا حركة ولا مجهود.' },
   paradoxCue3: { en: "Don't try to sleep. You are simply keeping a soft watch.", ar: 'لا تحاول أن تنام. أنت فقط تحافظ على يقظة هادئة.' },
   paradoxCue4: { en: "If sleep starts to come, that is fine. You weren't chasing it.", ar: 'وإن بدأ النوم يأتي، لا تقاومه. أنت لم تكن تسعى وراءه أصلًا.' },
   paradoxScience: {
@@ -179,7 +179,7 @@ export const STRINGS = {
   methodsTitle: { en: 'The Sleep Methods Library', ar: 'مكتبة طرق النوم' },
   methodsSub: {
     en: 'Every practical, research-backed way to fall asleep and treat insomnia — with the evidence behind each one.',
-    ar: 'كل طريقة عملية مدعومة بالأبحاث للنوم وعلاج الأرق — مع الدليل ورا كل واحدة.',
+    ar: 'كل طريقة عملية مدعومة بالأبحاث للنوم وعلاج الأرق — مع الدليل وراء كلٍّ منها.',
   },
   methodHow: { en: 'How to do it', ar: 'كيف تطبّقها' },
   methodEvidence: { en: 'The evidence', ar: 'الدليل العلمي' },
@@ -187,14 +187,14 @@ export const STRINGS = {
   methodOpenLocked: { en: 'Open the tool (Premium)', ar: 'افتح الأداة (بريميوم)' },
   methodsDisclaimer: {
     en: 'Educational, evidence-informed content — not medical advice. Persistent insomnia warrants clinician-guided CBT-I.',
-    ar: 'محتوى تعليمي قائم على الأبحاث — مش نصيحة طبية. الأرق المستمر يحتاج علاج سلوكي بإشراف مختصّ.',
+    ar: 'محتوى تعليمي قائم على الأبحاث، وليس نصيحة طبية. الأرق المستمر يحتاج إلى علاج سلوكي بإشراف مختص.',
   },
 
   // tools screen
   toolsTitle: { en: 'Guided tools', ar: 'أدوات تساعدك' },
   toolsSub: {
     en: 'Interactive practices you can start right now.',
-    ar: 'تمارين قصيرة تقدر تبدأها دلوقتي.',
+    ar: 'تمارين قصيرة يمكنك البدء بها الآن.',
   },
   toolCountTitle: { en: 'The Descending Count', ar: 'عدّ تنازلي بطيء' },
   toolCountSub: { en: 'slow, monotone counting', ar: 'عدٌّ بطيء رتيب' },
@@ -202,7 +202,7 @@ export const STRINGS = {
   toolShuffleSub: { en: 'random, unconnected images', ar: 'صور عشوائية غير مترابطة' },
   toolImageryTitle: { en: 'Imagery Distraction', ar: 'تخيّل يُبعدك عن الأفكار' },
   toolImagerySub: { en: 'one calm, neutral scene', ar: 'مشهد واحد هادئ محايد' },
-  toolParadoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى صاحيًا' },
+  toolParadoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى مستيقظًا' },
   toolParadoxSub: { en: 'paradoxical intention', ar: 'النيّة العكسية' },
 
   toolPmrTitle: { en: 'Muscle Release', ar: 'استرخاء العضلات' },
@@ -219,7 +219,7 @@ export const STRINGS = {
   pmrTitle: { en: 'Muscle Release', ar: 'استرخاء العضلات' },
   pmrLead: {
     en: 'Tense each muscle group for a few seconds, then let go and feel it soften. We move slowly from the feet up to the face.',
-    ar: 'اشدّ كل مجموعة عضلات لثوانٍ، بعدها أرخِها واحسّ بها بتلين. ننزل تدريجيًّا من القدمين لحد الوجه.',
+    ar: 'شُدّ كل مجموعة عضلات لبضع ثوانٍ، ثم أرخِها واشعر بها وهي تلين. ننتقل تدريجيًّا من القدمين إلى الوجه.',
   },
   pmrStart: { en: 'Begin releasing', ar: 'ابدأ الاسترخاء' },
   pmrHint: { en: 'tense · release · tap to stop', ar: 'شُدّ · أرخِ · المس لتوقف' },
@@ -228,7 +228,7 @@ export const STRINGS = {
   bodyscanTitle: { en: 'Body Scan', ar: 'جولة في جسدك' },
   bodyscanLead: {
     en: 'Rest your attention on one part of the body at a time, and let it soften as you pass. No effort, no tensing — just slow, kind noticing, from the toes to the crown.',
-    ar: 'ركّز انتباهك على جزء واحد من جسدك كل مرة، واتركه يسترخي. بلا مجهود ولا شدّ — فقط ملاحظة هادئة، من أصابع القدم لحد قمّة الرأس.',
+    ar: 'ركّز انتباهك على جزء واحد من جسدك كل مرة، واتركه يسترخي. بلا مجهود ولا شدّ — فقط ملاحظة هادئة، من أصابع القدمين حتى قمة الرأس.',
   },
   bodyscanStart: { en: 'Begin the scan', ar: 'ابدأ الجولة' },
   bodyscanHint: { en: 'follow slowly · tap to stop', ar: 'تابِع ببطء · المس لتوقف' },
@@ -240,7 +240,7 @@ export const STRINGS = {
     ar: 'نسخة مغمضة العينين من التثبيت بالحواس. تنقّل بين حواسّك واحدة تلو الأخرى — وكلّما لاحظت شيئًا حقًّا، المس الشاشة. تثبيت الانتباه في الجسد يسحبه من دوّامة الأفكار.',
   },
   groundStart: { en: 'Begin grounding', ar: 'ابدأ التثبيت' },
-  groundTapHint: { en: 'tap for each thing you notice', ar: 'المس عند كل حاجة تلاحظها' },
+  groundTapHint: { en: 'tap for each thing you notice', ar: 'المس الشاشة عند كل شيء تلاحظه' },
   groundDone: { en: 'You are here, in your bed.', ar: 'أنت هنا، في فراشك.' },
   groundDoneSub: {
     en: 'Stay with the last sensation. Repeat, or drift.',
@@ -253,16 +253,16 @@ export const STRINGS = {
   checkinUsed: { en: 'Last night you used:', ar: 'استخدمت ليلة أمس:' },
   checkinQuestion: { en: 'How easily did you fall asleep?', ar: 'كيف نمت؟' },
   checkinEasy: { en: 'Easily', ar: 'بسهولة' },
-  checkinSlow: { en: 'Took a while', ar: 'ناخد وقت' },
+  checkinSlow: { en: 'Took a while', ar: 'أخذ وقتًا' },
   checkinHard: { en: 'With difficulty', ar: 'بصعوبة' },
-  checkinThanks: { en: 'Noted. Your map is learning you.', ar: 'تمام، سُجّلت. خريطتك بدأت تعرفك.' },
-  checkinSeeMap: { en: 'See what works for you ←', ar: '← شوف اللي بينفع معك' },
+  checkinThanks: { en: 'Noted. Your map is learning you.', ar: 'تم التسجيل. خريطتك بدأت تتعرّف عليك.' },
+  checkinSeeMap: { en: 'See what works for you ←', ar: '← اكتشف ما يناسبك' },
 
   // insights — the personal map
-  insightsTitle: { en: 'What Works for Me', ar: 'إيه اللي ينفع معي' },
+  insightsTitle: { en: 'What Works for Me', ar: 'ما الذي ينفعني' },
   insightsSub: {
     en: 'Your own record — which practices actually preceded easy nights.',
-    ar: 'سجلّك الشخصي — أيّ الطرق بتسبق فعلًا لياليك السهلة.',
+    ar: 'سجلّك الشخصي: أيّ الطرق تسبق فعلًا لياليك السهلة.',
   },
   insightsEmpty: {
     en: 'Use any tool at night, then answer the one-question morning check-in. Within a few nights, your personal map starts forming here.',
@@ -274,9 +274,9 @@ export const STRINGS = {
   insightsHistory: { en: 'Recent nights', ar: 'ليالٍ قريبة' },
   insightsHonesty: {
     en: 'Honest note: these are your personal correlations, not clinical proof — many things shape a night. But your own repeated pattern is the most relevant signal you have.',
-    ar: 'ملاحظة أمينة: دي ارتباطات شخصية مش دليل طبي — في حاجات كتير بتأثر على نومك. لكن تكرار نمط عندك هو أصدق إشارة متاحة.',
+    ar: 'ملاحظة صادقة: هذه ارتباطات شخصية وليست دليلًا طبيًا، فأشياء كثيرة تؤثر في نومك. لكن تكرار النمط نفسه عندك هو أصدق إشارة متاحة.',
   },
-  toolInsightsTitle: { en: 'What Works for Me', ar: 'إيه اللي ينفع معي' },
+  toolInsightsTitle: { en: 'What Works for Me', ar: 'ما الذي ينفعني' },
   toolInsightsSub: { en: 'your personal sleep map', ar: 'خريطة نومك الخاصة' },
 
   // 14 nights program
@@ -290,7 +290,7 @@ export const STRINGS = {
     ar: 'العلاج السلوكي للأرق هو العلاج الأول للأرق المزمن — ويُوصى به قبل الحبوب المنوّمة. عبر ١٤ ليلة ستبني عاداته الأساسية، واحدة كل ليلة: القياس، وتثبيت الإيقاع، وإعادة تدريب السرير، وتهدئة الجسد والعقل، ثم كتابة بروتوكولك الخاص.',
   },
   programStart: { en: 'Begin night one', ar: 'ابدأ أول ليلة' },
-  programMarkDone: { en: 'Mark tonight done', ar: 'خلّصت ليلة النهارده' },
+  programMarkDone: { en: 'Mark tonight done', ar: 'أنهيت ليلة اليوم' },
   programDone: { en: 'Done ✓', ar: 'تمّت ✓' },
   programOpenTool: { en: 'Open the tool', ar: 'افتح الأداة' },
   programPacing: {
@@ -299,7 +299,7 @@ export const STRINGS = {
   },
   programDisclaimer: {
     en: 'Educational, evidence-informed content — not medical care. If insomnia persists most nights beyond a month, see a clinician for full CBT-I.',
-    ar: 'محتوى تعليمي قائم على الأبحاث — مش رعاية طبية. لو الأرق استمر معظم الليالي بعد شهر، راجع مختصّ لعلاج كامل.',
+    ar: 'محتوى تعليمي قائم على الأبحاث، وليس رعاية طبية. إن استمر الأرق معظم الليالي بعد شهر، فراجع مختصًّا لعلاج كامل.',
   },
   toolProgramTitle: { en: '14 Nights', ar: '١٤ ليلة' },
   toolProgramSub: { en: 'a guided CBT-I journey', ar: 'رحلة موجَّهة في العلاج السلوكي' },
@@ -353,15 +353,15 @@ export const STRINGS = {
   },
   windowQ1: {
     en: 'How many hours do you actually SLEEP on a typical night? (not time in bed)',
-    ar: 'كم ساعة تنامها فعلًا في الليلة العادية؟ (مش الوقت اللي تقضيه في السرير)',
+    ar: 'كم ساعة تنامها فعلًا في الليلة العادية؟ (وليس الوقت الذي تقضيه في السرير)',
   },
-  windowQ2: { en: 'Your fixed wake-up time — every day:', ar: 'موعد صحيانك الثابت — كل يوم:' },
-  windowResult: { en: 'Your window for this week', ar: 'نافذتك للأسبوع ده' },
+  windowQ2: { en: 'Your fixed wake-up time — every day:', ar: 'موعد استيقاظك الثابت، كل يوم:' },
+  windowResult: { en: 'Your window for this week', ar: 'نافذتك لهذا الأسبوع' },
   windowBed: { en: 'earliest bedtime', ar: 'أبكر موعد للنوم' },
-  windowWake: { en: 'wake time', ar: 'موعد الصحيان' },
+  windowWake: { en: 'wake time', ar: 'موعد الاستيقاظ' },
   windowNotEarlier: {
     en: 'Do not get into bed before this time — even if tired. Sleepy is the signal, not the clock.',
-    ar: 'لا تدخل السرير قبل الموعد ده — حتى لو كنت تعبان. النعاس هو الإشارة، مش الساعة.',
+    ar: 'لا تدخل السرير قبل هذا الموعد حتى لو كنت متعبًا. النعاس هو الإشارة، وليس الساعة.',
   },
   windowRulesTitle: { en: 'Weekly tuning', ar: 'الضبط الأسبوعي' },
   windowRule1: {
@@ -374,7 +374,7 @@ export const STRINGS = {
   },
   windowRule3: {
     en: '• Never shrink the window below 5½ hours, and keep the wake time fixed always.',
-    ar: '• لا تُنقص النافذة عن ٥ ساعات ونصف أبدًا، وأبقِ موعد الصحيان ثابتًا دائمًا.',
+    ar: '• لا تُنقص النافذة عن ٥ ساعات ونصف أبدًا، وأبقِ موعد الاستيقاظ ثابتًا دائمًا.',
   },
   windowEvidence: {
     en: 'Spielman et al. (1987); meta-analyses rank sleep restriction as the strongest single CBT-I component. Expect a few sleepier days at first — that pressure is the mechanism.',
@@ -398,7 +398,7 @@ export const STRINGS = {
   radioHeading: { en: 'Sleep Radio', ar: 'راديو النوم' },
   radioSub: {
     en: 'Tap a channel — it walks through its sounds for you, all night.',
-    ar: 'اضغط قناة — تشتغل تلقائيًّا طول الليل وتنتقل بين الأصوات وحدها.',
+    ar: 'اضغط قناة، فتعمل تلقائيًّا طوال الليل وتتنقّل بين الأصوات وحدها.',
   },
   radioOn: { en: 'ON AIR', ar: 'يعمل الآن' },
 
@@ -412,7 +412,7 @@ export const STRINGS = {
   },
   downloadsEmpty: {
     en: 'No downloads yet. Open any sound and tap the download arrow to keep it on your phone.',
-    ar: 'لا يوجد أصوات محفوظة. افتح أي صوت واضغط سهم التنزيل ليبقى على جهازك.',
+    ar: 'لا توجد أصوات محفوظة. افتح أي صوت واضغط سهم التنزيل ليبقى على جهازك.',
   },
   downloadsUsed: { en: '{amount} used', ar: 'يشغل {amount}' },
   downloadsClearAll: { en: 'Delete all downloads', ar: 'احذف كل المحفوظات' },
@@ -424,22 +424,22 @@ export const STRINGS = {
 
   // night rescue — the 3 a.m. mode
   toolRescueTitle: { en: 'Night Rescue', ar: 'نجدة الليل' },
-  toolRescueSub: { en: 'woke at 3 a.m.? start here', ar: 'صحيت في نص الليل؟ ابدأ هنا' },
-  rescueEntryTitle: { en: 'Awake in the middle of the night?', ar: 'صحيت في نص الليل؟' },
+  toolRescueSub: { en: 'woke at 3 a.m.? start here', ar: 'استيقظت في منتصف الليل؟ ابدأ هنا' },
+  rescueEntryTitle: { en: 'Awake in the middle of the night?', ar: 'استيقظت في منتصف الليل؟' },
   rescueEntrySub: {
     en: 'A near-dark mode that walks you back to sleep.',
-    ar: 'وضع شبه مظلم بيرجّعك للنوم.',
+    ar: 'وضع شبه مظلم يعيدك إلى النوم بهدوء.',
   },
   rescueTapHint: { en: 'tap to continue', ar: 'المس لتُكمل' },
-  rescueAsk: { en: 'What does this moment feel like?', ar: 'كيف هذه اللحظة؟' },
+  rescueAsk: { en: 'What does this moment feel like?', ar: 'بماذا تشعر الآن؟' },
   rescueStimulusTitle: { en: 'The 20-minute rule', ar: 'قاعدة العشرين دقيقة' },
-  rescueOtherPaths: { en: 'Show the other paths', ar: 'ورّيني المسارات الأخرى' },
+  rescueOtherPaths: { en: 'Show the other paths', ar: 'أرني المسارات الأخرى' },
 
   // media / player
   mediaTitle: { en: 'Sounds that help you sleep', ar: 'أصوات تساعدك تنام' },
   mediaSub: {
     en: 'Real, long-form ambient sound — plays instantly, loops all night.',
-    ar: 'أصوات حقيقية طويلة — تشتغل على طول وتستمر طول الليل.',
+    ar: 'أصوات حقيقية طويلة، تعمل فورًا وتستمر طوال الليل.',
   },
   sleepTimer: { en: 'Sleep timer', ar: 'مؤقّت النوم' },
   screenOff: { en: 'Screen off', ar: 'إطفاء الشاشة' },
@@ -506,7 +506,7 @@ export const STRINGS = {
     en: 'Paid plans arrive with the App Store release. For now, Lifetime is free — enjoy everything.',
     ar: 'الباقات المدفوعة ستتوفّر مع إصدار المتجر. حاليًا Lifetime مجاني — استمتع بكل شيء.',
   },
-  premiumActive: { en: 'You’re on Lifetime — everything is unlocked. Rest easy.', ar: 'أنت على باقة مدى الحياة — كل حاجة مفتوحة. نَم مطمئنًّا.' },
+  premiumActive: { en: 'You’re on Lifetime — everything is unlocked. Rest easy.', ar: 'أنت على باقة مدى الحياة — كل شيء مفتوح. نَم مطمئنًّا.' },
   premiumEntry: { en: 'Unlock every method and sound', ar: 'افتح كل الطرق والأصوات' },
   premiumBadge: { en: 'PREMIUM', ar: 'بريميوم' },
   bestValue: { en: 'BEST VALUE', ar: 'الأفضل قيمة' },
@@ -518,7 +518,7 @@ export const STRINGS = {
   },
   redeemNone: {
     en: 'No code was redeemed.',
-    ar: 'ما تمش استخدام أي رمز.',
+    ar: 'لم يُستخدم أي رمز.',
   },
   redeemAndroid: {
     en: 'Open the Play Store, tap your profile, then Payments and subscriptions → Redeem code.',
@@ -530,13 +530,14 @@ export const STRINGS = {
   redeemPlaceholder: { en: 'Enter your code', ar: 'أدخل الرمز' },
   redeemSubmit: { en: 'Redeem', ar: 'تفعيل' },
   redeemAppStore: { en: 'I have an App Store code', ar: 'لديّ رمز من App Store' },
+  redeemPlayStore: { en: 'I have a Google Play code', ar: 'لديّ رمز من Google Play' },
   redeemLifetimeDone: {
     en: 'Code accepted — Namflix is yours for life. Everything is unlocked.',
     ar: 'تم قبول الرمز — نامفليكس لك مدى الحياة. كل شيء مفتوح الآن.',
   },
   redeemInvalid: {
     en: 'That code isn’t valid. Check for typos and try again.',
-    ar: 'الرمز ده مش صالح. تأكد من كتابته وجرّب تاني.',
+    ar: 'هذا الرمز غير صالح. تأكد من كتابته وحاول مجددًا.',
   },
   restorePrompt: {
     en: 'Reinstalled, or on a new phone? Your subscription is tied to your store account.',
@@ -556,14 +557,14 @@ export const STRINGS = {
   trialUnitYear1: { en: 'year', ar: 'سنة' },
   trialDisclosure: {
     en: 'The free trial converts to a paid subscription automatically unless you cancel at least 24 hours before it ends. Cancel anytime in your App Store account settings.',
-    ar: 'تتحوّل التجربة المجانية لاشتراك مدفوع تلقائيًّا لو ما ألغيتهاش قبل ما تخلص بـ٢٤ ساعة على الأقل. تقدر تلغي في أي وقت من إعدادات حساب App Store.',
+    ar: 'تتحوّل التجربة المجانية إلى اشتراك مدفوع تلقائيًّا إن لم تُلغِها قبل انتهائها بـ٢٤ ساعة على الأقل. يمكنك الإلغاء في أي وقت من إعدادات حساب App Store.',
   },
   subDisclosure: {
     en: 'Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Manage or cancel anytime in your App Store account settings.',
-    ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا لو ما اتلغاش قبل نهاية المدة بـ٢٤ ساعة على الأقل. تقدر تدير اشتراكك أو تلغيه في أي وقت من إعدادات حساب App Store.',
+    ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا إن لم يُلغَ قبل نهاية المدة بـ٢٤ ساعة على الأقل. يمكنك إدارة اشتراكك أو إلغاؤه في أي وقت من إعدادات حساب App Store.',
   },
-  restoreNone: { en: 'No previous purchase found.', ar: 'ما لقيناش أي عملية شراء سابقة.' },
-  purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'ما قدرناش نكمّل الشراء. حاول مرة تانية.' },
+  restoreNone: { en: 'No previous purchase found.', ar: 'لم نجد أي عملية شراء سابقة.' },
+  purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'لم نتمكن من إتمام الشراء. حاول مرة أخرى.' },
 
   // limited-time free Lifetime offer (countdown + claim flow)
   offerEndsIn: { en: 'Free offer ends in', ar: 'ينتهي العرض المجاني خلال' },
@@ -583,16 +584,16 @@ export const STRINGS = {
   lockTitle: { en: 'This one is for members', ar: 'هذا المحتوى لأعضاء بريميوم' },
   lockSub: {
     en: 'Open it with Premium, or watch one short ad to open it for {hours}.',
-    ar: 'افتحه مع بريميوم، أو شوف إعلان قصير يفتحه لك {hours}.',
+    ar: 'افتحه مع بريميوم، أو شاهد إعلانًا قصيرًا يفتحه لك {hours}.',
   },
   unlockWithPremium: { en: 'Unlock with Premium', ar: 'افتحه مع بريميوم' },
   // {hours} → hoursPhrase(), e.g. "24 hours" / "٢٤ ساعة"
-  watchAdUnlock: { en: 'Watch a short ad to unlock this for {hours}', ar: 'شوف إعلان قصير يفتح لك ده {hours}' },
+  watchAdUnlock: { en: 'Watch a short ad to unlock this for {hours}', ar: 'شاهد إعلانًا قصيرًا ليُفتح لك {hours}' },
   goPremiumNoAds: { en: 'Go Premium — everything unlocked, no ads', ar: 'اشترك في بريميوم واستمتع بكل المحتوى بلا إعلانات' },
-  adLoading: { en: 'Getting a short ad ready…', ar: 'بنجهّز إعلان قصير…' },
-  adNoFill: { en: 'No ad available right now, please try again later', ar: 'مافيش إعلان دلوقتي، جرّب تاني بعد شوية' },
-  adDailyCap: { en: 'Daily limit reached — unlock everything with Premium', ar: 'وصلت للحد اليومي — افتح كل حاجة مع بريميوم' },
-  adNotNow: { en: 'Not now', ar: 'مش دلوقتي' },
+  adLoading: { en: 'Getting a short ad ready…', ar: 'نجهّز إعلانًا قصيرًا…' },
+  adNoFill: { en: 'No ad available right now, please try again later', ar: 'لا يتوفر إعلان الآن، حاول بعد قليل' },
+  adDailyCap: { en: 'Daily limit reached — unlock everything with Premium', ar: 'وصلت إلى الحد اليومي، افتح كل شيء مع بريميوم' },
+  adNotNow: { en: 'Not now', ar: 'ليس الآن' },
   adPrivacyChoices: { en: 'Ad privacy choices', ar: 'خيارات خصوصية الإعلانات' },
 
   // descent rationale
@@ -600,19 +601,19 @@ export const STRINGS = {
 
   // voluntary support (tip jar) — unlocks nothing, ever
   supportSection: { en: 'Support', ar: 'الدعم' },
-  supportCardTitle: { en: 'Keep Namflix free', ar: 'خلّي نامفلكس مجاني' },
+  supportCardTitle: { en: 'Keep Namflix free', ar: 'ساعد نامفلكس ليبقى مجانيًا' },
   supportCardSub: {
     en: 'no ads, no tracking — support it if it helped',
-    ar: 'بلا إعلانات ولا تتبّع — ادعمه لو نفعك',
+    ar: 'بلا إعلانات ولا تتبّع، ادعمه إن نفعك',
   },
   supportTitle: { en: 'Support Namflix', ar: 'ادعم نامفلكس' },
   supportIntro: {
     en: 'Namflix has no ads, no trackers, and nothing that watches you at 3 a.m. It is built and paid for by one person.',
-    ar: 'نامفلكس بلا إعلانات ولا تتبّع، ومحدش بيراقبك في الفجر. شخص واحد بيبنيه وبيدفع تكاليفه.',
+    ar: 'نامفلكس بلا إعلانات ولا تتبّع، ولا أحد يراقبك في الفجر. يبنيه شخص واحد ويتحمّل تكاليفه.',
   },
   supportWhy: {
     en: 'What your support pays for',
-    ar: 'دعمك بيروح لإيه',
+    ar: 'أين يذهب دعمك',
   },
   supportWhyBody: {
     en: 'Audio hosting and streaming, developer fees, and the hours behind each new evidence-based tool.',
@@ -621,15 +622,15 @@ export const STRINGS = {
   supportCta: { en: 'Buy me a coffee', ar: 'ادعمني بفنجان قهوة' },
   supportOpensBrowser: {
     en: 'Opens ko-fi.com in your browser. Any amount, once — no subscription.',
-    ar: 'هيفتح ko-fi.com في المتصفح. أي مبلغ، مرة واحدة — بلا اشتراك.',
+    ar: 'يفتح ko-fi.com في المتصفح. أي مبلغ، مرة واحدة، بلا اشتراك.',
   },
   supportUnlocksNothing: {
     en: 'This unlocks nothing. Everything you already have stays yours, and nothing in the app is hidden behind a donation.',
-    ar: 'ده مش بيفتح أي ميزة. اللي عندك يبقى ليك، ومافيش حاجة في التطبيق محجوبة ورا تبرّع.',
+    ar: 'هذا لا يفتح أي ميزة. ما لديك يبقى لك، ولا شيء في التطبيق محجوب خلف تبرّع.',
   },
   supportNoObligation: {
     en: 'If money is tight, skip this — telling one person who cannot sleep about the app helps just as much.',
-    ar: 'لو مش قادر، تجاوز — لما تعرّف شخص يعاني من الأرق على التطبيق هيساعدني بنفس القدر.',
+    ar: 'إن كان الوضع صعبًا فتجاوز هذا. أن تُعرّف شخصًا يعاني الأرق بالتطبيق يساعدني بالقدر نفسه.',
   },
   // health disclaimer — the app cites studies and sits in Health & Fitness, so
   // Apple 1.4.1 wants a visible "see a clinician" reminder, not a buried one
@@ -640,11 +641,11 @@ export const STRINGS = {
   contactSupport: { en: 'Contact support', ar: 'تواصل مع الدعم' },
   contactFailed: {
     en: 'Could not open mail. Write to Namflix.sleep@gmail.com',
-    ar: 'ما قدرناش نفتح البريد. ابعتلنا على Namflix.sleep@gmail.com',
+    ar: 'لم نتمكن من فتح البريد. راسلنا على Namflix.sleep@gmail.com',
   },
   supportFailed: {
     en: 'Could not open the link. Try again from your browser: ko-fi.com/muhammedatef98',
-    ar: 'ما قدرناش نفتح الرابط. جرّب من المتصفح: ko-fi.com/muhammedatef98',
+    ar: 'لم نتمكن من فتح الرابط. جرّب من المتصفح: ko-fi.com/muhammedatef98',
   },
 } as const;
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Alert, Linking, ActivityIndicator, TextInput, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { usePremium } from '@/contexts/PremiumContext';
-import { type PaidPlan, type FreeTrial, canRedeemInApp, redeemOfferCode } from '@/lib/purchases';
+import { type PaidPlan, type FreeTrial, canRedeemInApp, redeemOfferCode, openPlayRedeem } from '@/lib/purchases';
 import { useCountdown } from '@/hooks/useCountdown';
 import { track, type PurchaseSource } from '@/lib/analytics';
 import { BackButton } from '@/components/BackButton';
@@ -169,7 +169,11 @@ export default function PremiumScreen() {
   // sheet, so there we point at where Play does it.
   const onRedeem = async () => {
     if (!canRedeemInApp()) {
-      Alert.alert(t('redeemCode'), t('redeemAndroid'));
+      // Android: open Play's redeem page; premium syncs when the app returns.
+      // Only if that fails, fall back to written directions.
+      if (Platform.OS !== 'android' || !(await openPlayRedeem())) {
+        Alert.alert(t('redeemCode'), t('redeemAndroid'));
+      }
       return;
     }
     const res = await redeemOfferCode();
@@ -325,8 +329,8 @@ export default function PremiumScreen() {
 
           {/* Namflix lifetime code — always visible and checked on device, so
               it never sends anyone to a store. Hidden once premium is active.
-              The App Store offer-code link only shows where Apple's in-app
-              sheet exists (iOS); Android has no in-app equivalent. */}
+              The store-code link opens Apple's in-app sheet on iOS, and the
+              Play Store redeem page on Android. */}
           {!isPremium && (
             <View style={styles.codeBlock}>
               <Text style={[styles.codeTitle, isRTL && styles.rtl]}>{t('redeemCode')}</Text>
@@ -358,9 +362,11 @@ export default function PremiumScreen() {
                   )}
                 </Pressable>
               </View>
-              {canRedeemInApp() && (
+              {(canRedeemInApp() || Platform.OS === 'android') && (
                 <Pressable onPress={onRedeem} hitSlop={8} style={styles.redeemBtn}>
-                  <Text style={styles.redeemText}>{t('redeemAppStore')}</Text>
+                  <Text style={styles.redeemText}>
+                    {Platform.OS === 'android' ? t('redeemPlayStore') : t('redeemAppStore')}
+                  </Text>
                 </Pressable>
               )}
             </View>

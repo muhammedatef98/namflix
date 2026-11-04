@@ -3,7 +3,7 @@
     "name": "Namflix",
     "slug": "namflix",
     "scheme": "namflix",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "platforms": ["ios", "android"],
     "orientation": "portrait",
     "userInterfaceStyle": "dark",

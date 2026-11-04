@@ -35,7 +35,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 // RevenueCat's native billing module can't reach the store inside Expo Go, so
@@ -299,4 +299,33 @@ export async function redeemOfferCode(): Promise<PurchaseResult> {
   } catch (e: unknown) {
     return { ok: false, reason: 'error', message: (e as { message?: string })?.message };
   }
+}
+
+/**
+ * Android has no in-app redeem sheet: Play promo codes are redeemed in the
+ * Play Store. Open its redeem page; the entitlement syncs back when the app
+ * returns to the foreground (see refreshEntitlement + PremiumContext).
+ */
+export async function openPlayRedeem(): Promise<boolean> {
+  try {
+    await Linking.openURL('https://play.google.com/redeem');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Re-check the entitlement after something may have changed outside the app
+ * (a code redeemed in the Play Store). On Android, sync first so the Play-side
+ * purchase reaches RevenueCat.
+ */
+export async function refreshEntitlement(): Promise<boolean> {
+  if (!ready || !Purchases) return false;
+  try {
+    if (Platform.OS === 'android') await Purchases.syncPurchases();
+  } catch {
+    // fall through to a plain check
+  }
+  return hasActiveEntitlement();
 }

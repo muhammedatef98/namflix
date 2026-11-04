@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppState } from 'react-native';
 import { isValidLifetimeCode } from '@/lib/redeemCodes';
 import { fetchAppConfig, DEFAULT_CONFIG, type AppConfig } from '@/lib/remoteConfig';
 import {
@@ -7,6 +8,7 @@ import {
   hasActiveEntitlement,
   getPurchasablePlans,
   onEntitlementChange,
+  refreshEntitlement,
   buyPlan as iapBuyPlan,
   restorePurchases as iapRestore,
   type PaidPlan,
@@ -90,9 +92,20 @@ export function PremiumProvider({ children }: { children: ReactNode }) {
       setStorePremium(active);
       setPurchasablePlans(plans);
     })();
+    // Back from the Play Store redeem page (or any store screen): re-sync so a
+    // freshly redeemed code unlocks premium without a restart.
+    const appStateSub = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      refreshEntitlement()
+        .then((on) => {
+          if (on && !cancelled) setStorePremium(true);
+        })
+        .catch(() => undefined);
+    });
     return () => {
       cancelled = true;
       unsubscribe();
+      appStateSub.remove();
     };
   }, []);
 
