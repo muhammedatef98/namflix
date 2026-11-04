@@ -21,6 +21,7 @@ import { FavoritesProvider } from '@/contexts/FavoritesContext';
 import { PlaybackProvider } from '@/contexts/PlaybackContext';
 import { MixerProvider } from '@/contexts/MixerContext';
 import { AdsProvider } from '@/contexts/AdsContext';
+import { DownloadsProvider } from '@/contexts/DownloadsContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
 import { WarmthOverlay } from '@/components/WarmthOverlay';
 import { SplashLogo } from '@/components/SplashLogo';
@@ -97,6 +98,9 @@ function AppTree() {
       <LocaleProvider>
         <PremiumProvider>
           <FavoritesProvider>
+            {/* Downloads sits above Playback/Mixer so its URI cache is live
+                before either of them creates its first audio player. */}
+            <DownloadsProvider>
             <PlaybackProvider>
               <MixerProvider>
                 <StatusBar style="light" />
@@ -107,6 +111,7 @@ function AppTree() {
                 {!splashDone && <SplashLogo onDone={() => setSplashDone(true)} />}
               </MixerProvider>
             </PlaybackProvider>
+            </DownloadsProvider>
           </FavoritesProvider>
         </PremiumProvider>
       </LocaleProvider>

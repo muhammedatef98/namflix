@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import { useDownloads } from '@/contexts/DownloadsContext';
 import { usePlayback } from '@/contexts/PlaybackContext';
 import { useFeatureGate } from '@/hooks/useFeatureGate';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -34,6 +35,25 @@ function PlayPauseIcon({ playing }: { playing: boolean }) {
       ) : (
         <Path d="M8 5.5 L18 12 L8 18.5 Z" fill={NightPalette.voidBlack} />
       )}
+    </Svg>
+  );
+}
+
+/** Download status glyph — down-arrow idle, dashed arrow while fetching, tick when ready. */
+function DownloadIcon({ state, color }: { state: 'idle' | 'downloading' | 'ready'; color: string }) {
+  if (state === 'ready') {
+    return (
+      <Svg width={20} height={20} viewBox="0 0 24 24">
+        <Path d="M5 12 L10 17 L19 7" stroke={color} strokeWidth={2.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    );
+  }
+  const opacity = state === 'downloading' ? 0.55 : 1;
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24">
+      <Path d="M12 4 V15 M7 11 L12 16 L17 11 M5 19 H19"
+        stroke="rgba(242,201,166,0.85)" strokeWidth={1.9} fill="none"
+        strokeLinecap="round" strokeLinejoin="round" opacity={opacity} />
     </Svg>
   );
 }
@@ -67,6 +87,7 @@ export default function PlayerScreen() {
   const { t, tc, isRTL } = useLocale();
   const { accent } = useTheme();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const downloads = useDownloads();
   const playback = usePlayback();
   const { isLocked } = useFeatureGate();
   const router = useRouter();
@@ -154,13 +175,38 @@ export default function PlayerScreen() {
         <SafeAreaView style={styles.fill}>
           <View style={[styles.topRow, isRTL && styles.rowRTL]}>
             <BackButton />
-            <Pressable
-              onPress={() => toggleFavorite(screenTrack.id)}
-              hitSlop={10}
-              style={({ pressed }) => [styles.heartBtn, pressed && styles.heartPressed]}
-            >
-              <HeartIcon filled={isFavorite(screenTrack.id)} />
-            </Pressable>
+            <View style={[styles.topRowActions, isRTL && styles.rowRTL]}>
+              <Pressable
+                onPress={() => {
+                  if (downloads.isDownloaded(screenTrack.id)) {
+                    void downloads.remove(screenTrack.id);
+                  } else if (!downloads.isDownloading(screenTrack.id)) {
+                    void downloads.download(screenTrack);
+                  }
+                }}
+                hitSlop={10}
+                accessibilityLabel={t(downloads.isDownloaded(screenTrack.id) ? 'downloadRemove' : 'downloadStart')}
+                style={({ pressed }) => [styles.heartBtn, pressed && styles.heartPressed]}
+              >
+                <DownloadIcon
+                  state={
+                    downloads.isDownloading(screenTrack.id)
+                      ? 'downloading'
+                      : downloads.isDownloaded(screenTrack.id)
+                        ? 'ready'
+                        : 'idle'
+                  }
+                  color={accent}
+                />
+              </Pressable>
+              <Pressable
+                onPress={() => toggleFavorite(screenTrack.id)}
+                hitSlop={10}
+                style={({ pressed }) => [styles.heartBtn, pressed && styles.heartPressed]}
+              >
+                <HeartIcon filled={isFavorite(screenTrack.id)} />
+              </Pressable>
+            </View>
           </View>
 
           <View style={styles.body}>
@@ -244,6 +290,7 @@ const styles = StyleSheet.create({
   missing: { color: NightPalette.dimText, fontSize: 40 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   rowRTL: { flexDirection: 'row-reverse' },
+  topRowActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   heartBtn: {
     width: 40,
     height: 40,

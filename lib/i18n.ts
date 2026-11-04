@@ -394,6 +394,34 @@ export const STRINGS = {
   surpriseMe: { en: 'Play something for me', ar: 'شغِّل لي شيئًا' },
   favoritesRow: { en: 'Your favourites', ar: 'مفضّلتك' },
 
+  // sleep radio — curated channels that rotate on their own
+  radioHeading: { en: 'Sleep Radio', ar: 'راديو النوم' },
+  radioSub: {
+    en: 'Tap a channel — it walks through its sounds for you, all night.',
+    ar: 'اضغط قناة — تشتغل تلقائيًّا طول الليل وتنتقل بين الأصوات وحدها.',
+  },
+  radioOn: { en: 'ON AIR', ar: 'يعمل الآن' },
+
+  // offline downloads — the sound is kept on the phone, so no network needed
+  downloadStart: { en: 'Download for offline', ar: 'نزّل للاستخدام بدون نت' },
+  downloadRemove: { en: 'Remove download', ar: 'احذف النسخة المحفوظة' },
+  downloadsTitle: { en: 'Downloaded sounds', ar: 'الأصوات المحفوظة' },
+  downloadsSub: {
+    en: 'Yours on this phone. These keep playing even without internet.',
+    ar: 'موجودة على هاتفك. تستمر بالعمل حتى بدون نت.',
+  },
+  downloadsEmpty: {
+    en: 'No downloads yet. Open any sound and tap the download arrow to keep it on your phone.',
+    ar: 'لا يوجد أصوات محفوظة. افتح أي صوت واضغط سهم التنزيل ليبقى على جهازك.',
+  },
+  downloadsUsed: { en: '{amount} used', ar: 'يشغل {amount}' },
+  downloadsClearAll: { en: 'Delete all downloads', ar: 'احذف كل المحفوظات' },
+  downloadsClearConfirmTitle: { en: 'Delete all downloads?', ar: 'حذف كل المحفوظات؟' },
+  downloadsClearConfirmBody: {
+    en: 'The sounds still stream from our servers when you need them.',
+    ar: 'تظل الأصوات تعمل بالبثّ من خوادمنا عند الحاجة.',
+  },
+
   // night rescue — the 3 a.m. mode
   toolRescueTitle: { en: 'Night Rescue', ar: 'نجدة الليل' },
   toolRescueSub: { en: 'woke at 3 a.m.? start here', ar: 'صحيت في نص الليل؟ ابدأ هنا' },

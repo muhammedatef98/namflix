@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useFeatureGate, usePreloadRewardedOnFocus } from '@/hooks/useFeatureGate';
 import { useTheme } from '@/contexts/ThemeContext';
+import { usePlayback } from '@/contexts/PlaybackContext';
+import { RADIO_CHANNELS } from '@/lib/radio';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { StarField } from '@/components/StarField';
 import { TrackRow } from '@/components/TrackRow';
@@ -38,6 +40,17 @@ export default function ListenScreen() {
   usePreloadRewardedOnFocus();
   const { accent } = useTheme();
   const { favoriteIds } = useFavorites();
+  const { radioChannel, startRadio } = usePlayback();
+
+  const startRadioGated = (channelId: typeof RADIO_CHANNELS[number]['id']) => {
+    // Radio is a long overnight session — gate it exactly like the mixer.
+    // For a free user the gate goes to the lock sheet; for premium it plays.
+    if (!isPremium) {
+      open('/mixer'); // reuse the mixer's gating surface; same outcome
+      return;
+    }
+    startRadio(channelId);
+  };
 
   // "Play something for me" should always actually play something: for a free
   // user it draws from the free sounds instead of bouncing them to the paywall.
@@ -79,6 +92,42 @@ export default function ListenScreen() {
             <ShuffleGlyph color={accent} />
             <Text style={[styles.surpriseText, { color: accent }]}>{t('surpriseMe')}</Text>
           </Pressable>
+
+          {/* Sleep Radio — curated channels that rotate on their own. Tap
+              one and leave the phone alone; each channel walks through its
+              tracks every RADIO_ROTATE_MINUTES minutes. */}
+          <View style={styles.radioSection}>
+            <Text style={[styles.radioHeading, isRTL && styles.textRTL]}>{t('radioHeading')}</Text>
+            <Text style={[styles.radioSub, isRTL && styles.textRTL]}>{t('radioSub')}</Text>
+            <View style={styles.radioGrid}>
+              {RADIO_CHANNELS.map((ch) => {
+                const active = radioChannel === ch.id;
+                return (
+                  <Pressable
+                    key={ch.id}
+                    onPress={() => startRadioGated(ch.id)}
+                    style={({ pressed }) => [
+                      styles.radioChip,
+                      active && { borderColor: accent, backgroundColor: 'rgba(74,26,10,0.55)' },
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <Text style={[styles.radioChipTitle, isRTL && styles.textRTL]} numberOfLines={1}>
+                      {tc(ch.title)}
+                    </Text>
+                    <Text style={[styles.radioChipSub, isRTL && styles.textRTL]} numberOfLines={2}>
+                      {tc(ch.subtitle)}
+                    </Text>
+                    {active && (
+                      <Text style={[styles.radioOn, { color: accent }, isRTL && styles.textRTL]}>
+                        {t('radioOn')}
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
 
           <Pressable
             onPress={() => open('/mixer')}
@@ -139,4 +188,32 @@ const styles = StyleSheet.create({
   surpriseText: { fontSize: 13, fontFamily: FONT.medium, lineHeight: 20 },
   rows: {},
   textRTL: { textAlign: 'right', writingDirection: 'rtl' },
+  radioSection: { paddingHorizontal: 24, marginBottom: 22 },
+  radioHeading: { fontSize: 15, fontFamily: FONT.bold, color: '#F2C9A6', marginBottom: 4, lineHeight: 22 },
+  radioSub: { fontSize: 12, color: NightPalette.dimText, marginBottom: 12, lineHeight: 18 },
+  radioGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  radioChip: {
+    width: '48%',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(140,42,18,0.35)',
+    backgroundColor: 'rgba(36,17,9,0.55)',
+    padding: 12,
+    minHeight: 86,
+  },
+  radioChipTitle: { color: NightPalette.textPrimary, fontSize: 14, fontFamily: FONT.bold, lineHeight: 20 },
+  radioChipSub: { color: NightPalette.dimText, fontSize: 11, lineHeight: 16, marginTop: 4 },
+  radioOn: { fontSize: 10, fontFamily: FONT.bold, marginTop: 6, letterSpacing: 1 },
+  downloadsPill: {
+    alignSelf: 'flex-start',
+    marginHorizontal: 24,
+    marginBottom: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(242,201,166,0.25)',
+    backgroundColor: 'rgba(20,10,5,0.4)',
+  },
+  downloadsPillText: { color: NightPalette.dimText, fontSize: 12, lineHeight: 18 },
 });

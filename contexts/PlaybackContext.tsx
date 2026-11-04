@@ -10,6 +10,13 @@ import {
 } from 'react';
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 import { trackById, type SoundTrack } from '@/lib/mediaLibrary';
+import { uriForTrack } from '@/lib/downloads';
+import {
+  channelTracks,
+  radioChannelById,
+  RADIO_ROTATE_MINUTES,
+  type RadioChannelId,
+} from '@/lib/radio';
 import { recordToolUse } from '@/lib/nightTracking';
 
 /**
@@ -37,6 +44,10 @@ type PlaybackValue = {
   setVolume: (v: number) => void;
   /** Sleep timer; pass null (or the active value) to cancel. */
   setTimer: (min: number | null) => void;
+  /** Active radio channel (null when the user is on a single track or silent). */
+  radioChannel: RadioChannelId | null;
+  /** Start a radio channel — plays its tracks in order, rotating every N min. */
+  startRadio: (channelId: RadioChannelId) => void;
   /**
    * Pause for an interruption (e.g. a rewarded ad) and return a function that
    * resumes exactly where it was — unless the user or the sleep timer changed
@@ -52,10 +63,16 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   const [playing, setPlaying] = useState(false);
   const [volume, setVolumeState] = useState(1);
   const [timerMin, setTimerMin] = useState<number | null>(null);
+  const [radioChannel, setRadioChannel] = useState<RadioChannelId | null>(null);
 
   const playerRef = useRef<AudioPlayer | null>(null);
   const fadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Radio rotation timer + index, kept outside React state so the next
+  // rotation reads the current index without stale closures.
+  const radioRotationRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const radioQueueRef = useRef<string[]>([]);
+  const radioIndexRef = useRef(0);
   const volumeRef = useRef(1);
   const playingRef = useRef(false);
   // Bumped on every real playback change so a stale suspend() can't resume.
@@ -72,6 +89,7 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     return () => {
       if (fadeRef.current) clearInterval(fadeRef.current);
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (radioRotationRef.current) clearTimeout(radioRotationRef.current);
       playerRef.current?.release();
     };
   }, []);
@@ -87,6 +105,14 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     setTimerMin(null);
   }, []);
 
+  const clearRadio = useCallback(() => {
+    if (radioRotationRef.current) clearTimeout(radioRotationRef.current);
+    radioRotationRef.current = null;
+    radioQueueRef.current = [];
+    radioIndexRef.current = 0;
+    setRadioChannel(null);
+  }, []);
+
   const applyVolume = useCallback((v: number) => {
     volumeRef.current = v;
     setVolumeState(v);
@@ -97,11 +123,12 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     versionRef.current += 1;
     clearFade();
     clearTimer();
+    clearRadio();
     playerRef.current?.release();
     playerRef.current = null;
     setTrack(null);
     setPlaying(false);
-  }, [clearTimer]);
+  }, [clearTimer, clearRadio]);
 
   const startFadeOut = useCallback(() => {
     clearFade();
@@ -122,11 +149,37 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
     }, FADE_OUT_MS / FADE_OUT_STEPS);
   }, []);
 
+  /**
+   * Load a track and fade it in. Shared by single-track play() and by radio
+   * rotation — both want the same fade-in, same player handling.
+   */
+  const loadAndFadeIn = useCallback((next: SoundTrack) => {
+    versionRef.current += 1;
+    clearFade();
+    playerRef.current?.release();
+    const player = createAudioPlayer({ uri: uriForTrack(next) });
+    player.loop = true;
+    player.volume = 0;
+    player.play();
+    playerRef.current = player;
+    setTrack(next);
+    setPlaying(true);
+
+    let step = 0;
+    fadeRef.current = setInterval(() => {
+      step += 1;
+      const v = Math.min(volumeRef.current, (step / FADE_IN_STEPS) * volumeRef.current);
+      if (playerRef.current) playerRef.current.volume = v;
+      if (step >= FADE_IN_STEPS) clearFade();
+    }, FADE_IN_MS / FADE_IN_STEPS);
+  }, []);
+
   const play = useCallback(
     (trackId: string) => {
       const next = trackById(trackId);
       if (!next) return;
-      versionRef.current += 1;
+      // Picking a specific track means leaving radio — the user chose.
+      clearRadio();
       if (track?.id === trackId && playerRef.current) {
         if (!playing) {
           playerRef.current.play();
@@ -134,26 +187,45 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
         }
         return;
       }
-      clearFade();
-      playerRef.current?.release();
-      const player = createAudioPlayer({ uri: next.audioUrl });
-      player.loop = true;
-      player.volume = 0; // fade in below
-      player.play();
-      playerRef.current = player;
-      setTrack(next);
-      setPlaying(true);
+      loadAndFadeIn(next);
       void recordToolUse('sound');
-
-      let step = 0;
-      fadeRef.current = setInterval(() => {
-        step += 1;
-        const v = Math.min(volumeRef.current, (step / FADE_IN_STEPS) * volumeRef.current);
-        if (playerRef.current) playerRef.current.volume = v;
-        if (step >= FADE_IN_STEPS) clearFade();
-      }, FADE_IN_MS / FADE_IN_STEPS);
     },
-    [track, playing],
+    [track, playing, loadAndFadeIn, clearRadio],
+  );
+
+  // Rotation walks through the channel's queue, looping it. Scheduled fresh on
+  // every advance so a changed ROTATE_MINUTES or a channel switch is honoured.
+  const scheduleRotation = useCallback(() => {
+    if (radioRotationRef.current) clearTimeout(radioRotationRef.current);
+    radioRotationRef.current = setTimeout(() => {
+      const q = radioQueueRef.current;
+      if (q.length === 0) return;
+      radioIndexRef.current = (radioIndexRef.current + 1) % q.length;
+      const next = trackById(q[radioIndexRef.current]);
+      if (next) loadAndFadeIn(next);
+      scheduleRotation();
+    }, RADIO_ROTATE_MINUTES * 60_000);
+  }, [loadAndFadeIn]);
+
+  const startRadio = useCallback(
+    (channelId: RadioChannelId) => {
+      const channel = radioChannelById(channelId);
+      if (!channel) return;
+      const queue = channelTracks(channel);
+      if (queue.length === 0) return;
+      // If the channel is already on, do nothing — a second tap on the same
+      // channel should not restart it.
+      if (radioChannel === channelId && playerRef.current) return;
+
+      radioQueueRef.current = queue;
+      radioIndexRef.current = 0;
+      setRadioChannel(channelId);
+      const first = trackById(queue[0]);
+      if (first) loadAndFadeIn(first);
+      void recordToolUse('sound');
+      scheduleRotation();
+    },
+    [radioChannel, loadAndFadeIn, scheduleRotation],
   );
 
   const toggle = useCallback(() => {
@@ -198,8 +270,21 @@ export function PlaybackProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<PlaybackValue>(
-    () => ({ track, playing, volume, timerMin, play, toggle, stop, setVolume: applyVolume, setTimer, suspend }),
-    [track, playing, volume, timerMin, play, toggle, stop, applyVolume, setTimer, suspend],
+    () => ({
+      track,
+      playing,
+      volume,
+      timerMin,
+      play,
+      toggle,
+      stop,
+      setVolume: applyVolume,
+      setTimer,
+      suspend,
+      radioChannel,
+      startRadio,
+    }),
+    [track, playing, volume, timerMin, play, toggle, stop, applyVolume, setTimer, suspend, radioChannel, startRadio],
   );
 
   return <PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>;

@@ -11,6 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-audio';
 import { SOUND_TRACKS, type SoundTrack } from '@/lib/mediaLibrary';
+import { uriForTrack } from '@/lib/downloads';
 
 /**
  * App-wide sound mixer. Like PlaybackContext, the players live HERE — not in
@@ -135,7 +136,7 @@ export function MixerProvider({ children }: { children: ReactNode }) {
   const addLayer = useCallback((track: SoundTrack) => {
     setLayers((prev) => {
       if (prev.length >= MAX_LAYERS || prev.some((l) => l.track.id === track.id)) return prev;
-      const player = createAudioPlayer({ uri: track.audioUrl });
+      const player = createAudioPlayer({ uri: uriForTrack(track) });
       player.loop = true;
       player.volume = DEFAULT_VOLUME;
       player.play();
@@ -180,7 +181,7 @@ export function MixerProvider({ children }: { children: ReactNode }) {
       .map((id) => SOUND_TRACKS.find((tr) => tr.id === id))
       .filter((tr): tr is SoundTrack => tr !== undefined)
       .map((track) => {
-        const player = createAudioPlayer({ uri: track.audioUrl });
+        const player = createAudioPlayer({ uri: uriForTrack(track) });
         player.loop = true;
         player.volume = DEFAULT_VOLUME;
         player.play();
@@ -229,7 +230,7 @@ export function MixerProvider({ children }: { children: ReactNode }) {
         const track = SOUND_TRACKS.find((t) => t.id === trackId);
         if (!track) continue;
         const v = Math.min(1, Math.max(0, volume));
-        const player = createAudioPlayer({ uri: track.audioUrl });
+        const player = createAudioPlayer({ uri: uriForTrack(track) });
         player.loop = true;
         player.volume = v;
         player.play();
