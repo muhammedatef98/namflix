@@ -161,6 +161,12 @@ export default function HomeScreen() {
           {/* Quick tools */}
           <Text style={[styles.padded, styles.section, isRTL && styles.textRTL]}>{t('secTonight')}</Text>
           <View style={styles.padded}>
+            {/* Night Screen is free for everyone (lib/freeTier.ts) */}
+            <SoundscapeCard
+              {...lockProps('/night')}
+              title={t('nightEntry')}
+              subtitle={t('nightEntrySub')}
+            />
             <SoundscapeCard
               accent
               {...lockProps('/boring')}

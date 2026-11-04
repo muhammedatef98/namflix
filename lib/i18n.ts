@@ -441,6 +441,20 @@ export const STRINGS = {
   },
   rescueTapHint: { en: 'tap to continue', ar: 'المس لتُكمل' },
   rescueAsk: { en: 'What does this moment feel like?', ar: 'بماذا تشعر الآن؟' },
+  // night screen — dark companion with no clock on purpose
+  nightEntry: { en: 'Night Screen', ar: 'شاشة الليل' },
+  nightEntrySub: {
+    en: 'A dark, quiet screen for when you wake — no clock to watch',
+    ar: 'شاشة مظلمة هادئة لحظة الاستيقاظ، بلا ساعة تراقبها',
+  },
+  nightBreatheHint: {
+    en: 'Breathe with the light. In as it grows, out as it fades.',
+    ar: 'تنفّس مع الضوء: شهيق حين يكبر، وزفير حين يخفت.',
+  },
+  nightNothingPlaying: { en: 'Nothing playing', ar: 'لا يوجد صوت يعمل' },
+  nightPlayRain: { en: 'Play soft rain', ar: 'شغّل مطرًا هادئًا' },
+  nightNeedHelp: { en: 'Can’t get back to sleep?', ar: 'لا تستطيع العودة للنوم؟' },
+  nightShowControls: { en: 'Show controls', ar: 'إظهار الأزرار' },
   rescueStimulusTitle: { en: 'The 20-minute rule', ar: 'قاعدة العشرين دقيقة' },
   rescueOtherPaths: { en: 'Show the other paths', ar: 'أرني المسارات الأخرى' },
 

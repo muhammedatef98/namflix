@@ -17,6 +17,7 @@ const FREE_ROUTES: readonly string[] = [
   '/shuffle', // cognitive shuffle — the signature technique
   '/rescue', // 3 a.m. Night Rescue — the moment we most want to be there for
   '/boring', // the hub itself; its individual activities follow this policy
+  '/night', // Night Screen — waking in the dark should never hit a paywall
 ];
 
 /** Sounds that never lock — one from each family so the library reads as real. */
