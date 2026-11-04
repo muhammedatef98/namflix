@@ -4,6 +4,7 @@ import { NightPalette } from '@/constants/theme';
 import type { Localized } from '@/lib/i18n';
 
 const THEME_KEY = 'namflix.theme';
+const INTENSITY_KEY = 'namflix.theme.intensity';
 
 /**
  * Eye-comfort themes. Every option is a warm, low-blue-light palette — the
@@ -80,6 +81,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         if (saved && THEMES.some((th) => th.id === saved)) setThemeIdRaw(saved);
       })
       .catch(() => undefined);
+    // Restore the warmth slider too — the theme and its dim level are a pair,
+    // so both must survive an app restart.
+    AsyncStorage.getItem(INTENSITY_KEY)
+      .then((saved) => {
+        if (!saved) return;
+        const v = Number(saved);
+        if (Number.isFinite(v)) setIntensityRaw(Math.min(1, Math.max(0, v)));
+      })
+      .catch(() => undefined);
   }, []);
 
   const value = useMemo<ThemeValue>(() => {
@@ -87,7 +97,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return {
       palette: NightPalette,
       intensity,
-      setIntensity: (v) => setIntensityRaw(Math.min(1, Math.max(0, v))),
+      setIntensity: (v) => {
+        const clamped = Math.min(1, Math.max(0, v));
+        setIntensityRaw(clamped);
+        AsyncStorage.setItem(INTENSITY_KEY, String(clamped)).catch(() => undefined);
+      },
       theme,
       setThemeId: (id) => {
         setThemeIdRaw(id);

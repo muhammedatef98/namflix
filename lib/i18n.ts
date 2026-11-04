@@ -1,8 +1,10 @@
 /**
  * Lightweight bilingual layer (English / Modern Standard Arabic). No
  * dependency — a flat dictionary of UI chrome strings plus a `Localized`
- * shape for content that ships in both languages. Arabic is written in clean
- * فصحى (MSA), a first-class language here, not an afterthought.
+ * shape for content that ships in both languages. Arabic is written in warm, pan-Arab MSA — the newspaper tone, not the
+ * academic one. Short sentences, common verbs, and no decorative tashkeel
+ * on short labels. The goal is: a reader from any Arab country finds it
+ * natural, not formal.
  */
 
 export type Lang = 'en' | 'ar';
@@ -21,25 +23,25 @@ export const STRINGS = {
   // shared
   back: { en: 'back', ar: 'رجوع' },
   whyThisWorks: { en: 'why this works', ar: 'لماذا ينجح هذا' },
-  stop: { en: 'tap to stop', ar: 'المس للإيقاف' },
+  stop: { en: 'tap to stop', ar: 'المس لتوقف' },
   openYoutube: { en: 'Open in YouTube', ar: 'افتح في يوتيوب' },
-  premium: { en: 'Members only', ar: 'للمشتركين' },
-  subscribe: { en: 'Subscribe to Unlock', ar: 'اشترك للفتح' },
+  premium: { en: 'Members only', ar: 'لأعضاء بريميوم' },
+  subscribe: { en: 'Subscribe to Unlock', ar: 'اشترك لتفتحه' },
 
   // home
-  tagline: { en: 'the sky is dimming', ar: 'السماء تخفت' },
-  goodNight: { en: 'Good night', ar: 'طابت ليلتك' },
+  tagline: { en: 'the sky is dimming', ar: 'السماء بدأت تهدأ' },
+  goodNight: { en: 'Good night', ar: 'تصبح على خير' },
   homeIntro: {
     en: 'Everything here is built to lower arousal and ease you toward sleep — the science-backed way.',
-    ar: 'كل ما هنا مصمَّم لخفض الاستثارة وتيسير نومك — على نحوٍ مدعوم بالعلم.',
+    ar: 'كل ما هنا مصمَّم لتهدئة التوتر وتسهيل نومك — بطريقة مدعومة علميًّا.',
   },
   secExpeditions: { en: 'Stargazing Expeditions', ar: 'رحلات تأمّل النجوم' },
-  secTonight: { en: "Tonight's tools", ar: 'أدوات هذه الليلة' },
-  secListen: { en: 'Real sleep sounds & stories', ar: 'أصوات وقصص نوم حقيقية' },
+  secTonight: { en: "Tonight's tools", ar: 'أدوات الليلة' },
+  secListen: { en: 'Real sleep sounds & stories', ar: 'أصوات وقصص تساعدك تنام' },
   screenWarmth: { en: 'screen warmth', ar: 'دفء الشاشة' },
-  themeColour: { en: 'comfort theme', ar: 'سِمة مريحة للعين' },
+  themeColour: { en: 'comfort theme', ar: 'ثيم مريح للعين' },
 
-  toolBoringTitle: { en: 'Boring on Purpose', ar: 'مُملٌّ عن قصد' },
+  toolBoringTitle: { en: 'Boring on Purpose', ar: 'ممل عن قصد' },
   toolBoringSub: {
     en: 'cognitive shuffle • dull stories • slow watching',
     ar: 'خلط ذهني • قصص مملّة • مشاهدة بطيئة',
@@ -47,16 +49,16 @@ export const STRINGS = {
   toolMediaTitle: { en: 'Sleep Media Hub', ar: 'مكتبة النوم الصوتية' },
   toolMediaSub: { en: 'stories • hypnosis • NSDR • 8-hour', ar: 'قصص • تنويم • راحة عميقة • ٨ ساعات' },
   toolLogTitle: { en: 'Log Last Night', ar: 'سجِّل نوم الأمس' },
-  toolLogSub: { en: 'sleep diary • efficiency', ar: 'مذكّرة نوم • كفاءة' },
+  toolLogSub: { en: 'sleep diary • efficiency', ar: 'سجلّ نوم بسيط' },
   toolBreatheTitle: { en: 'Constellation Tracing', ar: 'تتبُّع الأبراج' },
   toolBreatheSub: { en: '4·7·8 breathing • Orion', ar: 'تنفّس ٤·٧·٨ • الجبّار' },
-  toolMixerTitle: { en: 'Cosmic Mixer', ar: 'مازج الأصوات الكوني' },
+  toolMixerTitle: { en: 'Cosmic Mixer', ar: 'خلّاط الأصوات الكوني' },
   toolMixerSub: { en: 'blend binaural layers', ar: 'امزج طبقات صوتية' },
   toolWorryTitle: { en: 'Deep Sky Worry Release', ar: 'إطلاق القلق' },
   toolWorrySub: { en: 'let the thought burn away', ar: 'دَع الفكرة تحترق وتتلاشى' },
 
   // boring hub
-  boringTitle: { en: 'Boring on Purpose', ar: 'مُملٌّ عن قصد' },
+  boringTitle: { en: 'Boring on Purpose', ar: 'ممل عن قصد' },
   boringSub: {
     en: 'Content engineered to be forgettable. The tired mind stays awake because it stays interested — so here, nothing is worth staying awake for.',
     ar: 'محتوًى مصمَّم كي يُنسى. فالعقل المتعب يبقى مستيقظًا لأنه يبقى مهتمًّا — وهنا لا شيء يستحق البقاء مستيقظًا لأجله.',
@@ -68,40 +70,40 @@ export const STRINGS = {
   secWatch: { en: 'Slow, uneventful watching', ar: 'مشاهدة بطيئة بلا أحداث' },
   boringDisclaimer: {
     en: 'These techniques ease sleep onset; they are not a treatment for a sleep disorder. If insomnia persists for weeks, clinician-guided CBT-I is the evidence-based first-line care.',
-    ar: 'هذه الأساليب تُيسّر بدء النوم، وليست علاجًا لاضطراب في النوم. وإن استمرّ الأرق أسابيع، فالعلاج المعرفي السلوكي للأرق بإشراف مختصّ هو الرعاية الأولى المثبتة.',
+    ar: 'هذه الطرق تُيسّر بدء النوم، وليست علاجًا لاضطراب في النوم. وإن استمرّ الأرق أسابيع، فالعلاج السلوكي للأرق للأرق بإشراف مختصّ هو الرعاية الأولى المثبتة.',
   },
 
   // shuffle
-  shuffleTitle: { en: 'The Cognitive Shuffle', ar: 'الخلط الذهني' },
+  shuffleTitle: { en: 'The Cognitive Shuffle', ar: 'خلخلة الأفكار' },
   shuffleLead: {
     en: "You'll see one random, everyday thing at a time. Picture it — plainly, for a moment — then let it dissolve before the next appears.",
     ar: 'سترى شيئًا عاديًّا عشوائيًّا واحدًا في كل مرة. تخيّله ببساطة للحظة، ثم دَعه يتلاشى قبل أن يظهر التالي.',
   },
-  shuffleRule1: { en: "Don't link them into a story.", ar: 'لا تربط بينها في قصة.' },
-  shuffleRule2: { en: 'No image is important. Some are dull. Good.', ar: 'لا صورة مهمّة. بعضها مملّ. وهذا جيّد.' },
-  shuffleRule3: { en: "If your mind drifts off — that's the point.", ar: 'إن شرد ذهنك، فهذا هو المقصود تمامًا.' },
-  shuffleStart: { en: 'Begin drifting', ar: 'ابدأ الشرود' },
-  shuffleHint: { en: 'picture it · let it go · tap to stop', ar: 'تخيّله · دَعه · المس للإيقاف' },
+  shuffleRule1: { en: "Don't link them into a story.", ar: 'لا تربطها بقصة.' },
+  shuffleRule2: { en: 'No image is important. Some are dull. Good.', ar: 'ما فيش صورة أهم من التانية. بعضها ممل، وده كويس.' },
+  shuffleRule3: { en: "If your mind drifts off — that's the point.", ar: 'لو شرد ذهنك فهذا بالضبط المطلوب.' },
+  shuffleStart: { en: 'Begin drifting', ar: 'ابدأ الخلخلة' },
+  shuffleHint: { en: 'picture it · let it go · tap to stop', ar: 'تخيّله · دَعه · المس لتوقف' },
   shuffleScience: {
     en: "A stream of disconnected images can't assemble into the coherent, alert thinking that keeps you awake — it mimics the scattered imagery your mind produces at natural sleep onset.",
     ar: 'تيّار من الصور غير المترابطة لا يستطيع أن ينتظم في تفكير متماسك يقظ يُبقيك مستيقظًا — بل يحاكي الصور المبعثرة التي ينتجها ذهنك عند بدء النوم الطبيعي.',
   },
   shuffleBasis: {
     en: 'Based on the "cognitive shuffle" (serial diversification) by cognitive scientist Luc Beaudoin. Early evidence is promising; it is low-risk to try.',
-    ar: 'مبنيّ على «الخلط الذهني» (التنويع المتسلسل) للعالِم المعرفي لوك بودوان. الأدلة المبكرة واعدة، وتجربته منخفضة المخاطر.',
+    ar: 'مبنيّ على «خلخلة الأفكار» (التنويع المتسلسل) للعالِم المعرفي لوك بودوان. الأدلة المبكرة واعدة، وتجربته منخفضة المخاطر.',
   },
 
   // count
-  countTitle: { en: 'The Descending Count', ar: 'العدّ التنازلي' },
+  countTitle: { en: 'The Descending Count', ar: 'عدّ تنازلي بطيء' },
   countLead: {
     en: 'A single number, slowly, from 200 down to one. Say each in your head and let the gaps grow long. There is nothing to reach — the point is the monotony.',
     ar: 'رقم واحد، ببطء، من مئتين تنازليًّا إلى الواحد. قُل كلًّا منها في ذهنك ودَع الفواصل تطول. لا شيء تبلغه — فالمقصود هو الرتابة.',
   },
   countStart: { en: 'Begin counting', ar: 'ابدأ العدّ' },
-  countHint: { en: 'say it in your head · slowly · tap to stop', ar: 'قُله في ذهنك · ببطء · المس للإيقاف' },
+  countHint: { en: 'say it in your head · slowly · tap to stop', ar: 'قُله في ذهنك · ببطء · المس لتوقف' },
   countScience: {
     en: 'A slow, predictable count starves the mind of the stimulating narrative thoughts that drive arousal. When it starts to bore you, it is working.',
-    ar: 'العدّ البطيء المتوقَّع يُجوّع العقلَ من الأفكار المثيرة التي تُذكي الاستثارة. وحين يبدأ يُملّك، فهو يعمل.',
+    ar: 'العدّ البطيء المتوقَّع يُجوّع العقلَ من الأفكار المثيرة التي تُذكي التوتر. وحين يبدأ يُملّك، فهو يعمل.',
   },
   countBasis: {
     en: 'Honest caveat: in one Oxford study (Harvey & Payne, 2002) plain counting underperformed vivid imagery — use this as a simple fallback.',
@@ -109,35 +111,35 @@ export const STRINGS = {
   },
 
   // imagery
-  imageryTitle: { en: 'Imagery Distraction', ar: 'التشتيت بالتخيّل' },
+  imageryTitle: { en: 'Imagery Distraction', ar: 'تخيّل يُبعدك عن الأفكار' },
   imageryLead: {
     en: "One calm, unremarkable place, explored slowly — sense by sense. Let each line settle into a picture before the next appears. You don't have to try; just notice.",
     ar: 'مكان واحد هادئ عاديّ، تستكشفه ببطء — حاسّةً بحاسّة. دَع كل سطر يستقرّ صورةً قبل أن يظهر التالي. لا يلزمك أن تجتهد؛ فقط لاحِظ.',
   },
-  imageryStart: { en: 'Walk down to the shore', ar: 'انزل إلى الشاطئ' },
-  imageryHint: { en: 'see it slowly · no rush · tap to stop', ar: 'شاهده ببطء · دون عجلة · المس للإيقاف' },
+  imageryStart: { en: 'Walk down to the shore', ar: 'انزل إلى البحر' },
+  imageryHint: { en: 'see it slowly · no rush · tap to stop', ar: 'شاهده ببطء · دون عجلة · المس لتوقف' },
   imageryScience: {
     en: 'Filling the mind with absorbing-but-neutral imagery crowds out the worry and planning that keep you awake — and it beats plain distraction or counting.',
     ar: 'مَلءُ الذهن بصور جاذبة لكنها محايدة يُزاحم القلقَ والتخطيط اللذين يُبقيانك مستيقظًا — وهو يتفوّق على التشتيت المجرّد أو العدّ.',
   },
   imageryBasis: {
     en: 'Based on imagery distraction, tested in a controlled study by Harvey & Payne (2002). One of the better-evidenced techniques here.',
-    ar: 'مبنيّ على التشتيت بالتخيّل، الذي اختُبر في دراسة محكَّمة (هارفي وباين، ٢٠٠٢). وهو من أقوى الأساليب هنا دليلًا.',
+    ar: 'مبنيّ على تخيّل يُبعدك عن الأفكار، الذي اختُبر في دراسة محكَّمة (هارفي وباين، ٢٠٠٢). وهو من أقوى الطرق هنا دليلًا.',
   },
 
   // paradox
-  paradoxTitle: { en: 'Try to Stay Awake', ar: 'حاوِل أن تبقى مستيقظًا' },
-  paradoxCue1: { en: 'Lie still. Let your eyes close, or rest them half-open.', ar: 'استلقِ ساكنًا. دَع عينيك تُغمَضان، أو أرِحهما نصف مفتوحتين.' },
-  paradoxCue2: { en: 'Gently try to stay awake — without moving, without effort.', ar: 'حاوِل بلطف أن تبقى مستيقظًا — دون حركة، دون جهد.' },
-  paradoxCue3: { en: "Don't try to sleep. You are simply keeping a soft watch.", ar: 'لا تحاول أن تنام. أنت فقط تُبقي يقظةً هادئة.' },
-  paradoxCue4: { en: "If sleep starts to come, that is fine. You weren't chasing it.", ar: 'وإن بدأ النوم يأتي، فلا بأس. لم تكن تسعى خلفه.' },
+  paradoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى صاحيًا' },
+  paradoxCue1: { en: 'Lie still. Let your eyes close, or rest them half-open.', ar: 'استلقِ بهدوء. اترك عينيك تُغلَقان، أو اتركهما نصف مفتوحتين.' },
+  paradoxCue2: { en: 'Gently try to stay awake — without moving, without effort.', ar: 'جرّب بهدوء أن تبقى صاحيًا — بلا حركة ولا مجهود.' },
+  paradoxCue3: { en: "Don't try to sleep. You are simply keeping a soft watch.", ar: 'لا تحاول أن تنام. أنت فقط تحافظ على يقظة هادئة.' },
+  paradoxCue4: { en: "If sleep starts to come, that is fine. You weren't chasing it.", ar: 'وإن بدأ النوم يأتي، لا تقاومه. أنت لم تكن تسعى وراءه أصلًا.' },
   paradoxScience: {
     en: 'Trying to fall asleep creates pressure to perform — and that effort keeps you alert. Gently trying to stay awake removes the effort, and sleep tends to arrive on its own.',
     ar: 'محاولة النوم تخلق ضغطًا كي «تنجح» — وهذا الجهد يُبقيك متنبّهًا. أما محاولة البقاء مستيقظًا بلطف فتُزيل الجهد، فيأتي النوم من تلقاء نفسه.',
   },
   paradoxBasis: {
     en: 'Paradoxical intention — a recognised CBT-I technique with randomised-trial support for easing sleep-effort and bedtime anxiety.',
-    ar: 'النية المتناقضة — أسلوب معترف به في العلاج المعرفي السلوكي للأرق، وله دعم من تجارب عشوائية في تخفيف جهد النوم وقلق ما قبل النوم.',
+    ar: 'النيّة العكسية — أسلوب معترف به في العلاج السلوكي للأرق للأرق، وله دعم من تجارب عشوائية في تخفيف جهد النوم وقلق ما قبل النوم.',
   },
 
   // the descent → "Your Path Tonight" / "مسارك الليلة" (adaptive per state)
@@ -146,38 +148,38 @@ export const STRINGS = {
     en: 'A single guided journey that dims as you go — matched to how tonight feels.',
     ar: 'رحلة موجَّهة واحدة تخفت وأنت تسير فيها — مفصَّلة على حال ليلتك.',
   },
-  descentQuestion: { en: "What's keeping you up tonight?", ar: 'ما الذي يُبقيك مستيقظًا الليلة؟' },
-  descentBegin: { en: 'Begin', ar: 'ابدأ الرحلة' },
+  descentQuestion: { en: "What's keeping you up tonight?", ar: 'ما الذي يشغلك عن النوم الليلة؟' },
+  descentBegin: { en: 'Begin', ar: 'ابدأ' },
   descentEnd: { en: 'end', ar: 'إنهاء' },
-  descentHint: { en: 'follow gently · tap to end', ar: 'اتبع بلطف · المس للإنهاء' },
-  descentHaptics: { en: 'gentle taps guide your breath', ar: 'نبضات خفيفة توجّه أنفاسك' },
+  descentHint: { en: 'follow gently · tap to end', ar: 'اتبع بلطف · المس لتُنهي' },
+  descentHaptics: { en: 'gentle taps guide your breath', ar: 'نبضات خفيفة ترشد أنفاسك' },
   descentDoneTitle: { en: 'You’ve arrived', ar: 'لقد وصلت' },
   descentDoneSub: {
     en: 'Stay here as long as you like. Keep a sound playing, or drift in silence.',
-    ar: 'ابقَ هنا ما شئت. دَع صوتًا يعمل، أو اسرح في الصمت.',
+    ar: 'ابقَ هنا على راحتك. اترك صوتًا يعمل، أو اغفُ في الصمت.',
   },
-  descentKeepSound: { en: 'Keep rain playing', ar: 'أبقِ المطر يعمل' },
-  descentSilence: { en: 'Drift in silence', ar: 'اسرح في الصمت' },
+  descentKeepSound: { en: 'Keep rain playing', ar: 'اترك المطر يعمل' },
+  descentSilence: { en: 'Drift in silence', ar: 'اغفُ في الصمت' },
   bIn: { en: 'breathe in', ar: 'شهيق' },
-  bHold: { en: 'hold', ar: 'أمسِك' },
+  bHold: { en: 'hold', ar: 'ثبّت' },
   bOut: { en: 'release', ar: 'زفير' },
   toolDescentTitle: { en: 'Your Path Tonight', ar: 'مسارك الليلة' },
   toolDescentSub: {
     en: 'your guided journey into sleep, tailored tonight',
-    ar: 'رحلتك الموجَّهة إلى النوم، مفصَّلة هذه الليلة',
+    ar: 'رحلتك الهادئة نحو النوم، مرتّبة لك الليلة',
   },
 
   // tabs
   tabHome: { en: 'Home', ar: 'الرئيسية' },
-  tabMethods: { en: 'Methods', ar: 'الأساليب' },
-  tabListen: { en: 'Listen', ar: 'استمِع' },
+  tabMethods: { en: 'Methods', ar: 'الطرق' },
+  tabListen: { en: 'Listen', ar: 'استمع' },
   tabTools: { en: 'Tools', ar: 'أدوات' },
 
   // methods library
-  methodsTitle: { en: 'The Sleep Methods Library', ar: 'مكتبة أساليب النوم' },
+  methodsTitle: { en: 'The Sleep Methods Library', ar: 'مكتبة طرق النوم' },
   methodsSub: {
     en: 'Every practical, research-backed way to fall asleep and treat insomnia — with the evidence behind each one.',
-    ar: 'كل طريقة عملية مدعومة بالأبحاث للنوم وعلاج الأرق — مع الدليل وراء كلٍّ منها.',
+    ar: 'كل طريقة عملية مدعومة بالأبحاث للنوم وعلاج الأرق — مع الدليل ورا كل واحدة.',
   },
   methodHow: { en: 'How to do it', ar: 'كيف تطبّقها' },
   methodEvidence: { en: 'The evidence', ar: 'الدليل العلمي' },
@@ -185,166 +187,181 @@ export const STRINGS = {
   methodOpenLocked: { en: 'Open the tool (Premium)', ar: 'افتح الأداة (بريميوم)' },
   methodsDisclaimer: {
     en: 'Educational, evidence-informed content — not medical advice. Persistent insomnia warrants clinician-guided CBT-I.',
-    ar: 'محتوى تعليمي قائم على الأدلة — وليس نصيحة طبية. الأرق المستمر يستدعي علاجًا معرفيًّا سلوكيًّا بإشراف مختصّ.',
+    ar: 'محتوى تعليمي قائم على الأبحاث — مش نصيحة طبية. الأرق المستمر يحتاج علاج سلوكي بإشراف مختصّ.',
   },
 
   // tools screen
-  toolsTitle: { en: 'Guided tools', ar: 'أدوات موجَّهة' },
+  toolsTitle: { en: 'Guided tools', ar: 'أدوات تساعدك' },
   toolsSub: {
     en: 'Interactive practices you can start right now.',
-    ar: 'ممارسات تفاعلية يمكنك بدؤها الآن.',
+    ar: 'تمارين قصيرة تقدر تبدأها دلوقتي.',
   },
-  toolCountTitle: { en: 'The Descending Count', ar: 'العدّ التنازلي' },
+  toolCountTitle: { en: 'The Descending Count', ar: 'عدّ تنازلي بطيء' },
   toolCountSub: { en: 'slow, monotone counting', ar: 'عدٌّ بطيء رتيب' },
-  toolShuffleTitle: { en: 'The Cognitive Shuffle', ar: 'الخلط الذهني' },
+  toolShuffleTitle: { en: 'The Cognitive Shuffle', ar: 'خلخلة الأفكار' },
   toolShuffleSub: { en: 'random, unconnected images', ar: 'صور عشوائية غير مترابطة' },
-  toolImageryTitle: { en: 'Imagery Distraction', ar: 'التشتيت بالتخيّل' },
+  toolImageryTitle: { en: 'Imagery Distraction', ar: 'تخيّل يُبعدك عن الأفكار' },
   toolImagerySub: { en: 'one calm, neutral scene', ar: 'مشهد واحد هادئ محايد' },
-  toolParadoxTitle: { en: 'Try to Stay Awake', ar: 'حاوِل أن تبقى مستيقظًا' },
-  toolParadoxSub: { en: 'paradoxical intention', ar: 'النية المتناقضة' },
+  toolParadoxTitle: { en: 'Try to Stay Awake', ar: 'جرّب أن تبقى صاحيًا' },
+  toolParadoxSub: { en: 'paradoxical intention', ar: 'النيّة العكسية' },
 
-  toolPmrTitle: { en: 'Muscle Release', ar: 'ترخية العضلات' },
+  toolPmrTitle: { en: 'Muscle Release', ar: 'استرخاء العضلات' },
   toolPmrSub: { en: 'tense · release, feet to face', ar: 'شَدٌّ وإرخاء من القدمين إلى الوجه' },
-  toolBodyscanTitle: { en: 'Body Scan', ar: 'مسح الجسد' },
+  toolBodyscanTitle: { en: 'Body Scan', ar: 'جولة في جسدك' },
   toolBodyscanSub: { en: 'slow attention through the body', ar: 'انتباه بطيء يجول في الجسد' },
-  toolGroundTitle: { en: 'Senses in the Dark', ar: 'حواسّ في العتمة' },
-  toolGroundSub: { en: '4·3·2·1 sensory grounding', ar: 'تأريض حسّي ٤·٣·٢·١' },
+  toolGroundTitle: { en: 'Senses in the Dark', ar: 'حواسك في العتمة' },
+  toolGroundSub: { en: '4·3·2·1 sensory grounding', ar: 'تثبيت بالحواس ٤·٣·٢·١' },
   toolsGroupJourneys: { en: 'Guided journeys', ar: 'رحلات موجَّهة' },
   toolsGroupMind: { en: 'Quiet the mind', ar: 'تهدئة العقل' },
   toolsGroupBody: { en: 'Relax the body', ar: 'إرخاء الجسد' },
 
   // progressive muscle relaxation
-  pmrTitle: { en: 'Muscle Release', ar: 'ترخية العضلات' },
+  pmrTitle: { en: 'Muscle Release', ar: 'استرخاء العضلات' },
   pmrLead: {
     en: 'Tense each muscle group for a few seconds, then let go and feel it soften. We move slowly from the feet up to the face.',
-    ar: 'شُدّ كل مجموعة عضلية لبضع ثوانٍ، ثم أرخِها واشعر بها تلين. ننتقل ببطء من القدمين حتى الوجه.',
+    ar: 'اشدّ كل مجموعة عضلات لثوانٍ، بعدها أرخِها واحسّ بها بتلين. ننزل تدريجيًّا من القدمين لحد الوجه.',
   },
-  pmrStart: { en: 'Begin releasing', ar: 'ابدأ الترخية' },
-  pmrHint: { en: 'tense · release · tap to stop', ar: 'شُدّ · أرخِ · المس للإيقاف' },
+  pmrStart: { en: 'Begin releasing', ar: 'ابدأ الاسترخاء' },
+  pmrHint: { en: 'tense · release · tap to stop', ar: 'شُدّ · أرخِ · المس لتوقف' },
 
   // body scan
-  bodyscanTitle: { en: 'Body Scan', ar: 'مسح الجسد' },
+  bodyscanTitle: { en: 'Body Scan', ar: 'جولة في جسدك' },
   bodyscanLead: {
     en: 'Rest your attention on one part of the body at a time, and let it soften as you pass. No effort, no tensing — just slow, kind noticing, from the toes to the crown.',
-    ar: 'ثبّت انتباهك على جزء واحد من الجسد في كل مرة، ودَعه يلين وأنت تمرّ به. لا جهد ولا شدّ — مجرّد ملاحظة بطيئة رقيقة، من أصابع القدمين إلى قمّة الرأس.',
+    ar: 'ركّز انتباهك على جزء واحد من جسدك كل مرة، واتركه يسترخي. بلا مجهود ولا شدّ — فقط ملاحظة هادئة، من أصابع القدم لحد قمّة الرأس.',
   },
-  bodyscanStart: { en: 'Begin the scan', ar: 'ابدأ المسح' },
-  bodyscanHint: { en: 'follow slowly · tap to stop', ar: 'تابِع ببطء · المس للإيقاف' },
+  bodyscanStart: { en: 'Begin the scan', ar: 'ابدأ الجولة' },
+  bodyscanHint: { en: 'follow slowly · tap to stop', ar: 'تابِع ببطء · المس لتوقف' },
 
   // sensory grounding
-  groundTitle: { en: 'Senses in the Dark', ar: 'حواسّ في العتمة' },
+  groundTitle: { en: 'Senses in the Dark', ar: 'حواسك في العتمة' },
   groundLead: {
     en: 'An eyes-closed version of sensory grounding. Move through your senses one by one — each time you truly notice something, tap the screen. Anchoring attention in the body pulls it out of racing thought.',
-    ar: 'نسخة مغمضة العينين من التأريض الحسّي. تنقّل بين حواسّك واحدة تلو الأخرى — وكلّما لاحظت شيئًا حقًّا، المس الشاشة. تثبيت الانتباه في الجسد يسحبه من دوّامة الأفكار.',
+    ar: 'نسخة مغمضة العينين من التثبيت بالحواس. تنقّل بين حواسّك واحدة تلو الأخرى — وكلّما لاحظت شيئًا حقًّا، المس الشاشة. تثبيت الانتباه في الجسد يسحبه من دوّامة الأفكار.',
   },
-  groundStart: { en: 'Begin grounding', ar: 'ابدأ التأريض' },
-  groundTapHint: { en: 'tap for each thing you notice', ar: 'المس عند كل شيء تلاحظه' },
-  groundDone: { en: 'You are here, in your bed.', ar: 'أنت هنا، في سريرك.' },
+  groundStart: { en: 'Begin grounding', ar: 'ابدأ التثبيت' },
+  groundTapHint: { en: 'tap for each thing you notice', ar: 'المس عند كل حاجة تلاحظها' },
+  groundDone: { en: 'You are here, in your bed.', ar: 'أنت هنا، في فراشك.' },
   groundDoneSub: {
     en: 'Stay with the last sensation. Repeat, or drift.',
-    ar: 'ابقَ مع الإحساس الأخير. أعِد الجولة، أو انسَبْ نحو النوم.',
+    ar: 'ابقَ مع الإحساس الأخير. أعِد الجولة، أو اترك نفسك تنام.',
   },
   groundAgain: { en: 'Once more', ar: 'مرة أخرى' },
 
   // morning check-in
   checkinGreeting: { en: 'Good morning', ar: 'صباح الخير' },
-  checkinUsed: { en: 'Last night you used:', ar: 'استخدمت البارحة:' },
-  checkinQuestion: { en: 'How easily did you fall asleep?', ar: 'كيف كان دخولك في النوم؟' },
+  checkinUsed: { en: 'Last night you used:', ar: 'استخدمت ليلة أمس:' },
+  checkinQuestion: { en: 'How easily did you fall asleep?', ar: 'كيف نمت؟' },
   checkinEasy: { en: 'Easily', ar: 'بسهولة' },
-  checkinSlow: { en: 'Took a while', ar: 'بعد وقت' },
+  checkinSlow: { en: 'Took a while', ar: 'ناخد وقت' },
   checkinHard: { en: 'With difficulty', ar: 'بصعوبة' },
-  checkinThanks: { en: 'Noted. Your map is learning you.', ar: 'سُجّلت. خريطتك تتعلّمك.' },
-  checkinSeeMap: { en: 'See what works for you ←', ar: '← شاهد ما ينفع معك' },
+  checkinThanks: { en: 'Noted. Your map is learning you.', ar: 'تمام، سُجّلت. خريطتك بدأت تعرفك.' },
+  checkinSeeMap: { en: 'See what works for you ←', ar: '← شوف اللي بينفع معك' },
 
   // insights — the personal map
-  insightsTitle: { en: 'What Works for Me', ar: 'ماذا ينفع معي' },
+  insightsTitle: { en: 'What Works for Me', ar: 'إيه اللي ينفع معي' },
   insightsSub: {
     en: 'Your own record — which practices actually preceded easy nights.',
-    ar: 'سجلّك أنت — أيّ الممارسات سبقت فعلًا لياليك السهلة.',
+    ar: 'سجلّك الشخصي — أيّ الطرق بتسبق فعلًا لياليك السهلة.',
   },
   insightsEmpty: {
     en: 'Use any tool at night, then answer the one-question morning check-in. Within a few nights, your personal map starts forming here.',
-    ar: 'استخدم أي أداة ليلًا، ثم أجب عن سؤال الصباح الواحد. خلال ليالٍ قليلة تبدأ خريطتك الشخصية بالتشكّل هنا.',
+    ar: 'استخدم أي أداة ليلًا، ثم أجب عن سؤال الصباح. خلال ليالٍ قليلة تبدأ خريطتك الشخصية في الظهور هنا.',
   },
   insightsWorks: { en: 'Your record', ar: 'سجلّك' },
-  insightsNights: { en: 'rated nights:', ar: 'ليالٍ مقيَّمة:' },
-  insightsGathering: { en: 'Still gathering', ar: 'قيد التجميع' },
-  insightsHistory: { en: 'Recent nights', ar: 'الليالي الأخيرة' },
+  insightsNights: { en: 'rated nights:', ar: 'ليالٍ تقيّمت:' },
+  insightsGathering: { en: 'Still gathering', ar: 'قيد الجمع' },
+  insightsHistory: { en: 'Recent nights', ar: 'ليالٍ قريبة' },
   insightsHonesty: {
     en: 'Honest note: these are your personal correlations, not clinical proof — many things shape a night. But your own repeated pattern is the most relevant signal you have.',
-    ar: 'ملاحظة صادقة: هذه ارتباطات شخصية لا إثبات سريري — فأشياء كثيرة تشكّل ليلتك. لكنّ نمطك المتكرّر هو أوثق إشارة تملكها.',
+    ar: 'ملاحظة أمينة: دي ارتباطات شخصية مش دليل طبي — في حاجات كتير بتأثر على نومك. لكن تكرار نمط عندك هو أصدق إشارة متاحة.',
   },
-  toolInsightsTitle: { en: 'What Works for Me', ar: 'ماذا ينفع معي' },
-  toolInsightsSub: { en: 'your personal sleep map', ar: 'خريطة نومك الشخصية' },
+  toolInsightsTitle: { en: 'What Works for Me', ar: 'إيه اللي ينفع معي' },
+  toolInsightsSub: { en: 'your personal sleep map', ar: 'خريطة نومك الخاصة' },
 
   // 14 nights program
   programTitle: { en: '14 Nights', ar: '١٤ ليلة' },
   programSub: {
     en: 'A self-guided miniature of CBT-I — one small step per night.',
-    ar: 'نسخة مصغّرة ذاتية من العلاج المعرفي السلوكي للأرق — خطوة صغيرة كل ليلة.',
+    ar: 'نسخة مصغّرة ذاتية من العلاج السلوكي للأرق للأرق — خطوة صغيرة كل ليلة.',
   },
   programIntro: {
     en: 'CBT-I is the first-line treatment for chronic insomnia — recommended before sleeping pills. Over 14 nights you will build its core habits, one per night: measuring, anchoring your rhythm, retraining the bed, calming body and mind, then writing your own protocol.',
-    ar: 'العلاج المعرفي السلوكي هو العلاج الأول للأرق المزمن — ويُوصى به قبل الحبوب المنوّمة. عبر ١٤ ليلة ستبني عاداته الأساسية، واحدة كل ليلة: القياس، وتثبيت الإيقاع، وإعادة تدريب السرير، وتهدئة الجسد والعقل، ثم كتابة بروتوكولك الخاص.',
+    ar: 'العلاج السلوكي للأرق هو العلاج الأول للأرق المزمن — ويُوصى به قبل الحبوب المنوّمة. عبر ١٤ ليلة ستبني عاداته الأساسية، واحدة كل ليلة: القياس، وتثبيت الإيقاع، وإعادة تدريب السرير، وتهدئة الجسد والعقل، ثم كتابة بروتوكولك الخاص.',
   },
-  programStart: { en: 'Begin night one', ar: 'ابدأ الليلة الأولى' },
-  programMarkDone: { en: 'Mark tonight done', ar: 'أتممتُ هذه الليلة' },
+  programStart: { en: 'Begin night one', ar: 'ابدأ أول ليلة' },
+  programMarkDone: { en: 'Mark tonight done', ar: 'خلّصت ليلة النهارده' },
   programDone: { en: 'Done ✓', ar: 'تمّت ✓' },
   programOpenTool: { en: 'Open the tool', ar: 'افتح الأداة' },
   programPacing: {
     en: 'One night unlocks per day — the pacing itself is part of the method.',
-    ar: 'تُفتح ليلة واحدة كل يوم — فالإيقاع نفسه جزء من المنهج.',
+    ar: 'تنفتح ليلة واحدة في اليوم — الإيقاع نفسه جزء من الطريقة.',
   },
   programDisclaimer: {
     en: 'Educational, evidence-informed content — not medical care. If insomnia persists most nights beyond a month, see a clinician for full CBT-I.',
-    ar: 'محتوى تعليمي قائم على الأدلة — وليس رعاية طبية. إن استمرّ الأرق معظم الليالي بعد شهر فراجع مختصًّا لعلاج كامل.',
+    ar: 'محتوى تعليمي قائم على الأبحاث — مش رعاية طبية. لو الأرق استمر معظم الليالي بعد شهر، راجع مختصّ لعلاج كامل.',
   },
   toolProgramTitle: { en: '14 Nights', ar: '١٤ ليلة' },
   toolProgramSub: { en: 'a guided CBT-I journey', ar: 'رحلة موجَّهة في العلاج السلوكي' },
 
   // mixer
-  mixerTitle: { en: 'Sound Mixer', ar: 'مازج الأصوات' },
+  mixerTitle: { en: 'Sound Mixer', ar: 'خلّاط الأصوات' },
   mixerSub: {
     en: 'Blend up to three sounds, each with its own volume.',
-    ar: 'امزج حتى ثلاثة أصوات، لكلٍّ مستواه الخاص.',
+    ar: 'اخلط حتى ثلاثة أصوات، كل واحد بمستواه.',
   },
   mixerAddLayer: { en: '+ Add a sound', ar: '+ أضِف صوتًا' },
   mixerClosePicker: { en: 'Close list', ar: 'أغلق القائمة' },
   mixerPlay: { en: 'Play', ar: 'تشغيل' },
   mixerPause: { en: 'Pause', ar: 'إيقاف مؤقت' },
-  mixPresetStorm: { en: 'Rain + campfire', ar: 'مطر + نار مخيّم' },
-  mixPresetNight: { en: 'Crickets + brown noise', ar: 'صراصير + ضوضاء بنيّة' },
+  mixPresetStorm: { en: 'Rain + campfire', ar: 'مطر + نار' },
+  mixPresetNight: { en: 'Crickets + brown noise', ar: 'صراصير + ضوضاء هادئة' },
   mixPresetShore: { en: 'Waves + wind', ar: 'أمواج + ريح' },
-  toolMixerNewSub: { en: 'blend rain, fire, noise…', ar: 'امزج المطر والنار والضوضاء…' },
+  toolMixerNewSub: { en: 'blend rain, fire, noise…', ar: 'اخلط المطر والنار والضوضاء…' },
+
+  // save & recall the user's own mixes (tap one to launch it exactly as saved)
+  mixerSaveThis: { en: 'Save this mix', ar: 'احفظ هذا المزيج' },
+  mixerSavePlaceholder: { en: 'Give this mix a name', ar: 'أعطِ هذا المزيج اسمًا' },
+  mixerSaveConfirm: { en: 'Save', ar: 'احفظ' },
+  mixerYourSaved: { en: 'Your saved mixes', ar: 'مزيجاتك المحفوظة' },
+  mixerSavedOneLayer: { en: '1 sound', ar: 'صوت واحد' },
+  mixerSavedLayersN: { en: '{n} sounds', ar: '{n} أصوات' },
+  mixerDeleteSavedTitle: { en: 'Delete this mix?', ar: 'نحذف هذا المزيج؟' },
+  mixerDeleteSavedBody: {
+    en: "This removes '{name}' from your saved mixes. The sounds themselves stay available.",
+    ar: 'سنحذف «{name}» من مزيجاتك المحفوظة. أمّا الأصوات نفسها فستبقى متاحة.',
+  },
+  deleteCancel: { en: 'Cancel', ar: 'إلغاء' },
+  deleteConfirmYes: { en: 'Delete', ar: 'حذف' },
 
   // autogenic training
-  autogenicTitle: { en: 'Heavy & Warm', ar: 'ثِقل ودفء' },
+  autogenicTitle: { en: 'Heavy & Warm', ar: 'ثقل ودفء' },
   autogenicLead: {
     en: 'Autogenic training (Schultz, 1930s): repeat each phrase inwardly, slowly, and let the body follow the words. Heaviness, then warmth, then calm — a standard relaxation therapy for insomnia.',
-    ar: 'التدريب الذاتي (شولتز، الثلاثينيات): ردّد كل عبارة في داخلك ببطء، ودَع الجسد يتبع الكلمات. ثِقل، ثم دفء، ثم هدوء — علاج استرخاء قياسي للأرق.',
+    ar: 'التدريب الذاتي (شولتز، الثلاثينيات): ردّد كل عبارة في داخلك ببطء، واترك جسمك يتبع الكلمات. ثقل، ثم دفء، ثم هدوء — طريقة استرخاء معتمدة للأرق.',
   },
   autogenicStart: { en: 'Begin the phrases', ar: 'ابدأ العبارات' },
-  autogenicHint: { en: 'repeat inwardly · tap to stop', ar: 'ردّد في داخلك · المس للإيقاف' },
-  toolAutogenicTitle: { en: 'Heavy & Warm', ar: 'ثِقل ودفء' },
-  toolAutogenicSub: { en: 'autogenic self-suggestion', ar: 'إيحاء ذاتي (أوتوجيني)' },
+  autogenicHint: { en: 'repeat inwardly · tap to stop', ar: 'ردّد في داخلك · المس لتوقف' },
+  toolAutogenicTitle: { en: 'Heavy & Warm', ar: 'ثقل ودفء' },
+  toolAutogenicSub: { en: 'autogenic self-suggestion', ar: 'إيحاء ذاتي هادئ' },
 
   // sleep window calculator
   windowTitle: { en: 'Your Sleep Window', ar: 'نافذة نومك' },
   windowSub: {
     en: 'Sleep restriction — the most effective single CBT-I component, sized to you.',
-    ar: 'تقييد النوم — أنجع مكوّن منفرد في علاج الأرق، مضبوطًا عليك أنت.',
+    ar: 'تقييد النوم — أقوى عنصر منفرد في علاج الأرق، مضبوط عليك أنت.',
   },
   windowQ1: {
     en: 'How many hours do you actually SLEEP on a typical night? (not time in bed)',
-    ar: 'كم ساعة تنامها فعلًا في الليلة المعتادة؟ (لا الوقت الذي تقضيه في السرير)',
+    ar: 'كم ساعة تنامها فعلًا في الليلة العادية؟ (مش الوقت اللي تقضيه في السرير)',
   },
-  windowQ2: { en: 'Your fixed wake-up time — every day:', ar: 'موعد استيقاظك الثابت — كل يوم:' },
-  windowResult: { en: 'Your window for this week', ar: 'نافذتك لهذا الأسبوع' },
-  windowBed: { en: 'earliest bedtime', ar: 'أبكر موعد للسرير' },
-  windowWake: { en: 'wake time', ar: 'موعد الاستيقاظ' },
+  windowQ2: { en: 'Your fixed wake-up time — every day:', ar: 'موعد صحيانك الثابت — كل يوم:' },
+  windowResult: { en: 'Your window for this week', ar: 'نافذتك للأسبوع ده' },
+  windowBed: { en: 'earliest bedtime', ar: 'أبكر موعد للنوم' },
+  windowWake: { en: 'wake time', ar: 'موعد الصحيان' },
   windowNotEarlier: {
     en: 'Do not get into bed before this time — even if tired. Sleepy is the signal, not the clock.',
-    ar: 'لا تدخل السرير قبل هذا الموعد — حتى لو كنت مرهقًا. النعاس هو الإشارة، لا الساعة.',
+    ar: 'لا تدخل السرير قبل الموعد ده — حتى لو كنت تعبان. النعاس هو الإشارة، مش الساعة.',
   },
   windowRulesTitle: { en: 'Weekly tuning', ar: 'الضبط الأسبوعي' },
   windowRule1: {
@@ -357,7 +374,7 @@ export const STRINGS = {
   },
   windowRule3: {
     en: '• Never shrink the window below 5½ hours, and keep the wake time fixed always.',
-    ar: '• لا تُنقص النافذة عن ٥ ساعات ونصف أبدًا، وأبقِ موعد الاستيقاظ ثابتًا دائمًا.',
+    ar: '• لا تُنقص النافذة عن ٥ ساعات ونصف أبدًا، وأبقِ موعد الصحيان ثابتًا دائمًا.',
   },
   windowEvidence: {
     en: 'Spielman et al. (1987); meta-analyses rank sleep restriction as the strongest single CBT-I component. Expect a few sleepier days at first — that pressure is the mechanism.',
@@ -368,7 +385,7 @@ export const STRINGS = {
     ar: 'لا يناسب المصابين بالصرع أو الاضطراب ثنائي القطب، ولا أصحاب الأعمال التي يخطر فيها نعاس النهار (قيادة، آلات ثقيلة) — استشر مختصًّا أولًا.',
   },
   toolWindowTitle: { en: 'Your Sleep Window', ar: 'نافذة نومك' },
-  toolWindowSub: { en: 'sleep-restriction calculator', ar: 'حاسبة تقييد النوم' },
+  toolWindowSub: { en: 'sleep-restriction calculator', ar: 'حاسبة نافذة النوم' },
 
   // links row (home footer)
   privacyLink: { en: 'Privacy policy', ar: 'سياسة الخصوصية' },
@@ -378,39 +395,39 @@ export const STRINGS = {
   favoritesRow: { en: 'Your favourites', ar: 'مفضّلتك' },
 
   // night rescue — the 3 a.m. mode
-  toolRescueTitle: { en: 'Night Rescue', ar: 'الإنقاذ الليلي' },
-  toolRescueSub: { en: 'woke at 3 a.m.? start here', ar: 'استيقظت في منتصف الليل؟ ابدأ هنا' },
-  rescueEntryTitle: { en: 'Awake in the middle of the night?', ar: 'مستيقظ في منتصف الليل؟' },
+  toolRescueTitle: { en: 'Night Rescue', ar: 'نجدة الليل' },
+  toolRescueSub: { en: 'woke at 3 a.m.? start here', ar: 'صحيت في نص الليل؟ ابدأ هنا' },
+  rescueEntryTitle: { en: 'Awake in the middle of the night?', ar: 'صحيت في نص الليل؟' },
   rescueEntrySub: {
     en: 'A near-dark mode that walks you back to sleep.',
-    ar: 'وضع شبه مظلم يرافقك عائدًا إلى النوم.',
+    ar: 'وضع شبه مظلم بيرجّعك للنوم.',
   },
-  rescueTapHint: { en: 'tap to continue', ar: 'المس للمتابعة' },
-  rescueAsk: { en: 'What does this moment feel like?', ar: 'كيف تبدو هذه اللحظة؟' },
+  rescueTapHint: { en: 'tap to continue', ar: 'المس لتُكمل' },
+  rescueAsk: { en: 'What does this moment feel like?', ar: 'كيف هذه اللحظة؟' },
   rescueStimulusTitle: { en: 'The 20-minute rule', ar: 'قاعدة العشرين دقيقة' },
-  rescueOtherPaths: { en: 'Show the other paths', ar: 'أرِني المسارات الأخرى' },
+  rescueOtherPaths: { en: 'Show the other paths', ar: 'ورّيني المسارات الأخرى' },
 
   // media / player
-  mediaTitle: { en: 'Sounds that help you sleep', ar: 'أصوات تساعدك على النوم' },
+  mediaTitle: { en: 'Sounds that help you sleep', ar: 'أصوات تساعدك تنام' },
   mediaSub: {
     en: 'Real, long-form ambient sound — plays instantly, loops all night.',
-    ar: 'صوت محيطيّ حقيقيّ طويل — يعمل فورًا ويتكرّر طوال الليل.',
+    ar: 'أصوات حقيقية طويلة — تشتغل على طول وتستمر طول الليل.',
   },
   sleepTimer: { en: 'Sleep timer', ar: 'مؤقّت النوم' },
   screenOff: { en: 'Screen off', ar: 'إطفاء الشاشة' },
-  tapToWake: { en: 'tap to wake screen', ar: 'المس لإيقاظ الشاشة' },
+  tapToWake: { en: 'tap to wake screen', ar: 'المس لتُشعل الشاشة' },
 
   // breathe screen
   breatheIn: { en: 'Breathe in', ar: 'شهيق' },
-  breatheHold: { en: 'Hold', ar: 'أمسِك' },
+  breatheHold: { en: 'Hold', ar: 'ثبّت' },
   breatheOut: { en: 'Release', ar: 'زفير' },
-  breatheHint: { en: '4 · 7 · 8 — follow the light', ar: '٤ · ٧ · ٨ — اتبع الضوء' },
+  breatheHint: { en: '4 · 7 · 8 — follow the light', ar: '٤ · ٧ · ٨ — تابع الضوء' },
 
   // worry screen
   worryTitle: { en: 'Deep Sky', ar: 'سماء عميقة' },
-  worrySub: { en: 'name the thought, then let it burn away', ar: 'سَمِّ الفكرة، ثم دَعها تحترق وتتلاشى' },
-  worryPlaceholder: { en: "what's keeping you awake?", ar: 'ما الذي يُبقيك مستيقظًا؟' },
-  worryRelease: { en: 'Release', ar: 'أطلِقها' },
+  worrySub: { en: 'name the thought, then let it burn away', ar: 'سَمِّ الفكرة، ثم اتركها تحترق وتختفي' },
+  worryPlaceholder: { en: "what's keeping you awake?", ar: 'ما الذي يشغلك عن النوم؟' },
+  worryRelease: { en: 'Release', ar: 'أطلقها' },
 
   codeResent: { en: 'A new code is on its way.', ar: 'رمز جديد في الطريق إليك.' },
 
@@ -418,26 +435,26 @@ export const STRINGS = {
   premiumTitle: { en: 'Namflix Premium', ar: 'نامفلكس بريميوم' },
   premiumSub: {
     en: 'Every method, every sound, the full guided descent — unlocked.',
-    ar: 'كل الأساليب، كل الأصوات، الرحلة الموجَّهة كاملة — مفتوحة لك.',
+    ar: 'كل الطرق، كل الأصوات، والرحلة الموجَّهة بكاملها — مفتوحة لك.',
   },
   // what the subscription actually buys — Apple requires the purchase screen to
   // describe this next to the price (Guideline 3.1.2(c) / 2.3.2)
-  premiumIncludes: { en: 'Every plan includes', ar: 'كل باقة تشمل' },
+  premiumIncludes: { en: 'Every plan includes', ar: 'كل باقة فيها' },
   premiumFeat1: {
     en: '40+ looping sleep sounds, favourites and a 3-layer mixer',
-    ar: '‏٤٠+ صوتًا للنوم بتكرار مستمر، والمفضّلة، ومازج من ٣ طبقات',
+    ar: '‏٤٠+ صوت نوم بتكرار مستمر، مع المفضّلة وخلّاط من ٣ طبقات',
   },
   premiumFeat2: {
     en: '30+ evidence-based methods, plus Drift and Night Rescue',
-    ar: '‏٣٠+ أسلوبًا قائمًا على الأدلة، مع «السكينة» و«الإنقاذ الليلي»',
+    ar: '‏٣٠+ أسلوبًا قائمًا على الأدلة، مع «السكينة» و«نجدة الليل»',
   },
   premiumFeat3: {
     en: 'The 14-night CBT-I program, sleep window and personal insights',
-    ar: 'برنامج الـ١٤ ليلة للعلاج المعرفي السلوكي، ونافذة النوم، وتحليلك الشخصي',
+    ar: 'برنامج الـ١٤ ليلة للعلاج السلوكي، نافذة النوم، وتحليلك الشخصي',
   },
   premiumFeat4: {
     en: 'No ads and no tracking — restore it on any of your devices',
-    ar: 'بلا إعلانات ولا تتبّع — استعِدْه على أي جهاز من أجهزتك',
+    ar: 'بلا إعلانات ولا تتبّع — استرجعه على أي جهاز من أجهزتك',
   },
   planMonthly: { en: 'Monthly', ar: 'شهري' },
   planYearly: { en: 'Yearly', ar: 'سنوي' },
@@ -451,7 +468,7 @@ export const STRINGS = {
   vsMonthly: { en: 'vs paying monthly', ar: 'عن الدفع الشهري' },
   planLifetimePaidNote: {
     en: 'One payment. Yours for good — no renewal.',
-    ar: 'دفعة واحدة. لك إلى الأبد — بلا تجديد.',
+    ar: 'دفعة واحدة. لك للأبد — بلا تجديد.',
   },
   planLifetimeFree: { en: 'Free', ar: 'مجانًا' },
   planLifetimeNote: { en: 'Launch offer — limited time', ar: 'عرض الإطلاق — لوقت محدود' },
@@ -461,8 +478,8 @@ export const STRINGS = {
     en: 'Paid plans arrive with the App Store release. For now, Lifetime is free — enjoy everything.',
     ar: 'الباقات المدفوعة ستتوفّر مع إصدار المتجر. حاليًا Lifetime مجاني — استمتع بكل شيء.',
   },
-  premiumActive: { en: 'You’re on Lifetime — everything is unlocked. Rest easy.', ar: 'أنت على باقة مدى الحياة — كل شيء مفتوح. نَم مطمئنًّا.' },
-  premiumEntry: { en: 'Unlock every method and sound', ar: 'افتح كل الأساليب والأصوات' },
+  premiumActive: { en: 'You’re on Lifetime — everything is unlocked. Rest easy.', ar: 'أنت على باقة مدى الحياة — كل حاجة مفتوحة. نَم مطمئنًّا.' },
+  premiumEntry: { en: 'Unlock every method and sound', ar: 'افتح كل الطرق والأصوات' },
   premiumBadge: { en: 'PREMIUM', ar: 'بريميوم' },
   bestValue: { en: 'BEST VALUE', ar: 'الأفضل قيمة' },
   restorePurchases: { en: 'Restore purchases', ar: 'استرجاع المشتريات' },
@@ -473,7 +490,7 @@ export const STRINGS = {
   },
   redeemNone: {
     en: 'No code was redeemed.',
-    ar: 'لم يُستخدم أي رمز.',
+    ar: 'ما تمش استخدام أي رمز.',
   },
   redeemAndroid: {
     en: 'Open the Play Store, tap your profile, then Payments and subscriptions → Redeem code.',
@@ -491,11 +508,11 @@ export const STRINGS = {
   },
   redeemInvalid: {
     en: 'That code isn’t valid. Check for typos and try again.',
-    ar: 'هذا الرمز غير صالح. تأكّد من كتابته وحاول مرة أخرى.',
+    ar: 'الرمز ده مش صالح. تأكد من كتابته وجرّب تاني.',
   },
   restorePrompt: {
     en: 'Reinstalled, or on a new phone? Your subscription is tied to your store account.',
-    ar: 'أعدتَ التثبيت أو انتقلت إلى هاتف جديد؟ اشتراكك مرتبط بحساب المتجر.',
+    ar: 'أعدت التثبيت أو انتقلت لهاتف جديد؟ اشتراكك مرتبط بحساب المتجر.',
   },
   termsOfUse: { en: 'Terms of Use', ar: 'شروط الاستخدام' },
   // free-trial copy. Only rendered when the store actually reports a trial —
@@ -511,14 +528,14 @@ export const STRINGS = {
   trialUnitYear1: { en: 'year', ar: 'سنة' },
   trialDisclosure: {
     en: 'The free trial converts to a paid subscription automatically unless you cancel at least 24 hours before it ends. Cancel anytime in your App Store account settings.',
-    ar: 'تتحوّل التجربة المجانية إلى اشتراك مدفوع تلقائيًّا ما لم تُلغِها قبل انتهائها بـ٢٤ ساعة على الأقل. يمكنك الإلغاء في أي وقت من إعدادات حساب App Store.',
+    ar: 'تتحوّل التجربة المجانية لاشتراك مدفوع تلقائيًّا لو ما ألغيتهاش قبل ما تخلص بـ٢٤ ساعة على الأقل. تقدر تلغي في أي وقت من إعدادات حساب App Store.',
   },
   subDisclosure: {
     en: 'Payment is charged to your Apple ID. Subscriptions renew automatically unless cancelled at least 24 hours before the period ends. Manage or cancel anytime in your App Store account settings.',
-    ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا ما لم يُلغَ قبل ٢٤ ساعة على الأقل من نهاية المدة. يمكنك الإدارة أو الإلغاء في أي وقت من إعدادات حساب App Store.',
+    ar: 'يُخصم المبلغ من حساب Apple ID. يتجدّد الاشتراك تلقائيًا لو ما اتلغاش قبل نهاية المدة بـ٢٤ ساعة على الأقل. تقدر تدير اشتراكك أو تلغيه في أي وقت من إعدادات حساب App Store.',
   },
-  restoreNone: { en: 'No previous purchase found.', ar: 'لم نجد أي عملية شراء سابقة.' },
-  purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'تعذّر إتمام الشراء. من فضلك حاول مرة أخرى.' },
+  restoreNone: { en: 'No previous purchase found.', ar: 'ما لقيناش أي عملية شراء سابقة.' },
+  purchaseFailed: { en: 'Purchase could not be completed. Please try again.', ar: 'ما قدرناش نكمّل الشراء. حاول مرة تانية.' },
 
   // limited-time free Lifetime offer (countdown + claim flow)
   offerEndsIn: { en: 'Free offer ends in', ar: 'ينتهي العرض المجاني خلال' },
@@ -535,19 +552,19 @@ export const STRINGS = {
   premiumNoAds: { en: 'Remove all ads', ar: 'إزالة كل الإعلانات' },
 
   // locked content — rewarded unlock (free users only)
-  lockTitle: { en: 'This one is for members', ar: 'هذا المحتوى للمشتركين' },
+  lockTitle: { en: 'This one is for members', ar: 'هذا المحتوى لأعضاء بريميوم' },
   lockSub: {
     en: 'Open it with Premium, or watch one short ad to open it for {hours}.',
-    ar: 'افتحه مع بريميوم، أو شاهد إعلانًا قصيرًا ليبقى مفتوحًا لك {hours}.',
+    ar: 'افتحه مع بريميوم، أو شوف إعلان قصير يفتحه لك {hours}.',
   },
   unlockWithPremium: { en: 'Unlock with Premium', ar: 'افتحه مع بريميوم' },
   // {hours} → hoursPhrase(), e.g. "24 hours" / "٢٤ ساعة"
-  watchAdUnlock: { en: 'Watch a short ad to unlock this for {hours}', ar: 'شاهد إعلانًا قصيرًا وافتح هذا لمدة {hours}' },
+  watchAdUnlock: { en: 'Watch a short ad to unlock this for {hours}', ar: 'شوف إعلان قصير يفتح لك ده {hours}' },
   goPremiumNoAds: { en: 'Go Premium — everything unlocked, no ads', ar: 'اشترك في بريميوم واستمتع بكل المحتوى بلا إعلانات' },
-  adLoading: { en: 'Getting a short ad ready…', ar: 'نُجهّز إعلانًا قصيرًا…' },
-  adNoFill: { en: 'No ad available right now, please try again later', ar: 'لا يتوفّر إعلان الآن، جرّب مرة أخرى بعد قليل' },
-  adDailyCap: { en: 'Daily limit reached — unlock everything with Premium', ar: 'وصلتَ إلى الحدّ اليومي — افتح كل شيء مع بريميوم' },
-  adNotNow: { en: 'Not now', ar: 'ليس الآن' },
+  adLoading: { en: 'Getting a short ad ready…', ar: 'بنجهّز إعلان قصير…' },
+  adNoFill: { en: 'No ad available right now, please try again later', ar: 'مافيش إعلان دلوقتي، جرّب تاني بعد شوية' },
+  adDailyCap: { en: 'Daily limit reached — unlock everything with Premium', ar: 'وصلت للحد اليومي — افتح كل حاجة مع بريميوم' },
+  adNotNow: { en: 'Not now', ar: 'مش دلوقتي' },
   adPrivacyChoices: { en: 'Ad privacy choices', ar: 'خيارات خصوصية الإعلانات' },
 
   // descent rationale
@@ -555,51 +572,51 @@ export const STRINGS = {
 
   // voluntary support (tip jar) — unlocks nothing, ever
   supportSection: { en: 'Support', ar: 'الدعم' },
-  supportCardTitle: { en: 'Keep Namflix free', ar: 'أبقِ نامفلكس مجانيًّا' },
+  supportCardTitle: { en: 'Keep Namflix free', ar: 'خلّي نامفلكس مجاني' },
   supportCardSub: {
     en: 'no ads, no tracking — support it if it helped',
-    ar: 'بلا إعلانات ولا تتبّع — ادعمه إن نفعك',
+    ar: 'بلا إعلانات ولا تتبّع — ادعمه لو نفعك',
   },
   supportTitle: { en: 'Support Namflix', ar: 'ادعم نامفلكس' },
   supportIntro: {
     en: 'Namflix has no ads, no trackers, and nothing that watches you at 3 a.m. It is built and paid for by one person.',
-    ar: 'نامفلكس بلا إعلانات ولا أدوات تتبّع، ولا شيء يراقبك في الثالثة فجرًا. يبنيه ويتحمّل تكاليفه شخص واحد.',
+    ar: 'نامفلكس بلا إعلانات ولا تتبّع، ومحدش بيراقبك في الفجر. شخص واحد بيبنيه وبيدفع تكاليفه.',
   },
   supportWhy: {
     en: 'What your support pays for',
-    ar: 'ما الذي يذهب إليه دعمك',
+    ar: 'دعمك بيروح لإيه',
   },
   supportWhyBody: {
     en: 'Audio hosting and streaming, developer fees, and the hours behind each new evidence-based tool.',
-    ar: 'استضافة الأصوات وبثّها، ورسوم النشر، والساعات وراء كل أداة جديدة قائمة على الأدلة.',
+    ar: 'استضافة الأصوات وبثّها، ورسوم النشر، والساعات وراء كل أداة جديدة قائمة على الأبحاث.',
   },
   supportCta: { en: 'Buy me a coffee', ar: 'ادعمني بفنجان قهوة' },
   supportOpensBrowser: {
     en: 'Opens ko-fi.com in your browser. Any amount, once — no subscription.',
-    ar: 'يفتح ko-fi.com في متصفّحك. أيّ مبلغ، مرّة واحدة — بلا اشتراك.',
+    ar: 'هيفتح ko-fi.com في المتصفح. أي مبلغ، مرة واحدة — بلا اشتراك.',
   },
   supportUnlocksNothing: {
     en: 'This unlocks nothing. Everything you already have stays yours, and nothing in the app is hidden behind a donation.',
-    ar: 'هذا لا يفتح أي ميزة. ما لديك يبقى لك، ولا شيء في التطبيق محجوب خلف تبرّع.',
+    ar: 'ده مش بيفتح أي ميزة. اللي عندك يبقى ليك، ومافيش حاجة في التطبيق محجوبة ورا تبرّع.',
   },
   supportNoObligation: {
     en: 'If money is tight, skip this — telling one person who cannot sleep about the app helps just as much.',
-    ar: 'إن كان الوضع ضيّقًا فتجاوز هذا — أن تُخبر شخصًا يعاني الأرق عن التطبيق يعينني بالقدر نفسه.',
+    ar: 'لو مش قادر، تجاوز — لما تعرّف شخص يعاني من الأرق على التطبيق هيساعدني بنفس القدر.',
   },
   // health disclaimer — the app cites studies and sits in Health & Fitness, so
   // Apple 1.4.1 wants a visible "see a clinician" reminder, not a buried one
   medicalDisclaimer: {
     en: 'Namflix offers evidence-based education and self-help, not medical care. It does not diagnose or treat, and it is not a substitute for a clinician — if sleep problems persist or you take sleep medication, speak to a doctor.',
-    ar: 'يقدّم نامفلكس محتوى تعليميًّا ومساعدة ذاتية قائمة على الأدلة، وليس رعاية طبية. لا يُشخّص ولا يعالج، ولا يغني عن الطبيب — إن استمرّت مشكلات النوم أو كنت تتناول أدوية للنوم فاستشر طبيبًا.',
+    ar: 'يقدّم نامفلكس محتوى تعليميًّا ومساعدة ذاتية قائمة على الأبحاث، وليس رعاية طبية. لا يُشخّص ولا يعالج، ولا يغني عن الطبيب — إن استمرّت مشكلات النوم أو كنت تتناول أدوية للنوم فاستشر طبيبًا.',
   },
   contactSupport: { en: 'Contact support', ar: 'تواصل مع الدعم' },
   contactFailed: {
     en: 'Could not open mail. Write to Namflix.sleep@gmail.com',
-    ar: 'تعذّر فتح البريد. راسلنا على Namflix.sleep@gmail.com',
+    ar: 'ما قدرناش نفتح البريد. ابعتلنا على Namflix.sleep@gmail.com',
   },
   supportFailed: {
     en: 'Could not open the link. Try again from your browser: ko-fi.com/muhammedatef98',
-    ar: 'تعذّر فتح الرابط. جرّب من متصفّحك: ko-fi.com/muhammedatef98',
+    ar: 'ما قدرناش نفتح الرابط. جرّب من المتصفح: ko-fi.com/muhammedatef98',
   },
 } as const;
 
